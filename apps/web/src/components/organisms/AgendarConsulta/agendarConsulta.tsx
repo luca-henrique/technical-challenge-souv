@@ -7,10 +7,9 @@ import { hojeEmRecife, type Profissional, type TipoConsulta } from '@bemviver/sh
 import Alert from '@/components/atoms/Alert/alert'
 import Button from '@/components/atoms/Button/button'
 import Card from '@/components/atoms/Card/card'
-import Input from '@/components/atoms/Input/input'
-import Select from '@/components/atoms/Select/select'
-import Field from '@/components/molecules/Field/field'
+import SeletorData from '@/components/molecules/SeletorData/seletorData'
 import SeletorHorario from '@/components/molecules/SeletorHorario/seletorHorario'
+import SeletorProfissional from '@/components/molecules/SeletorProfissional/seletorProfissional'
 import { api } from '@/lib/api'
 import { NOME_TIPO } from '@/lib/formato'
 
@@ -60,34 +59,24 @@ export default function AgendarConsulta() {
       </div>
 
       <Card className="space-y-4">
-        <Field label="Profissional">
-          <Select
-            value={profissionalId}
-            onChange={(e) => {
-              setProfissionalId(e.target.value)
-              setHora('')
-            }}
-          >
-            <option value="">Selecione</option>
-            {profissionais.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.nome} ({p.especialidade})
-              </option>
-            ))}
-          </Select>
-        </Field>
+        <SeletorProfissional
+          profissionais={profissionais}
+          valor={profissionalId}
+          permitirVazio
+          onChange={(id) => {
+            setProfissionalId(id)
+            setHora('')
+          }}
+        />
 
-        <Field label="Data">
-          <Input
-            type="date"
-            min={hojeEmRecife()}
-            value={data}
-            onChange={(e) => {
-              setData(e.target.value)
-              setHora('')
-            }}
-          />
-        </Field>
+        <SeletorData
+          min={hojeEmRecife()}
+          valor={data}
+          onChange={(novaData) => {
+            setData(novaData)
+            setHora('')
+          }}
+        />
 
         <fieldset>
           <legend className="block text-sm font-medium text-gray-700">Tipo de consulta</legend>

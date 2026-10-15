@@ -5,8 +5,7 @@ import { hojeEmRecife, type Agenda } from '@bemviver/shared'
 import Alert from '@/components/atoms/Alert/alert'
 import Button from '@/components/atoms/Button/button'
 import Card from '@/components/atoms/Card/card'
-import Input from '@/components/atoms/Input/input'
-import Field from '@/components/molecules/Field/field'
+import SeletorData from '@/components/molecules/SeletorData/seletorData'
 import TabelaConsultas from '@/components/organisms/TabelaConsultas/tabelaConsultas'
 import { useSessao } from '@/hooks/useSessao'
 import { api } from '@/lib/api'
@@ -43,17 +42,13 @@ export default function AgendaProfissional() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <Field label="Data">
-          <Input
-            type="date"
-            required
-            value={data}
-            onChange={(e) => {
-              setData(e.target.value)
-              setConfirmando(false)
-            }}
-          />
-        </Field>
+        <SeletorData
+          valor={data}
+          onChange={(novaData) => {
+            setData(novaData)
+            setConfirmando(false)
+          }}
+        />
         {agenda && !agenda.folga && !confirmando && (
           <Button variante="secundario" onClick={() => setConfirmando(true)}>
             Bloquear este dia como folga

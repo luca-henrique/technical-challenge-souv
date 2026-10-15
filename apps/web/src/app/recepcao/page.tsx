@@ -1,46 +1,47 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { hojeEmRecife, type Profissional } from '@bemviver/shared'
+import { Controller } from 'react-hook-form'
 import Alert from '@/components/atoms/Alert/alert'
-import Input from '@/components/atoms/Input/input'
-import Select from '@/components/atoms/Select/select'
-import Field from '@/components/molecules/Field/field'
+import SeletorData from '@/components/molecules/SeletorData/seletorData'
+import SeletorProfissional from '@/components/molecules/SeletorProfissional/seletorProfissional'
 import AgendaDoDia from '@/components/organisms/AgendaDoDia/agendaDoDia'
-import { profissionaisService } from '@/services/profissionais'
+import { useFiltroRecepcao } from '@/hooks/useFiltroRecepcao'
 
 export default function RecepcaoPage() {
-  const [profissionais, setProfissionais] = useState<Profissional[]>([])
-  const [profissionalId, setProfissionalId] = useState('')
-  const [data, setData] = useState(() => hojeEmRecife())
-  const [erro, setErro] = useState('')
+  const { control, profissionais, profissionalId, data, carregando, erro, errors } = useFiltroRecepcao()
 
-  useEffect(() => {
-    profissionaisService
-      .listarProfissionais()
-      .then((lista) => {
-        setProfissionais(lista)
-        setProfissionalId(lista[0]?.id ?? '')
-      })
-      .catch((e: Error) => setErro(e.message))
-  }, [])
+  if (carregando) {
+    return <p className="text-sm text-gray-500">Carregando profissionais...</p>
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end gap-4">
-        <Field label="Profissional" className="min-w-64 flex-1">
-          <Select value={profissionalId} onChange={(e) => setProfissionalId(e.target.value)}>
-            {profissionais.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.nome} ({p.especialidade})
-              </option>
-            ))}
-          </Select>
-        </Field>
-        <Field label="Data">
-          <Input type="date" required value={data} onChange={(e) => setData(e.target.value)} />
-        </Field>
-      </div>
+      <form className="flex flex-wrap items-end gap-4" onSubmit={(e) => e.preventDefault()}>
+        <Controller
+          name="profissionalId"
+          control={control}
+          render={({ field }) => (
+            <SeletorProfissional
+              profissionais={profissionais}
+              valor={field.value}
+              onChange={field.onChange}
+              erro={errors.profissionalId?.message}
+              className="min-w-64 flex-1"
+            />
+          )}
+        />
+        <Controller
+          name="data"
+          control={control}
+          render={({ field }) => (
+            <SeletorData
+              valor={field.value}
+              onChange={field.onChange}
+              erro={errors.data?.message}
+            />
+          )}
+        />
+      </form>
 
       {erro && <Alert>{erro}</Alert>}
       {profissionalId && data && <AgendaDoDia profissionalId={profissionalId} data={data} />}
