@@ -8,17 +8,30 @@ export interface Sessao {
 export const CHAVE_SESSAO = 'bemviver-sessao'
 
 export function lerSessao(): Sessao | null {
+  if (typeof window === 'undefined') return null
   try {
-    return JSON.parse(localStorage.getItem(CHAVE_SESSAO) ?? 'null')
+    const salva = localStorage.getItem(CHAVE_SESSAO)
+    if (salva) return JSON.parse(salva)
+    const cookie = document.cookie
+      .split('; ')
+      .find((linha) => linha.startsWith(`${CHAVE_SESSAO}=`))
+      ?.split('=')[1]
+    return cookie ? JSON.parse(decodeURIComponent(cookie)) : null
   } catch {
     return null
   }
 }
 
 export function salvarSessao(sessao: Sessao) {
-  localStorage.setItem(CHAVE_SESSAO, JSON.stringify(sessao))
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(CHAVE_SESSAO, JSON.stringify(sessao))
+    document.cookie = `${CHAVE_SESSAO}=${encodeURIComponent(JSON.stringify(sessao))}; path=/; max-age=28800; SameSite=Lax`
+  }
 }
 
 export function encerrarSessao() {
-  localStorage.removeItem(CHAVE_SESSAO)
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(CHAVE_SESSAO)
+    document.cookie = `${CHAVE_SESSAO}=; path=/; max-age=0; SameSite=Lax`
+  }
 }

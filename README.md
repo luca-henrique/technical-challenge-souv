@@ -58,7 +58,7 @@ O `npm run dev` sobe o PostgreSQL e o Mailpit no Docker, aplica as migrations, r
 | --- | --- |
 | Web | `http://localhost:3100` |
 | API | `http://localhost:3333` |
-| PostgreSQL | `localhost:5433` (usuário, senha e banco `bemviver`) |
+| PostgreSQL | `localhost:5434` (usuário, senha e banco `bemviver`) |
 | Prisma Studio (opcional) | `http://localhost:5555`, com `npm run studio` |
 | n8n (bônus) | `http://localhost:5678`, com `npm run n8n` |
 | Mailpit (caixa de e-mail falsa) | `http://localhost:8025`, com SMTP na porta 1025 |
