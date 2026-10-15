@@ -1,0 +1,5 @@
+export * from './auth'
+export * from './consultas'
+export * from './integracoes'
+export * from './pacientes'
+export * from './profissionais'

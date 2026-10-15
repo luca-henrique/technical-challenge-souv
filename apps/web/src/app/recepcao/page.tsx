@@ -7,7 +7,7 @@ import Input from '@/components/atoms/Input/input'
 import Select from '@/components/atoms/Select/select'
 import Field from '@/components/molecules/Field/field'
 import AgendaDoDia from '@/components/organisms/AgendaDoDia/agendaDoDia'
-import { api } from '@/lib/api'
+import { profissionaisService } from '@/services/profissionais'
 
 export default function RecepcaoPage() {
   const [profissionais, setProfissionais] = useState<Profissional[]>([])
@@ -16,7 +16,8 @@ export default function RecepcaoPage() {
   const [erro, setErro] = useState('')
 
   useEffect(() => {
-    api<Profissional[]>('/profissionais')
+    profissionaisService
+      .listarProfissionais()
       .then((lista) => {
         setProfissionais(lista)
         setProfissionalId(lista[0]?.id ?? '')

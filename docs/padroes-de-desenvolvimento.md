@@ -167,6 +167,15 @@ A função auxiliar tipada `api<T>()`:
 - Em caso de resposta `401 Unauthorized`, limpa a sessão local automaticamente.
 - Deserializa e lança exceções com a mensagem amigável enviada pelo backend (`erro`).
 
+### 4.6 Camada de Serviços Tipada (`src/services/`)
+Para evitar chamadas `fetch`/`api` espalhadas e despadronizadas nos componentes, os endpoints são centralizados em serviços modulares organizados por pastas de domínio:
+- `services/auth/`: Login (`fazerLogin`).
+- `services/profissionais/`: Listagem de profissionais, agenda por data, horários disponíveis e bloqueio de folgas.
+- `services/consultas/`: Listagem de consultas do paciente (`listarMinhasConsultas`), agendamento (`agendarConsulta`), cancelamento e registro de faltas.
+- `services/pacientes/`: Listagem de pacientes para atendimento na recepção.
+- `services/integracoes/`: Busca de lembretes para automações externas.
+Cada pasta possui seu arquivo principal `[dominio]Service.ts`, suas tipagens específicas `types.ts` e um ponto de exportação `index.ts`.
+
 ---
 
 ## 5. Pacote Compartilhado (`packages/shared`)
