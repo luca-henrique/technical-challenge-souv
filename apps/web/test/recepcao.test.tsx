@@ -55,4 +55,30 @@ describe('RecepcaoPage', () => {
       expect(screen.getByDisplayValue('Dra. Julia (Pediatria)')).toBeDefined()
     })
   })
+
+  it('exibe o estado vazio quando nenhum profissional está selecionado', async () => {
+    entrarComo('recepcao')
+
+    simularApi((url) => {
+      if (url.includes('/api/profissionais')) {
+        return [
+          { id: 'prof-1', nome: 'Dr. Roberto', especialidade: 'Cardiologia' },
+        ]
+      }
+      return null
+    })
+
+    renderComQuery(<RecepcaoPage />)
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Profissional')).toBeDefined()
+    })
+
+    fireEvent.change(screen.getByLabelText('Profissional'), { target: { value: '' } })
+
+    await waitFor(() => {
+      expect(screen.getByRole('status', { name: 'Nenhum profissional selecionado' })).toBeDefined()
+      expect(screen.getByText('Nenhum profissional selecionado')).toBeDefined()
+    })
+  })
 })

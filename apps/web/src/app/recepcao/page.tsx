@@ -6,6 +6,7 @@ import SeletorData from "@/components/molecules/SeletorData/seletorData";
 import SeletorProfissional from "@/components/molecules/SeletorProfissional/seletorProfissional";
 import AgendaDoDia from "@/components/organisms/AgendaDoDia/agendaDoDia";
 import RecepcaoSkeleton from "@/components/organisms/RecepcaoSkeleton/recepcaoSkeleton";
+import SemProfissionalSelecionado from "@/components/molecules/SemProfissionalSelecionado/semProfissionalSelecionado";
 import { useFiltroRecepcao } from "@/hooks/useFiltroRecepcao";
 
 export default function RecepcaoPage() {
@@ -59,7 +60,7 @@ export default function RecepcaoPage() {
       {profissionalId ? (
         <AgendaDoDia profissionalId={profissionalId} data={data} />
       ) : (
-        <p>Selecione um profissional</p>
+        <SemProfissionalSelecionado />
       )}
     </div>
   );
