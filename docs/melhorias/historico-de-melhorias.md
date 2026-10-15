@@ -135,12 +135,20 @@ Seguindo estritamente a hierarquia do Atomic Design e as convenções do projeto
 2. Se nenhum profissional está selecionado -> Exibe `<SemProfissionalSelecionado />`.
 3. Se um profissional está selecionado -> Renderiza `<AgendaDoDia />` com a grade do dia e o formulário de agendamento.
 
-### Fluxo na Área do Paciente ([`MinhasConsultas`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/MinhasConsultas/minhasConsultas.tsx))
+### Fluxo na Área do Paciente ([`MinhasConsultas`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/MinhasConsultas/minhasConsultas.tsx) e [`AgendarConsulta`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/AgendarConsulta/agendarConsulta.tsx))
 - **Hook [`useMinhasConsultas`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/hooks/useMinhasConsultas.ts)**:
   - Busca as consultas do paciente autenticado via `consultasService.listarMinhasConsultas()` com a chave de cache `['consultas', 'minhas']`.
   - Mutation reativa para `cancelarConsulta` com invalidação automática de cache pós-sucesso.
+- **Hook [`useHorarios`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/hooks/useHorarios.ts)**:
+  - Consulta reativa dos horários livres via `profissionaisService.buscarHorarios(profissionalId, data, tipo)` com chave `['horarios', profissionalId, data, tipo]`.
+- **Hook [`useAgendarConsulta`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/hooks/useAgendarConsulta.ts)**:
+  - Mutation para agendamento de consulta via `consultasService.agendarConsulta()`, invalidando automaticamente as consultas do paciente e a agenda do profissional.
+- **Refatoração do Organismo [`AgendarConsulta`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/AgendarConsulta/agendarConsulta.tsx)**:
+  - Migração de múltiplos `useState`/`useEffect` manuais para **React Hook Form + Zod** ([`agendarConsultaPacienteSchema`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/AgendarConsulta/schema.ts)).
+  - Atualização dinâmica dos horários disponíveis com base na combinação de profissional, data e tipo de consulta.
+  - Limpeza automática do horário selecionado ao alterar o profissional, data ou tipo.
 - **Carregamento Visual com Skeleton**:
-  - Enquanto `carregando` for verdadeiro, renderiza `<MinhasConsultasSkeleton />` garantindo uma transição visual suave, sem layout shifts.
+  - Enquanto `carregando` for verdadeiro em `MinhasConsultas`, renderiza `<MinhasConsultasSkeleton />` garantindo uma transição visual suave, sem layout shifts.
 - **Resolução de Bug de Loading Infinito**:
   - Anteriormente, o componente utilizava `if (consultas.length === 0) return <p>Carregando...</p>`, o que fazia com que pacientes sem consultas agendadas ficassem eternamente presos na mensagem de carregamento.
   - Ajustado para distinguir o estado real de carregamento (`carregando`) da lista vazia (`consultas.length === 0`), exibindo mensagem clara: *"Você não possui consultas agendadas no momento."*.
@@ -166,4 +174,4 @@ Todas as alterações contam com validação contínua nos scripts do projeto:
 - `npm run lint`: **0 advertências ou erros no ESLint**.
 - Testes automatizados com Vitest:
   - Backend: [`test/auth.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/auth.test.ts), [`test/profissionais.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/profissionais.test.ts), [`test/integracoes.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/integracoes.test.ts).
-  - Frontend: [`test/login.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/login.test.tsx), [`test/middleware.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/middleware.test.ts), [`test/recepcao.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/recepcao.test.tsx), [`test/agendaDoDia.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/agendaDoDia.test.tsx), [`test/minhasConsultas.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/minhasConsultas.test.tsx).
+  - Frontend: [`test/login.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/login.test.tsx), [`test/middleware.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/middleware.test.ts), [`test/recepcao.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/recepcao.test.tsx), [`test/agendaDoDia.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/agendaDoDia.test.tsx), [`test/minhasConsultas.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/minhasConsultas.test.tsx), [`test/agendarConsulta.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/agendarConsulta.test.tsx).

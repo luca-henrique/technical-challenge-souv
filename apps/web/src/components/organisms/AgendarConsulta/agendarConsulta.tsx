@@ -2,55 +2,89 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { hojeEmRecife, type Profissional, type TipoConsulta } from '@bemviver/shared'
+import { useState } from 'react'
+import { Controller, useForm, useWatch } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { hojeEmRecife } from '@bemviver/shared'
 import Alert from '@/components/atoms/Alert/alert'
 import Button from '@/components/atoms/Button/button'
 import Card from '@/components/atoms/Card/card'
+import Skeleton from '@/components/atoms/Skeleton/skeleton'
 import SeletorData from '@/components/molecules/SeletorData/seletorData'
 import SeletorHorario from '@/components/molecules/SeletorHorario/seletorHorario'
 import SeletorProfissional from '@/components/molecules/SeletorProfissional/seletorProfissional'
-import { api } from '@/lib/api'
-import { NOME_TIPO } from '@/lib/formato'
+import SeletorTipoConsulta from '@/components/molecules/SeletorTipoConsulta/seletorTipoConsulta'
+import { useAgendarConsulta } from '@/hooks/useAgendarConsulta'
+import { useHorarios } from '@/hooks/useHorarios'
+import { useProfissionais } from '@/hooks/useProfissionais'
+import { agendarConsultaPacienteSchema, type DadosAgendarConsultaPaciente } from './schema'
+import type { AgendarConsultaProps } from './types'
 
-export default function AgendarConsulta() {
+export default function AgendarConsulta({
+  className = '',
+  onSucesso,
+  opcoesTipoConsulta,
+}: AgendarConsultaProps) {
   const router = useRouter()
-  const [profissionais, setProfissionais] = useState<Profissional[]>([])
-  const [profissionalId, setProfissionalId] = useState('')
-  const [data, setData] = useState('')
-  const [tipo, setTipo] = useState<TipoConsulta>('primeira')
-  const [horarios, setHorarios] = useState<string[] | null>(null)
-  const [hora, setHora] = useState('')
-  const [erro, setErro] = useState('')
-  const [enviando, setEnviando] = useState(false)
+  const [erroMutacao, setErroMutacao] = useState('')
 
-  useEffect(() => {
-    api<Profissional[]>('/profissionais')
-      .then(setProfissionais)
-      .catch((e: Error) => setErro(e.message))
-  }, [])
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<DadosAgendarConsultaPaciente>({
+    resolver: zodResolver(agendarConsultaPacienteSchema),
+    defaultValues: {
+      profissionalId: '',
+      data: '',
+      tipo: 'primeira',
+      hora: '',
+    },
+  })
 
-  useEffect(() => {
-    if (!profissionalId || !data) return
-    api<{ horarios: string[] }>(`/profissionais/${profissionalId}/horarios?data=${data}&tipo=${tipo}`)
-      .then((resposta) => setHorarios(resposta.horarios))
-      .catch((e: Error) => setErro(e.message))
-  }, [profissionalId, data, tipo])
+  const formProfissionalId = useWatch({ control, name: 'profissionalId' })
+  const formData = useWatch({ control, name: 'data' })
+  const formTipo = useWatch({ control, name: 'tipo' })
+  const formHora = useWatch({ control, name: 'hora' })
 
-  async function confirmar() {
-    setErro('')
-    setEnviando(true)
+  const {
+    data: profissionais = [],
+    isLoading: carregandoProfissionais,
+    error: erroProfissionais,
+  } = useProfissionais(formData ? { data: formData } : undefined)
+
+  const {
+    data: horarios = [],
+    isLoading: carregandoHorarios,
+    error: erroHorarios,
+  } = useHorarios(formProfissionalId, formData, formTipo)
+
+  const { mutateAsync: agendar, isPending: enviando } = useAgendarConsulta()
+
+  const onSubmit = handleSubmit(async (valores) => {
+    setErroMutacao('')
     try {
-      await api('/consultas', { metodo: 'POST', corpo: { profissionalId, data, hora, tipo } })
-      router.push('/paciente')
+      await agendar({
+        profissionalId: valores.profissionalId,
+        data: valores.data,
+        hora: valores.hora,
+        tipo: valores.tipo,
+      })
+      if (onSucesso) {
+        onSucesso()
+      } else {
+        router.push('/paciente')
+      }
     } catch (e) {
-      setErro((e as Error).message)
-      setEnviando(false)
+      setErroMutacao((e as Error).message)
     }
-  }
+  })
+
+  const erroGeral = erroMutacao || erroProfissionais?.message || erroHorarios?.message
 
   return (
-    <div className="mx-auto max-w-md space-y-4">
+    <div className={`mx-auto max-w-md space-y-4 ${className}`}>
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-xl font-semibold">Marcar consulta</h1>
         <Link href="/paciente" className="text-sm text-teal-700 underline">
@@ -59,57 +93,90 @@ export default function AgendarConsulta() {
       </div>
 
       <Card className="space-y-4">
-        <SeletorProfissional
-          profissionais={profissionais}
-          valor={profissionalId}
-          permitirVazio
-          onChange={(id) => {
-            setProfissionalId(id)
-            setHora('')
-          }}
-        />
-
-        <SeletorData
-          min={hojeEmRecife()}
-          valor={data}
-          onChange={(novaData) => {
-            setData(novaData)
-            setHora('')
-          }}
-        />
-
-        <fieldset>
-          <legend className="block text-sm font-medium text-gray-700">Tipo de consulta</legend>
-          <div className="mt-1 grid grid-cols-2 gap-2">
-            {(['primeira', 'retorno'] as const).map((opcao) => (
-              <Button
-                key={opcao}
-                variante={tipo === opcao ? 'primario' : 'secundario'}
-                aria-pressed={tipo === opcao}
-                onClick={() => {
-                  setTipo(opcao)
-                  setHora('')
+        <form onSubmit={onSubmit} noValidate className="space-y-4">
+          <Controller
+            name="profissionalId"
+            control={control}
+            render={({ field }) => (
+              <SeletorProfissional
+                profissionais={profissionais}
+                valor={field.value}
+                permitirVazio
+                onChange={(id) => {
+                  field.onChange(id)
+                  setValue('hora', '', { shouldValidate: true })
                 }}
-              >
-                {NOME_TIPO[opcao]}
-              </Button>
-            ))}
-          </div>
-        </fieldset>
+                erro={errors.profissionalId?.message}
+              />
+            )}
+          />
 
-        {profissionalId && data && horarios && (
-          <fieldset>
-            <legend className="block text-sm font-medium text-gray-700">Horário</legend>
-            <SeletorHorario horarios={horarios} selecionado={hora} onSelecionar={setHora} />
-          </fieldset>
-        )}
+          <Controller
+            name="data"
+            control={control}
+            render={({ field }) => (
+              <SeletorData
+                min={hojeEmRecife()}
+                valor={field.value}
+                onChange={(novaData) => {
+                  field.onChange(novaData)
+                  setValue('hora', '', { shouldValidate: true })
+                }}
+                erro={errors.data?.message}
+              />
+            )}
+          />
+
+          <Controller
+            name="tipo"
+            control={control}
+            render={({ field }) => (
+              <SeletorTipoConsulta
+                opcoes={opcoesTipoConsulta}
+                valor={field.value}
+                onChange={(novoTipo) => {
+                  field.onChange(novoTipo)
+                  setValue('hora', '', { shouldValidate: true })
+                }}
+                erro={errors.tipo?.message}
+              />
+            )}
+          />
+
+          {formProfissionalId && formData && (
+            <fieldset>
+              <legend className="block text-sm font-medium text-gray-700">Horário</legend>
+              {carregandoHorarios ? (
+                <div className="mt-2 space-y-2" role="status" aria-label="Carregando horários">
+                  <Skeleton className="h-9 w-full" />
+                  <span className="sr-only">Carregando horários disponíveis...</span>
+                </div>
+              ) : (
+                <SeletorHorario
+                  horarios={horarios}
+                  selecionado={formHora}
+                  onSelecionar={(horaEscolhida) => {
+                    setValue('hora', horaEscolhida, { shouldValidate: true })
+                  }}
+                />
+              )}
+              {errors.hora && (
+                <p className="mt-1 text-sm text-red-600">{errors.hora.message}</p>
+              )}
+            </fieldset>
+          )}
+
+          {erroGeral && <Alert>{erroGeral}</Alert>}
+
+          <Button
+            type="submit"
+            disabled={!formHora || enviando || carregandoProfissionais}
+            className="w-full"
+          >
+            {enviando ? 'Marcando...' : 'Confirmar consulta'}
+          </Button>
+        </form>
       </Card>
-
-      {erro && <Alert>{erro}</Alert>}
-
-      <Button disabled={!hora || enviando} onClick={confirmar} className="w-full">
-        {enviando ? 'Marcando...' : 'Confirmar consulta'}
-      </Button>
     </div>
   )
 }
