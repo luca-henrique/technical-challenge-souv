@@ -107,6 +107,8 @@ Seguindo estritamente a hierarquia do Atomic Design e as convenções do projeto
 ### 5.3 Organismos (`components/organisms`)
 - **[RecepcaoSkeleton](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/RecepcaoSkeleton/recepcaoSkeleton.tsx)**:
   - Estrutura completa de esqueleto para a página de recepção (filtros + tabela de agenda + cartão lateral de agendamento).
+- **[MinhasConsultasSkeleton](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/MinhasConsultasSkeleton/minhasConsultasSkeleton.tsx)**:
+  - Esqueleto para o carregamento da lista de consultas do paciente (título, botão e cartões com linhas pulsantes de detalhes).
 - **[AgendaDoDia](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/AgendaDoDia/agendaDoDia.tsx)**:
   - Refatorado para **TanStack Query + React Hook Form + Zod**.
 - **[MarcarConsulta](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/MarcarConsulta/marcarConsulta.tsx)**:
@@ -133,6 +135,16 @@ Seguindo estritamente a hierarquia do Atomic Design e as convenções do projeto
 2. Se nenhum profissional está selecionado -> Exibe `<SemProfissionalSelecionado />`.
 3. Se um profissional está selecionado -> Renderiza `<AgendaDoDia />` com a grade do dia e o formulário de agendamento.
 
+### Fluxo na Área do Paciente ([`MinhasConsultas`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/MinhasConsultas/minhasConsultas.tsx))
+- **Hook [`useMinhasConsultas`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/hooks/useMinhasConsultas.ts)**:
+  - Busca as consultas do paciente autenticado via `consultasService.listarMinhasConsultas()` com a chave de cache `['consultas', 'minhas']`.
+  - Mutation reativa para `cancelarConsulta` com invalidação automática de cache pós-sucesso.
+- **Carregamento Visual com Skeleton**:
+  - Enquanto `carregando` for verdadeiro, renderiza `<MinhasConsultasSkeleton />` garantindo uma transição visual suave, sem layout shifts.
+- **Resolução de Bug de Loading Infinito**:
+  - Anteriormente, o componente utilizava `if (consultas.length === 0) return <p>Carregando...</p>`, o que fazia com que pacientes sem consultas agendadas ficassem eternamente presos na mensagem de carregamento.
+  - Ajustado para distinguir o estado real de carregamento (`carregando`) da lista vazia (`consultas.length === 0`), exibindo mensagem clara: *"Você não possui consultas agendadas no momento."*.
+
 ---
 
 ## 7. Correções de Bugs Relevantes
@@ -140,6 +152,10 @@ Seguindo estritamente a hierarquia do Atomic Design e as convenções do projeto
 ### Bug de Fuso Horário no Título da Agenda (`timeZone: "UTC"`)
 - **Sintoma**: Strings ISO de data pura (`"2026-10-15"`) geradas pelo backend eram convertidas para objeto `Date` em UTC (`2026-10-15T00:00:00.000Z`). Ao chamar `.toLocaleDateString("pt-BR")` no navegador de clientes em UTC-3, a data retrocedia para as 21:00 do dia anterior, exibindo **14/10 (quarta-feira)** em vez de **15/10 (quinta-feira)**.
 - **Correção**: Inclusão de `{ timeZone: "UTC" }` nas opções do formatador de data em `agendaDoDia.tsx`.
+
+### Bug de Carregamento Infinito em Minhas Consultas
+- **Sintoma**: Paciente sem consultas ficava preso na mensagem "Carregando suas consultas...".
+- **Correção**: Separação do estado `carregando` (do TanStack Query) da verificação de tamanho do array.
 
 ---
 
@@ -150,4 +166,4 @@ Todas as alterações contam com validação contínua nos scripts do projeto:
 - `npm run lint`: **0 advertências ou erros no ESLint**.
 - Testes automatizados com Vitest:
   - Backend: [`test/auth.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/auth.test.ts), [`test/profissionais.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/profissionais.test.ts), [`test/integracoes.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/integracoes.test.ts).
-  - Frontend: [`test/login.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/login.test.tsx), [`test/middleware.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/middleware.test.ts), [`test/recepcao.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/recepcao.test.tsx), [`test/agendaDoDia.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/agendaDoDia.test.tsx).
+  - Frontend: [`test/login.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/login.test.tsx), [`test/middleware.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/middleware.test.ts), [`test/recepcao.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/recepcao.test.tsx), [`test/agendaDoDia.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/agendaDoDia.test.tsx), [`test/minhasConsultas.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/minhasConsultas.test.tsx).
