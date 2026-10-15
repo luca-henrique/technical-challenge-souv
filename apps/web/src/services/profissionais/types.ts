@@ -2,6 +2,11 @@ import type { Agenda, Profissional, TipoConsulta } from '@bemviver/shared'
 
 export type { Agenda, Profissional, TipoConsulta }
 
+export interface ListarProfissionaisParams {
+  data?: string
+  profissionalId?: string
+}
+
 export interface BuscarAgendaParams {
   profissionalId: string
   data: string

@@ -126,9 +126,9 @@ A estrutura em `src/components/` segue a divisão por níveis de responsabilidad
 
 ```text
 src/components/
-├── atoms/        # Componentes base, sem regra de negócio (Button, Input, Select, Card, Alert)
+├── atoms/        # Componentes base, sem regra de negócio (Button, Input, Select, Card, Alert, Skeleton)
 ├── molecules/    # Junções simples de átomos (Field, CartaoConsulta, SeletorHorario, SeletorProfissional, SeletorData)
-├── organisms/    # Blocos funcionais com regras de negócio ou chamadas de API (AgendaDoDia, TabelaConsultas)
+├── organisms/    # Blocos funcionais com regras de negócio ou chamadas de API (AgendaDoDia, TabelaConsultas, RecepcaoSkeleton)
 └── templates/    # Estruturas estruturais e layouts de página (AreaTemplate, AuthTemplate)
 ```
 

@@ -1,22 +1,34 @@
-'use client'
+"use client";
 
-import { Controller } from 'react-hook-form'
-import Alert from '@/components/atoms/Alert/alert'
-import SeletorData from '@/components/molecules/SeletorData/seletorData'
-import SeletorProfissional from '@/components/molecules/SeletorProfissional/seletorProfissional'
-import AgendaDoDia from '@/components/organisms/AgendaDoDia/agendaDoDia'
-import { useFiltroRecepcao } from '@/hooks/useFiltroRecepcao'
+import { Controller } from "react-hook-form";
+import Alert from "@/components/atoms/Alert/alert";
+import SeletorData from "@/components/molecules/SeletorData/seletorData";
+import SeletorProfissional from "@/components/molecules/SeletorProfissional/seletorProfissional";
+import AgendaDoDia from "@/components/organisms/AgendaDoDia/agendaDoDia";
+import RecepcaoSkeleton from "@/components/organisms/RecepcaoSkeleton/recepcaoSkeleton";
+import { useFiltroRecepcao } from "@/hooks/useFiltroRecepcao";
 
 export default function RecepcaoPage() {
-  const { control, profissionais, profissionalId, data, carregando, erro, errors } = useFiltroRecepcao()
+  const {
+    control,
+    profissionais,
+    profissionalId,
+    data,
+    carregando,
+    erro,
+    errors,
+  } = useFiltroRecepcao();
 
   if (carregando) {
-    return <p className="text-sm text-gray-500">Carregando profissionais...</p>
+    return <RecepcaoSkeleton />;
   }
 
   return (
     <div className="space-y-6">
-      <form className="flex flex-wrap items-end gap-4" onSubmit={(e) => e.preventDefault()}>
+      <form
+        className="flex flex-wrap items-end gap-4"
+        onSubmit={(e) => e.preventDefault()}
+      >
         <Controller
           name="profissionalId"
           control={control}
@@ -44,7 +56,11 @@ export default function RecepcaoPage() {
       </form>
 
       {erro && <Alert>{erro}</Alert>}
-      {profissionalId && data && <AgendaDoDia profissionalId={profissionalId} data={data} />}
+      {profissionalId ? (
+        <AgendaDoDia profissionalId={profissionalId} data={data} />
+      ) : (
+        <p>Selecione um profissional</p>
+      )}
     </div>
-  )
+  );
 }

@@ -1,9 +1,13 @@
 import type { Agenda, Profissional, TipoConsulta } from '@bemviver/shared'
 import { api } from '@/lib/api'
-import type { RespostaFolga, RespostaHorarios } from './types'
+import type { ListarProfissionaisParams, RespostaFolga, RespostaHorarios } from './types'
 
-export async function listarProfissionais(): Promise<Profissional[]> {
-  return api<Profissional[]>('/profissionais')
+export async function listarProfissionais(params?: ListarProfissionaisParams): Promise<Profissional[]> {
+  const query = new URLSearchParams()
+  if (params?.data) query.set('data', params.data)
+  if (params?.profissionalId) query.set('profissionalId', params.profissionalId)
+  const qs = query.toString()
+  return api<Profissional[]>(qs ? `/profissionais?${qs}` : '/profissionais')
 }
 
 export async function buscarAgenda(profissionalId: string, data: string): Promise<Agenda> {

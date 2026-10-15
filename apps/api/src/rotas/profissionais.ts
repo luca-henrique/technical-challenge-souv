@@ -6,12 +6,42 @@ import { prisma } from '../prisma'
 
 export const rotasProfissionais = Router()
 
-rotasProfissionais.get('/', async (_req, res) => {
+rotasProfissionais.get('/', async (req, res) => {
+  const data = req.query.data ? String(req.query.data) : undefined
+  const profissionalId = req.query.profissionalId ? String(req.query.profissionalId) : undefined
+
+  if (data && !dataValida(data)) {
+    res.status(400).json({ erro: 'Informe a data no formato AAAA-MM-DD' })
+    return
+  }
+
+  const where: { id?: string } = {}
+  if (profissionalId) {
+    where.id = profissionalId
+  }
+
   const profissionais = await prisma.profissional.findMany({
-    include: { usuario: { select: { nome: true } } },
+    where,
+    include: {
+      usuario: { select: { nome: true } },
+      ...(data ? { folgas: { where: { data } } } : {}),
+    },
     orderBy: { usuario: { nome: 'asc' } },
   })
-  res.json(profissionais.map((p) => ({ id: p.id, nome: p.usuario.nome, especialidade: p.especialidade })))
+
+  res.json(
+    profissionais.map((p) => {
+      const item: { id: string; nome: string; especialidade: string; folga?: boolean } = {
+        id: p.id,
+        nome: p.usuario.nome,
+        especialidade: p.especialidade,
+      }
+      if (data) {
+        item.folga = Boolean(p.folgas && p.folgas.length > 0)
+      }
+      return item
+    }),
+  )
 })
 
 rotasProfissionais.get('/:id/agenda', permitir('recepcao', 'profissional'), async (req, res) => {

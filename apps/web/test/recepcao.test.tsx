@@ -41,7 +41,7 @@ describe('RecepcaoPage', () => {
 
     renderComQuery(<RecepcaoPage />)
 
-    expect(screen.getByText('Carregando profissionais...')).toBeDefined()
+    expect(screen.getByRole('status', { name: 'Carregando dados da recepção' })).toBeDefined()
 
     await waitFor(() => {
       expect(screen.getByLabelText('Profissional')).toBeDefined()

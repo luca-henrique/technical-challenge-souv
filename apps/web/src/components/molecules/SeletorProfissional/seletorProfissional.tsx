@@ -18,7 +18,7 @@ export default function SeletorProfissional({
         {permitirVazio && <option value="">{textoVazio}</option>}
         {profissionais.map((p) => (
           <option key={p.id} value={p.id}>
-            {p.nome} ({p.especialidade})
+            {p.nome} ({p.especialidade}){p.folga ? ' (De folga)' : ''}
           </option>
         ))}
       </Select>

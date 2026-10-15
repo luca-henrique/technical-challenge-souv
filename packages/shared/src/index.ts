@@ -12,6 +12,7 @@ export interface Profissional {
   id: string
   nome: string
   especialidade: string
+  folga?: boolean
 }
 
 export interface Paciente {
