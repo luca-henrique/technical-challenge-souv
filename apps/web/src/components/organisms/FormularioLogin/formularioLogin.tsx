@@ -30,24 +30,28 @@ export default function FormularioLogin() {
 
   return (
     <form onSubmit={onSubmit} noValidate className="space-y-4">
-      <Field label="E-mail" erro={errors.email?.message}>
+      <Field id="login-email" label="E-mail" erro={errors.email?.message}>
         <Input
+          id="login-email"
           type="email"
           autoComplete="email"
           aria-invalid={Boolean(errors.email)}
+          aria-describedby={errors.email ? 'login-email-erro' : undefined}
           {...register('email')}
         />
       </Field>
-      <Field label="Senha" erro={errors.senha?.message}>
+      <Field id="login-senha" label="Senha" erro={errors.senha?.message}>
         <Input
+          id="login-senha"
           type="password"
           autoComplete="current-password"
           aria-invalid={Boolean(errors.senha)}
+          aria-describedby={errors.senha ? 'login-senha-erro' : undefined}
           {...register('senha')}
         />
       </Field>
       {error && <Alert>{error.message}</Alert>}
-      <Button type="submit" disabled={isPending} className="w-full">
+      <Button type="submit" disabled={isPending} aria-busy={isPending} className="w-full">
         {isPending ? 'Entrando...' : 'Entrar'}
       </Button>
     </form>
