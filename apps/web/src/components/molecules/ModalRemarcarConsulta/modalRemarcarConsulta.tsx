@@ -1,14 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { diaUtil, hojeEmRecife } from '@bemviver/shared'
 import Alert from '@/components/atoms/Alert/alert'
 import Button from '@/components/atoms/Button/button'
-import Card from '@/components/atoms/Card/card'
-import Heading from '@/components/atoms/Heading/heading'
-import IconButton from '@/components/atoms/IconButton/iconButton'
+import Modal from '@/components/molecules/Modal/modal'
 import Skeleton from '@/components/atoms/Skeleton/skeleton'
 import SeletorData from '@/components/molecules/SeletorData/seletorData'
 import SeletorHorario from '@/components/molecules/SeletorHorario/seletorHorario'
@@ -50,15 +48,6 @@ export default function ModalRemarcarConsulta({
 
   const { mutateAsync: remarcar, isPending: remarcando } = useRemarcarConsulta()
 
-  useEffect(() => {
-    if (!aberto) return
-    function aoPressionarTecla(e: KeyboardEvent) {
-      if (e.key === 'Escape' && !remarcando) onFechar()
-    }
-    window.addEventListener('keydown', aoPressionarTecla)
-    return () => window.removeEventListener('keydown', aoPressionarTecla)
-  }, [aberto, remarcando, onFechar])
-
   if (!aberto) return null
 
   const onSubmit = handleSubmit(async (valores) => {
@@ -77,30 +66,14 @@ export default function ModalRemarcarConsulta({
   })
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-remarcar-titulo"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
-    >
-      <Card className="w-full max-w-md space-y-4 shadow-xl">
-        <div className="flex items-center justify-between border-b pb-3 dark:border-gray-800">
-          <div>
-            <Heading id="modal-remarcar-titulo" as="h2" variante="modal">
-              Remarcar consulta
-            </Heading>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              {consulta.profissionalNome} ({consulta.especialidade})
-            </p>
-          </div>
-          <IconButton
-            onClick={onFechar}
-            aria-label="Fechar modal de remarcação"
-          >
-            ✕
-          </IconButton>
-        </div>
-
+    <Modal aberto={aberto} onFechar={onFechar} tituloId="modal-remarcar-titulo">
+      <Modal.Header
+        id="modal-remarcar-titulo"
+        titulo="Remarcar consulta"
+        subtitulo={`${consulta.profissionalNome} (${consulta.especialidade})`}
+        onFechar={onFechar}
+      />
+      <Modal.Body>
         <p className="text-xs text-gray-600 dark:text-gray-300">
           Horário atual: <strong>{formatarData(consulta.data)} às {consulta.hora}</strong>.
           Selecione a nova data e o horário desejado:
@@ -150,16 +123,16 @@ export default function ModalRemarcarConsulta({
             <Alert>{erroMutacao || erroHorarios?.message}</Alert>
           )}
 
-          <div className="flex justify-end gap-2 pt-2 border-t dark:border-gray-800">
+          <Modal.Footer>
             <Button type="button" variante="secundario" onClick={onFechar} disabled={remarcando}>
               Cancelar
             </Button>
             <Button type="submit" disabled={!formNovaHora || remarcando}>
               {remarcando ? 'Remarcando...' : 'Confirmar nova data'}
             </Button>
-          </div>
+          </Modal.Footer>
         </form>
-      </Card>
-    </div>
+      </Modal.Body>
+    </Modal>
   )
 }
