@@ -324,6 +324,29 @@ Revisão e implementação completa da [RN07](file:///Users/lucas1/Desktop/proje
   - Backend: [`apps/api/test/rn07-bloqueio-de-folgas.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/rn07-bloqueio-de-folgas.test.ts) (6 testes cobrindo bloqueio de folga, preservação de consultas, bloqueio 409 de agendamento, lista vazia de horários, flag no GET /profissionais e rejeição de folga no passado/duplicada).
   - Frontend: [`apps/web/test/rn07-bloqueio-de-folgas.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/rn07-bloqueio-de-folgas.test.tsx) (4 testes cobrindo confirmação de folga na agenda médica, alerta de folga com consultas preservadas, alerta na recepção e indicação visual no seletor).
 
+## 16. Implementação e Revisão da Regra de Negócio RN08 (Registro de Faltas e Restrições Operacionais)
+
+Revisão e implementação completa da [RN08](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN08-registro-de-faltas-e-restricoes.md):
+
+- **Exclusividade da Recepção (RBAC)**:
+  - Endpoint [`POST /consultas/:id/falta`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/src/rotas/consultas.ts#L15) restrito exclusivamente ao perfil `recepcao` (`permitir('recepcao')`). Pacientes e profissionais são rejeitados com `403 Forbidden`.
+- **Validações Temporais e de Estado**:
+  - A falta só pode ser registrada **após o horário de início da consulta** (`inicio <= agora`). Tentativa de registro antecipado ou preventivo retorna `409 Conflict` (`{ erro: 'A falta só pode ser registrada depois do horário da consulta' }`).
+  - Só é possível registrar falta para consultas com status estritamente `'agendada'`. Consultas canceladas ou que já possuem falta registrada retornam `409 Conflict` (`{ erro: 'Só é possível registrar falta em uma consulta agendada' }`).
+  - Consulta inexistente retorna `404 Not Found`.
+- **Simplificação de Regras Operacionais**:
+  - Sem encaixes ou sobreposições.
+  - Sem penalidades financeiras ou bloqueios automáticos para pacientes com faltas recorrentes.
+- **Interface e Experiência do Usuário (Front-end)**:
+  - [`AgendaDoDia`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/AgendaDoDia/agendaDoDia.tsx): botão "Registrar falta" renderizado condicionalmente apenas quando `new Date(consulta.inicio) <= new Date()`, ocultando-o para consultas futuras.
+  - Feedback visual no botão com o texto `"Registrando..."` enquanto a requisição é processada.
+  - Atualização automática do status da consulta para "Faltou" via invalidação reativa da query `['agenda', profissionalId, data]`.
+  - Ausência total do botão de registrar falta nas telas do paciente e do profissional.
+- **Cobertura de Testes Automatizados**:
+  - Backend: [`apps/api/test/rn08-registro-de-faltas.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/rn08-registro-de-faltas.test.ts) (6 testes cobrindo registro de falta pós-horário, bloqueio antecipado, rejeição em consulta cancelada/duplicada, 404 e proteção RBAC 403).
+  - Frontend: [`apps/web/test/rn08-registro-de-faltas.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/rn08-registro-de-faltas.test.tsx) (4 testes cobrindo visibilidade temporal do botão, execução e invalidação da agenda, tratamento de erro 409 e ausência do botão no paciente).
+
+
 
 
 
