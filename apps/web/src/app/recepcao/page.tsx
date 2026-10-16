@@ -38,7 +38,7 @@ export default function RecepcaoPage() {
       </div>
 
       <form
-        className="flex flex-wrap  gap-4 justify-center"
+        className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start"
         onSubmit={(e) => e.preventDefault()}
       >
         <Controller
@@ -51,7 +51,7 @@ export default function RecepcaoPage() {
               permitirVazio
               onChange={field.onChange}
               erro={errors.profissionalId?.message}
-              className="min-w-64 flex-1"
+              className="w-full"
             />
           )}
         />
@@ -63,6 +63,8 @@ export default function RecepcaoPage() {
               valor={field.value}
               onChange={field.onChange}
               erro={errors.data?.message}
+              hint=""
+              className="w-full"
             />
           )}
         />
