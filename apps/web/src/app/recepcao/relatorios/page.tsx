@@ -5,7 +5,9 @@ import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import Alert from '@/components/atoms/Alert/alert'
 import Button from '@/components/atoms/Button/button'
+import Heading from '@/components/atoms/Heading/heading'
 import LinkButton from '@/components/atoms/LinkButton/linkButton'
+import Text from '@/components/atoms/Text/text'
 import BotaoExportarPdf from '@/components/molecules/BotaoExportarPdf/botaoExportarPdf'
 import SeletorData from '@/components/molecules/SeletorData/seletorData'
 import SeletorProfissional from '@/components/molecules/SeletorProfissional/seletorProfissional'
@@ -49,12 +51,12 @@ export default function RelatoriosPage() {
       <div className="space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+            <Heading as="h1" variante="pagina">
               Relatório de Absenteísmo (No-Show)
-            </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            </Heading>
+            <Text variante="corpo" cor="secundario">
               Métricas consolidadas de faltas e lista de pacientes reincidentes.
-            </p>
+            </Text>
           </div>
           <div className="flex items-center gap-2 print:hidden">
             <LinkButton href="/recepcao" variante="secundario">

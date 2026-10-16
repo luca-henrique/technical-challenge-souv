@@ -1,5 +1,6 @@
 'use client'
 
+import Heading from '@/components/atoms/Heading/heading'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -97,7 +98,9 @@ export default function AgendarConsulta({
   return (
     <div className={`mx-auto max-w-md space-y-4 ${className}`}>
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Marcar consulta</h1>
+        <Heading as="h1" variante="pagina">
+          Marcar consulta
+        </Heading>
         <Link href="/paciente" className="text-sm text-teal-700 hover:text-teal-800 dark:text-teal-400 underline">
           Voltar
         </Link>
