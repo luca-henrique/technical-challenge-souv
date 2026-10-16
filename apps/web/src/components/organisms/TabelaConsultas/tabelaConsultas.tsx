@@ -1,3 +1,4 @@
+import Badge from '@/components/atoms/Badge/badge'
 import { NOME_STATUS, NOME_TIPO } from '@/lib/formato'
 import type { TabelaConsultasProps } from './types'
 
@@ -40,13 +41,13 @@ export default function TabelaConsultas({ consultas, acoes }: TabelaConsultasPro
                 <span>{NOME_STATUS[consulta.status]}</span>
                 {consulta.status === 'agendada' &&
                   (consulta.confirmadaEm ? (
-                    <span className="ml-2 inline-flex items-center rounded bg-emerald-100 px-1.5 py-0.5 text-xs font-semibold text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+                    <Badge variante="sucesso" tamanho="sm" className="ml-2">
                       Confirmada
-                    </span>
+                    </Badge>
                   ) : (
-                    <span className="ml-2 inline-flex items-center rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                    <Badge variante="neutro" tamanho="sm" className="ml-2">
                       Pendente
-                    </span>
+                    </Badge>
                   ))}
               </td>
               {acoes && <td className="py-2 text-right whitespace-nowrap">{acoes(consulta)}</td>}

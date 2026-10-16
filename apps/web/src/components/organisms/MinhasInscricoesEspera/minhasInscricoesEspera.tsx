@@ -1,5 +1,6 @@
 'use client'
 
+import Badge from '@/components/atoms/Badge/badge'
 import Button from '@/components/atoms/Button/button'
 import Card from '@/components/atoms/Card/card'
 import Skeleton from '@/components/atoms/Skeleton/skeleton'
@@ -46,13 +47,13 @@ export default function MinhasInscricoesEspera() {
                 Data: <strong>{formatarData(item.data)}</strong> | Turno: {item.turno === 'manha' ? 'Manhã' : item.turno === 'tarde' ? 'Tarde' : 'Qualquer'}
               </p>
               {item.status === 'notificado' ? (
-                <span className="inline-block mt-1 rounded bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-800 dark:bg-green-900/50 dark:text-green-300">
+                <Badge variante="sucesso" tamanho="md" className="mt-1">
                   🎉 Vaga liberada! Agende agora ou aguarde contato.
-                </span>
+                </Badge>
               ) : (
-                <span className="inline-block mt-1 rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
+                <Badge variante="aviso" tamanho="sm" className="mt-1">
                   Aguardando desistência
-                </span>
+                </Badge>
               )}
             </div>
 

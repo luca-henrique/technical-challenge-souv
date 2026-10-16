@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Button from '@/components/atoms/Button/button'
+import Badge from '@/components/atoms/Badge/badge'
 import Card from '@/components/atoms/Card/card'
 import ModalRemarcarConsulta from '@/components/molecules/ModalRemarcarConsulta/modalRemarcarConsulta'
 import { useConfirmarConsulta } from '@/hooks/useConfirmarConsulta'
@@ -26,9 +27,9 @@ export default function CartaoConsulta({ consulta, onCancelar }: CartaoConsultaP
 
         {consulta.confirmadaEm ? (
           <div className="pt-1">
-            <span className="inline-flex items-center gap-1 rounded bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300">
+            <Badge variante="sucesso" tamanho="md">
               ✓ Presença confirmada
-            </span>
+            </Badge>
           </div>
         ) : consulta.status === 'agendada' ? (
           <div className="pt-1">
