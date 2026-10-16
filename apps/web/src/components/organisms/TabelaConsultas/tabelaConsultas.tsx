@@ -3,19 +3,28 @@ import type { TabelaConsultasProps } from './types'
 
 export default function TabelaConsultas({ consultas, acoes }: TabelaConsultasProps) {
   if (consultas.length === 0) {
-    return <p className="text-sm text-gray-500">Nenhuma consulta neste dia.</p>
+    return (
+      <p role="status" className="text-sm text-gray-500 dark:text-gray-400">
+        Nenhuma consulta neste dia.
+      </p>
+    )
   }
 
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left text-sm">
-        <thead className="border-b border-gray-200 text-gray-500">
+        <caption className="sr-only">Escala diária de atendimentos do profissional</caption>
+        <thead className="border-b border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-400">
           <tr>
-            <th className="py-2 pr-4 font-medium">Horário</th>
-            <th className="py-2 pr-4 font-medium">Paciente</th>
-            <th className="py-2 pr-4 font-medium">Tipo</th>
-            <th className="py-2 pr-4 font-medium">Situação</th>
-            {acoes && <th className="py-2" />}
+            <th scope="col" className="py-2 pr-4 font-medium">Horário</th>
+            <th scope="col" className="py-2 pr-4 font-medium">Paciente</th>
+            <th scope="col" className="py-2 pr-4 font-medium">Tipo</th>
+            <th scope="col" className="py-2 pr-4 font-medium">Situação</th>
+            {acoes && (
+              <th scope="col" className="py-2 text-right">
+                <span className="sr-only">Ações</span>
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>

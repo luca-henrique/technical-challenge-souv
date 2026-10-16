@@ -32,7 +32,7 @@ export default function FormBloquearPeriodo({
           Bloquear período de folga (férias/recesso)
         </h3>
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          Nenhum paciente conseguirá agendar consultas nos dias selecionados.
+          Nenhum paciente conseguirá agendar consultas nos dias selecionados (finais de semana são desconsiderados do bloqueio; limite de 90 dias).
         </p>
       </div>
 
@@ -71,7 +71,7 @@ export default function FormBloquearPeriodo({
           <Button type="button" variante="secundario" tamanho="compacto" onClick={onCancelar} disabled={bloqueando}>
             Cancelar
           </Button>
-          <Button type="submit" tamanho="compacto" disabled={bloqueando}>
+          <Button type="submit" tamanho="compacto" disabled={bloqueando} aria-busy={bloqueando}>
             {bloqueando ? 'Bloqueando...' : 'Confirmar bloqueio'}
           </Button>
         </div>

@@ -130,6 +130,7 @@ export default function AgendaDoDia({
                     tamanho="compacto"
                     disabled={registrandoFalta}
                     onClick={() => executar("falta", consulta.id)}
+                    aria-label={`Registrar falta para paciente ${consulta.pacienteNome} às ${consulta.hora}`}
                   >
                     {registrandoFalta ? "Registrando..." : "Registrar falta"}
                   </Button>
@@ -139,6 +140,7 @@ export default function AgendaDoDia({
                   tamanho="compacto"
                   disabled={cancelando}
                   onClick={() => executar("cancelar", consulta.id)}
+                  aria-label={`Cancelar consulta de ${consulta.pacienteNome} às ${consulta.hora}`}
                 >
                   {cancelando ? "Cancelando..." : "Cancelar"}
                 </Button>

@@ -10,6 +10,7 @@ export default function RecepcaoSkeleton({ className = '' }: RecepcaoSkeletonPro
       aria-busy="true"
       aria-label="Carregando dados da recepção"
     >
+      <span className="sr-only">Carregando dados da recepção...</span>
       <div className="flex flex-wrap items-end gap-4">
         <div className="min-w-64 flex-1 space-y-2">
           <Skeleton className="h-4 w-24" />

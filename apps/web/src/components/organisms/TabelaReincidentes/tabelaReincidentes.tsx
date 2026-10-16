@@ -19,11 +19,12 @@ export default function TabelaReincidentes({ reincidentes }: TabelaReincidentesP
       </h3>
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm text-gray-700 dark:text-gray-300">
+          <caption className="sr-only">Pacientes com faltas no período selecionado</caption>
           <thead>
             <tr className="border-b border-gray-200 dark:border-gray-800 text-xs font-semibold text-gray-500 dark:text-gray-400">
-              <th className="py-2 pr-4">Paciente</th>
-              <th className="py-2 pr-4">E-mail</th>
-              <th className="py-2 text-right">Faltas registradas</th>
+              <th scope="col" className="py-2 pr-4">Paciente</th>
+              <th scope="col" className="py-2 pr-4">E-mail</th>
+              <th scope="col" className="py-2 text-right">Faltas registradas</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
