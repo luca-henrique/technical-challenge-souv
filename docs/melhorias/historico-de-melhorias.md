@@ -300,6 +300,31 @@ Revisão e implementação completa da [RN06](file:///Users/lucas1/Desktop/proje
   - Backend: [`apps/api/test/rn06-perfis-e-permissoes-rbac.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/rn06-perfis-e-permissoes-rbac.test.ts) (15 testes cobrindo todas as células da matriz de permissões RBAC para os perfis `paciente`, `recepcao` e `profissional`).
   - Frontend: [`apps/web/test/rn06-perfis-e-permissoes-rbac.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/rn06-perfis-e-permissoes-rbac.test.tsx) (7 testes cobrindo rotas privadas, redirecionamento pós-login, bloqueio de URL cruzada e sessão híbrida).
 
+## 15. Implementação e Revisão da Regra de Negócio RN07 (Bloqueio de Folgas do Profissional)
+
+Revisão e implementação completa da [RN07](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN07-bloqueio-de-folgas.md):
+
+- **Autonomia Médica e Exclusividade**:
+  - Endpoint [`POST /profissionais/:id/folgas`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/src/rotas/profissionais.ts#L96-L103) protegido estritamente para o perfil `profissional`, validando que `req.usuario.id === profissionalId`.
+- **Preservação Integral de Consultas Preexistentes**:
+  - O cadastro de folga apenas insere um registro na tabela `folgas` (`@@unique([profissionalId, data])`), sem cancelar nem excluir nenhuma consulta preexistente no banco de dados.
+  - A agenda médica ([`GET /profissionais/:id/agenda`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/src/rotas/profissionais.ts#L47-L74)) exibe `folga: true` junto à lista completa de consultas previamente agendadas.
+- **Bloqueio de Novos Agendamentos**:
+  - Na rota [`POST /consultas`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/src/controllers/consultasController.ts#L59-L65), qualquer tentativa de agendamento em dia de folga é rejeitada dentro da transação com `409 Conflict` (`{ erro: 'O profissional está de folga nesse dia' }`).
+  - Na rota de horários ([`GET /profissionais/:id/horarios`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/src/rotas/profissionais.ts#L86-L90)), dias com folga retornam lista vazia de horários (`{ horarios: [] }`).
+  - Na rota de profissionais ([`GET /profissionais?data=AAAA-MM-DD`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/src/rotas/profissionais.ts#L27-L44)), profissionais com folga na data pesquisada recebem `folga: true`.
+- **Validações de Data e Idempotência**:
+  - Tentativa de bloquear folga no passado é rejeitada com `400 Bad Request` (`{ erro: 'Não é possível bloquear um dia que já passou' }`).
+  - Tentativa de cadastrar folga duplicada para a mesma data retorna `409 Conflict` (`{ erro: 'Esse dia já está bloqueado' }`).
+- **Interface e Experiência do Usuário (Front-end)**:
+  - [`AgendaProfissional`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/AgendaProfissional/agendaProfissional.tsx): botão "Bloquear este dia como folga" com fluxo de confirmação inline ("Confirmar folga" e "Voltar") e exibição do alerta em destaque ("Este dia está bloqueado como folga.").
+  - [`AgendaDoDia`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/AgendaDoDia/agendaDoDia.tsx): alerta para a recepção indicando dia bloqueado de folga, preservando as consultas marcadas.
+  - [`SeletorProfissional`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/molecules/SeletorProfissional/seletorProfissional.tsx): adiciona o sufixo `(De folga)` nas opções de profissionais com folga ativa na data selecionada.
+- **Cobertura de Testes Automatizados**:
+  - Backend: [`apps/api/test/rn07-bloqueio-de-folgas.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/rn07-bloqueio-de-folgas.test.ts) (6 testes cobrindo bloqueio de folga, preservação de consultas, bloqueio 409 de agendamento, lista vazia de horários, flag no GET /profissionais e rejeição de folga no passado/duplicada).
+  - Frontend: [`apps/web/test/rn07-bloqueio-de-folgas.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/rn07-bloqueio-de-folgas.test.tsx) (4 testes cobrindo confirmação de folga na agenda médica, alerta de folga com consultas preservadas, alerta na recepção e indicação visual no seletor).
+
+
 
 
 
