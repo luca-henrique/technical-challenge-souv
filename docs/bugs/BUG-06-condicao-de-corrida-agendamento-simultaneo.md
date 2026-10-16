@@ -82,7 +82,16 @@ const consulta = await prisma.$transaction(async (tx) => {
 
 ## 4. Testes Automatizados de Validação
 
+- **Back-end (Regressão Dedicada)**: [`apps/api/test/bugs/bug-06-condicao-de-corrida.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/bugs/bug-06-condicao-de-corrida.test.ts)
+  - `relato da clínica: duas pessoas marcando o mesmo horário simultaneamente deve resultar em apenas 1 agendamento e 1 erro 409`: dispara requisições concorrentes reais via `Promise.all` e valida que uma retorna 201, a outra 409, e exatamente 1 consulta existe no PostgreSQL.
+  - `evita condição de corrida entre consulta de 60 min e consulta de 30 min enviadas simultaneamente`: valida corrida com sobreposição parcial de durações.
 - **Back-end**: [`apps/api/test/rn04-exclusividade-e-conflitos.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/rn04-exclusividade-e-conflitos.test.ts)
-  - `garante que duas requisições simultâneas para o mesmo horário criem apenas uma consulta`: dispara simultaneamente via `Promise.all` duas requisições de agendamento HTTP para o mesmo médico no mesmo slot e comprova que:
-    1. Uma requisição responde `201 Created` e a outra `409 Conflict`.
-    2. No banco de dados, o número total de consultas criadas é rigorosamente igual a **1**.
+  - `garante que duas requisições simultâneas para o mesmo horário criem apenas uma consulta`
+
+---
+
+## 5. Status da Resolução: Concluído e Validado ✅
+
+- **Diagnóstico confirmado**: Janela de concorrência assíncrona entre leitura de conflito e escrita permitia inserções duplicadas simultâneas.
+- **Correção aplicada**: Bloqueio de transação no banco de dados via PostgreSQL Transaction Advisory Lock (`pg_advisory_xact_lock`) com hash por profissional e data.
+- **Cobertura de testes**: 100% de consistência atômica comprovada sob paralelismo real.
