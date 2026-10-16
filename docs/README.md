@@ -24,6 +24,7 @@ Documentação técnica aprofundada de cada regra de negócio do sistema, com ma
 ### 2. [Melhorias e Arquitetura (`docs/melhorias/`)](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/melhorias/README.md)
 Histórico e detalhamento das modernizações técnicas introduzidas no monorepo:
 - **[Histórico Consolidado de Melhorias](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/melhorias/historico-de-melhorias.md)**: Visão geral de todas as entregas técnicas (TanStack Query, Zod, RHF, Edge Middleware, Skeletons e serviços).
+- **[Mapeamento de Páginas e Features do Front-end](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/melhorias/mapeamento-paginas-e-features.md)**: Inventário completo das rotas em `apps/web/src/app` separadas por pastas com todas as features e componentes atômicos.
 - **[Padrões de Desenvolvimento e Nomenclatura](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/melhorias/padroes-de-desenvolvimento.md)**: Convenções de pastas, arquivos, TypeScript, Atomic Design e boas práticas.
 - **[Melhorias no Formulário de Login](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/melhorias/melhorias-formulario-login.md)**: Detalhamento do login moderno com TanStack Query e Zod.
 - **[Melhorias na Agenda do Dia](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/melhorias/melhorias-agenda-do-dia.md)**: Refatoração da agenda da recepção e resolução do bug de fuso horário.
