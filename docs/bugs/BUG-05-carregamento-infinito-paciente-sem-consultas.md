@@ -78,5 +78,15 @@ export default function MinhasConsultas() {
 
 ## 4. Testes Automatizados de Validação
 
+- **Front-end (Regressão Dedicada)**: [`apps/web/test/bugs/bug-05-carregamento-infinito.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/bugs/bug-05-carregamento-infinito.test.tsx)
+  - `relato da clínica: paciente novo com zero consultas não pode ficar com a tela travada em carregamento infinito`: simula paciente recém-cadastrado com resposta `[]` e valida o desaparecimento do skeleton, a exibição imediata do aviso de estado vazio e a disponibilidade do botão para marcar a primeira consulta.
 - **Front-end**: [`apps/web/test/minhasConsultas.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/minhasConsultas.test.tsx)
   - `exibe aviso amigável quando o paciente não tem consultas agendadas`: valida que quando a API devolve `[]`, a tela exibe imediatamente `"Você não possui consultas agendadas no momento."` e o botão `"Marcar consulta"`.
+
+---
+
+## 5. Status da Resolução: Concluído e Validado ✅
+
+- **Diagnóstico confirmado**: Condição `!consultas || consultas.length === 0` unificava erroneamente o carregamento assíncrono com a ausência de dados, travando pacientes novos em `<p>Carregando...</p>`.
+- **Correção aplicada**: Segregação formal entre o estado `isLoading`/`carregando` (que exibe o `MinhasConsultasSkeleton`) e a lista vazia `consultas.length === 0` (que renderiza mensagem amigável e botão de agendamento).
+- **Cobertura de testes**: 100% dos testes de estados assíncronos e vazios passando.
