@@ -6,6 +6,7 @@ import Alert from '@/components/atoms/Alert/alert'
 import Button from '@/components/atoms/Button/button'
 import Card from '@/components/atoms/Card/card'
 import BotaoExportarPdf from '@/components/molecules/BotaoExportarPdf/botaoExportarPdf'
+import FormBloquearPeriodo from '@/components/molecules/FormBloquearPeriodo/formBloquearPeriodo'
 import SeletorData from '@/components/molecules/SeletorData/seletorData'
 import TabelaConsultas from '@/components/organisms/TabelaConsultas/tabelaConsultas'
 import { useSessao } from '@/hooks/useSessao'
@@ -18,6 +19,8 @@ export default function AgendaProfissional() {
   const [agenda, setAgenda] = useState<Agenda | null>(null)
   const [erro, setErro] = useState('')
   const [confirmando, setConfirmando] = useState(false)
+  const [exibindoPeriodo, setExibindoPeriodo] = useState(false)
+  const [bloqueandoPeriodo, setBloqueandoPeriodo] = useState(false)
   const [atualizacao, setAtualizacao] = useState(0)
 
   useEffect(() => {
@@ -40,6 +43,24 @@ export default function AgendaProfissional() {
     }
   }
 
+  async function bloquearPeriodo(dados: { dataInicio: string; dataFim: string }) {
+    if (!profissionalId) return
+    setBloqueandoPeriodo(true)
+    try {
+      await api(`/profissionais/${profissionalId}/folgas/periodo`, {
+        metodo: 'POST',
+        corpo: dados,
+      })
+      setExibindoPeriodo(false)
+      setErro('')
+      setAtualizacao((n) => n + 1)
+    } catch (e) {
+      setErro((e as Error).message)
+    } finally {
+      setBloqueandoPeriodo(false)
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -50,20 +71,35 @@ export default function AgendaProfissional() {
             setConfirmando(false)
           }}
         />
-        {agenda && !agenda.folga && !confirmando && (
-          <Button variante="secundario" onClick={() => setConfirmando(true)}>
-            Bloquear este dia como folga
-          </Button>
-        )}
-        {confirmando && (
-          <div className="flex gap-2">
-            <Button onClick={bloquearDia}>Confirmar folga</Button>
-            <Button variante="secundario" onClick={() => setConfirmando(false)}>
-              Voltar
+        <div className="flex flex-wrap items-center gap-2">
+          {agenda && !agenda.folga && !confirmando && !exibindoPeriodo && (
+            <Button variante="secundario" onClick={() => setConfirmando(true)}>
+              Bloquear este dia como folga
             </Button>
-          </div>
-        )}
+          )}
+          {!exibindoPeriodo && !confirmando && (
+            <Button variante="secundario" onClick={() => setExibindoPeriodo(true)}>
+              Bloquear período (férias)
+            </Button>
+          )}
+          {confirmando && (
+            <div className="flex gap-2">
+              <Button onClick={bloquearDia}>Confirmar folga</Button>
+              <Button variante="secundario" onClick={() => setConfirmando(false)}>
+                Voltar
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
+
+      {exibindoPeriodo && (
+        <FormBloquearPeriodo
+          onConfirmar={bloquearPeriodo}
+          onCancelar={() => setExibindoPeriodo(false)}
+          bloqueando={bloqueandoPeriodo}
+        />
+      )}
 
       {erro && <Alert>{erro}</Alert>}
 

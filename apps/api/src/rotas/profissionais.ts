@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { hojeEmRecife } from '@bemviver/shared'
-import { dataValida, diaUtil, ehTipoConsulta, horariosDisponiveis } from '../agenda'
+import { dataValida, diaUtil, ehTipoConsulta, horariosDisponiveis, somarDias } from '../agenda'
 import { permitir } from '../auth'
 import { prisma } from '../prisma'
 
@@ -124,4 +124,63 @@ rotasProfissionais.post('/:id/folgas', permitir('profissional'), async (req, res
 
   const folga = await prisma.folga.create({ data: { profissionalId, data } })
   res.status(201).json(folga)
+})
+
+rotasProfissionais.post('/:id/folgas/periodo', permitir('profissional', 'recepcao'), async (req, res) => {
+  const profissionalId = req.params.id
+  const dataInicio = String(req.body?.dataInicio ?? '')
+  const dataFim = String(req.body?.dataFim ?? '')
+
+  if (req.usuario.perfil === 'profissional' && req.usuario.id !== profissionalId) {
+    res.status(403).json({ erro: 'Você só pode bloquear a sua própria agenda' })
+    return
+  }
+  if (!dataValida(dataInicio) || !dataValida(dataFim)) {
+    res.status(400).json({ erro: 'Informe as datas de início e fim no formato AAAA-MM-DD' })
+    return
+  }
+  if (dataInicio < hojeEmRecife()) {
+    res.status(400).json({ erro: 'Não é possível bloquear um período que já passou' })
+    return
+  }
+  if (dataInicio > dataFim) {
+    res.status(400).json({ erro: 'A data de início não pode ser posterior à data de término' })
+    return
+  }
+
+  const profissional = await prisma.profissional.findUnique({ where: { id: profissionalId } })
+  if (!profissional) {
+    res.status(404).json({ erro: 'Profissional não encontrado' })
+    return
+  }
+
+  const dias: string[] = []
+  let d = dataInicio
+  while (d <= dataFim) {
+    dias.push(d)
+    d = somarDias(d, 1)
+  }
+
+  if (dias.length > 90) {
+    res.status(400).json({ erro: 'O período máximo de bloqueio é de 90 dias' })
+    return
+  }
+
+  const folgasExistentes = await prisma.folga.findMany({
+    where: { profissionalId, data: { in: dias } },
+  })
+  const setExistentes = new Set(folgasExistentes.map((f) => f.data))
+  const diasParaCriar = dias.filter((dia) => !setExistentes.has(dia))
+
+  if (diasParaCriar.length > 0) {
+    await prisma.folga.createMany({
+      data: diasParaCriar.map((dia) => ({ profissionalId, data: dia })),
+    })
+  }
+
+  res.status(201).json({
+    totalDiasBloqueados: diasParaCriar.length,
+    periodo: { dataInicio, dataFim },
+    dias: diasParaCriar,
+  })
 })
