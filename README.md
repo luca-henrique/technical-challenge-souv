@@ -126,21 +126,25 @@ A senha de todos é `bemviver123`.
 
 ## 5. Relatos da clínica
 
+> A documentação detalhada de cada causa raiz, solução arquitetural e cobertura de testes está catalogada em [`docs/bugs/`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/bugs/README.md).
+
 ### Problemas relatados
 
-- “Uma paciente disse que na tela dela a consulta aparece na quarta. Na agenda da recepção, a mesma consulta aparece na terça.”
-- “Na semana passada o doutor ficou com dois pacientes no mesmo horário.”
-- “Quando alguém cancela, ninguém mais consegue marcar naquele horário.”
-- “Às vezes troco de profissional na agenda e continua aparecendo a agenda do anterior.”
-- “Um paciente novo disse que a tela de consultas dele fica só carregando.”
-- “Aconteceu uma vez de duas pessoas marcarem o mesmo horário. Não conseguimos reproduzir.”
+- [“Uma paciente disse que na tela dela a consulta aparece na quarta. Na agenda da recepção, a mesma consulta aparece na terça.”](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/bugs/BUG-01-discrepancia-data-fuso-horario.md) — Bug de fuso horário / regressão D-1.
+- [“Na semana passada o doutor ficou com dois pacientes no mesmo horário.”](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/bugs/BUG-02-sobreposicao-consultas-duracoes-diferentes.md) — Sobreposição de durações distintas (60 min x 30 min).
+- [“Quando alguém cancela, ninguém mais consegue marcar naquele horário.”](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/bugs/BUG-03-slot-bloqueado-apos-cancelamento.md) — Slot mantido bloqueado por falta de filtro de canceladas.
+- [“Às vezes troco de profissional na agenda e continua aparecendo a agenda do anterior.”](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/bugs/BUG-04-cache-troca-profissional-agenda.md) — Cache desatualizado de agenda sem chaveamento por profissional.
+- [“Um paciente novo disse que a tela de consultas dele fica só carregando.”](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/bugs/BUG-05-carregamento-infinito-paciente-sem-consultas.md) — Carregamento infinito por conflito entre estado vazio e loading.
+- [“Aconteceu uma vez de duas pessoas marcarem o mesmo horário. Não conseguimos reproduzir.”](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/bugs/BUG-06-condicao-de-corrida-agendamento-simultaneo.md) — Condição de corrida (*race condition*) em agendamentos concorrentes.
 
 ### Pedidos e situações em aberto
 
-- “Estamos perdendo dinheiro com cancelamentos no mesmo dia da consulta.”
-- “A recepção precisa conseguir encaixar urgências, mesmo quando o horário já está ocupado.”
-- “Um profissional vai tirar folga na sexta e já tem pacientes marcados. Não sabemos o que acontece com essas consultas.”
-- “Tem paciente que falta toda semana. Queremos fazer alguma coisa.”
+> A análise estratégica, fundamentação técnica e alinhamento com as regras de negócio canônicas estão detalhados em [`docs/bugs/SITUACOES-EM-ABERTO.md`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/bugs/SITUACOES-EM-ABERTO.md).
+
+- [“Estamos perdendo dinheiro com cancelamentos no mesmo dia da consulta.”](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/bugs/SITUACOES-EM-ABERTO.md#1-pedido-estamos-perdendo-dinheiro-com-cancelamentos-no-mesmo-dia-da-consulta)
+- [“A recepção precisa conseguir encaixar urgências, mesmo quando o horário já está ocupado.”](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/bugs/SITUACOES-EM-ABERTO.md#2-pedido-a-recepcao-precisa-conseguir-encaixar-urgencias-mesmo-quando-o-horario-ja-esta-ocupado)
+- [“Um profissional vai tirar folga na sexta e já tem pacientes marcados. Não sabemos o que acontece com essas consultas.”](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/bugs/SITUACOES-EM-ABERTO.md#3-situacao-um-profissional-vai-tirar-folga-na-sexta-e-ja-tem-pacientes-marcados-nao-sabemos-o-que-acontece-com-essas-consultas)
+- [“Tem paciente que falta toda semana. Queremos fazer alguma coisa.”](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/bugs/SITUACOES-EM-ABERTO.md#4-pedido-tem-paciente-que-falta-toda-semana-queremos-fazer-alguma-coisa)
 
 ## 6. Funcionalidades pedidas
 
