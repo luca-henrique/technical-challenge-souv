@@ -107,7 +107,13 @@ export default function AgendaProfissional() {
         <Card className="space-y-3">
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-lg font-semibold first-letter:uppercase">{formatarData(agenda.data)}</h2>
-            <BotaoExportarPdf />
+            <BotaoExportarPdf
+              tipo="agenda"
+              filtros={{
+                data,
+                profissionalId,
+              }}
+            />
           </div>
           {agenda.folga && <Alert variante="aviso">Este dia está bloqueado como folga.</Alert>}
           <TabelaConsultas consultas={agenda.consultas} />

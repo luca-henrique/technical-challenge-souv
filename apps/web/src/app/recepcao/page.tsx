@@ -38,7 +38,7 @@ export default function RecepcaoPage() {
       </div>
 
       <form
-        className="flex flex-wrap items-end gap-4"
+        className="flex flex-wrap  gap-4 justify-center"
         onSubmit={(e) => e.preventDefault()}
       >
         <Controller
@@ -48,6 +48,7 @@ export default function RecepcaoPage() {
             <SeletorProfissional
               profissionais={profissionais}
               valor={field.value}
+              permitirVazio
               onChange={field.onChange}
               erro={errors.profissionalId?.message}
               className="min-w-64 flex-1"

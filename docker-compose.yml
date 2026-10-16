@@ -25,6 +25,17 @@ services:
       - "8025:8025"
       - "1025:1025"
 
+  # Redis para filas e processamento assíncrono com BullMQ
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
   # Só sobe com npm run n8n
   n8n:
     image: n8nio/n8n:2.40.3

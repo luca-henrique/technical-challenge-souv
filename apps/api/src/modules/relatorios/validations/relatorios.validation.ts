@@ -25,3 +25,25 @@ export const relatorioFaltasQuerySchema = z
       })
     }
   })
+
+export const gerarPdfBodySchema = z.object({
+  tipo: z.enum(['agenda', 'absenteismo']),
+  filtros: z
+    .object({
+      data: z
+        .string()
+        .optional()
+        .refine((d) => !d || dataValida(d), { message: 'Data inválida (AAAA-MM-DD)' }),
+      profissionalId: z.string().optional(),
+      dataInicio: z
+        .string()
+        .optional()
+        .refine((d) => !d || dataValida(d), { message: 'Data de início inválida' }),
+      dataFim: z
+        .string()
+        .optional()
+        .refine((d) => !d || dataValida(d), { message: 'Data de término inválida' }),
+      especialidade: z.string().optional(),
+    })
+    .default({}),
+})

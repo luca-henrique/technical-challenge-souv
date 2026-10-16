@@ -45,8 +45,40 @@ Use uma seção para cada problema investigado ou decisão tomada, copiando o bl
 - **Ações diretas (Magic Links)**: Inclusão de links com tokens JWT de uso único no corpo do e-mail ("Confirmar presença com 1 clique" e "Remarcar consulta"), permitindo ao paciente atualizar o status sem login manual prévio.
 - **Observabilidade**: Adição de nó *Error Trigger* no n8n reportando falhas de conexão ou erros de entrega SMTP para canal de alerta (Slack/Discord/Sentry).
 - **Provedor SMTP Transacional**: Substituição do Mailpit local por serviço em nuvem de alta entregabilidade (AWS SES, Resend ou SendGrid) com DKIM, SPF e DMARC devidamente configurados.
+## Geração de PDF com Worker em Background usando BullMQ e Redis (FEAT-09)
 
-## Ordem das funcionalidades, com justificativa
+**O que eu vi**
+A impressão e exportação física de relatórios (Agenda do Dia e Relatório de Absenteísmo) é uma contingência operacional vital para clínicas médicas. A compilação de documentos e renderização de layouts visuais complexos é computacionalmente intensiva (Chromium headless com Puppeteer), podendo bloquear o Event Loop do Express caso executada de forma síncrona na thread HTTP principal.
+
+**O que achei que era**
+Execução puramente client-side com `window.print()` era simples, porém vulnerável a inconsistências entre navegadores e sistemas operacionais, além de impossibilitar agendamentos ou downloads padronizados em lote pelo servidor.
+
+**Como confirmei**
+Em ambiente de alta concorrência com múltiplos recepcionistas e médicos solicitando relatórios simultaneamente, requisições HTTP bloqueadas para compilar PDFs degradam a latência e causam timeouts de rede.
+
+**O que fiz e por quê**
+1. **Infraestrutura**: Adicionado serviço Redis 7 Alpine no `docker-compose.yml` (porta 6380 para evitar conflitos locais) e variáveis no `.env`.
+2. **Fila Assíncrona (BullMQ)**: Criada a fila `geracao-pdf` (`src/infra/jobs/pdfQueue.ts`) com política de retentativas automáticas (3 tentativas com backoff exponencial) e retenção temporária de arquivos concluídos.
+3. **Worker Dedicado (Puppeteer)**: Implementado `pdfWorker.ts` processando de forma isolada os jobs enfileirados, compilando templates HTML responsivos corporativos da clínica e gerando arquivos PDF A4 padronizados em `/uploads/pdfs/`.
+4. **Endpoints REST**:
+   - `POST /relatorios/pdf`: Retorna HTTP 202 com `jobId` imediatamente.
+   - `GET /relatorios/pdf/status/:jobId`: Consulta reativa do progresso e status da compilação.
+   - `GET /relatorios/pdf/download/:jobId`: Download autenticado com streaming binário.
+5. **Frontend**: Hook reativo `useExportarPdf` integrado ao componente `BotaoExportarPdf`, fornecendo feedback em tempo real de carregamento, percentual de progresso e acionamento automático de download.
+
+**Como testei**
+- Testes automatizados em `apps/api/test/features/feat-09-geracao-pdf-worker.test.ts` cobrindo enfileiramento, RBAC, consulta de status e rejeição de tipos inválidos.
+- Typecheck em ambos os workspaces (`apps/api` e `apps/web`) com 0 erros.
+
+**O que considerei e descartei**
+- PDFKit sem worker: Mais leve, porém com formatação visual rígida e incapaz de refletir os componentes e tokens de design do sistema web.
+- Geração síncrona no Express: Descartada pelo alto risco de bloqueio da thread principal de I/O em picos de uso.
+
+**Quanto tempo levou**
+40 minutos.
+
+---
+
 
 A priorização detalhada e a fundamentação estratégica completa estão documentadas em **[docs/novas-features/README.md](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/novas-features/README.md)** utilizando o framework **RICE** (Reach, Impact, Confidence, Effort).
 

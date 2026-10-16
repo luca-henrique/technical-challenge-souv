@@ -63,7 +63,15 @@ export default function RelatoriosPage() {
             <LinkButton href="/recepcao" variante="secundario">
               Voltar para Agenda
             </LinkButton>
-            <BotaoExportarPdf rotulo="Exportar Relatório" />
+            <BotaoExportarPdf
+              rotulo="Exportar Relatório"
+              tipo="absenteismo"
+              filtros={{
+                dataInicio: filtrosAtivos.dataInicio,
+                dataFim: filtrosAtivos.dataFim,
+                profissionalId: filtrosAtivos.profissionalId,
+              }}
+            />
           </div>
         </div>
 

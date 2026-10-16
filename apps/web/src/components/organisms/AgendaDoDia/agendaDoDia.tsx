@@ -110,7 +110,13 @@ export default function AgendaDoDia({
           <h2 className="text-lg font-semibold first-letter:uppercase">
             {formatarData(agenda.data)}
           </h2>
-          <BotaoExportarPdf />
+          <BotaoExportarPdf
+            tipo="agenda"
+            filtros={{
+              data,
+              profissionalId,
+            }}
+          />
         </div>
         {agenda.folga && (
           <Alert variante="aviso">
