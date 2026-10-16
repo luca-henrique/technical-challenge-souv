@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { diaUtil, hojeEmRecife } from '@bemviver/shared'
@@ -48,6 +48,15 @@ export default function ModalRemarcarConsulta({
 
   const { mutateAsync: remarcar, isPending: remarcando } = useRemarcarConsulta()
 
+  useEffect(() => {
+    if (!aberto) return
+    function aoPressionarTecla(e: KeyboardEvent) {
+      if (e.key === 'Escape' && !remarcando) onFechar()
+    }
+    window.addEventListener('keydown', aoPressionarTecla)
+    return () => window.removeEventListener('keydown', aoPressionarTecla)
+  }, [aberto, remarcando, onFechar])
+
   if (!aberto) return null
 
   const onSubmit = handleSubmit(async (valores) => {
@@ -85,8 +94,8 @@ export default function ModalRemarcarConsulta({
           <button
             type="button"
             onClick={onFechar}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-            aria-label="Fechar"
+            className="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:hover:bg-gray-800 dark:hover:text-gray-200 transition-colors"
+            aria-label="Fechar modal de remarcação"
           >
             ✕
           </button>

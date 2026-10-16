@@ -37,6 +37,7 @@ export default function CartaoConsulta({ consulta, onCancelar }: CartaoConsultaP
               tamanho="compacto"
               disabled={confirmandoPresenca}
               onClick={() => confirmarPresenca(consulta.id)}
+              aria-label={`Confirmar presença na consulta com ${consulta.profissionalNome} no dia ${formatarData(consulta.data)} às ${consulta.hora}`}
               className="text-xs text-teal-700 hover:text-teal-800 border-teal-300"
             >
               {confirmandoPresenca ? 'Confirmando...' : 'Confirmar presença'}
@@ -46,10 +47,19 @@ export default function CartaoConsulta({ consulta, onCancelar }: CartaoConsultaP
         {consulta.status === 'agendada' &&
           (confirmando ? (
             <div className="flex gap-2 pt-2">
-              <Button variante="perigo" onClick={() => onCancelar(consulta.id)} className="flex-1">
+              <Button
+                variante="perigo"
+                onClick={() => onCancelar(consulta.id)}
+                aria-label={`Confirmar cancelamento da consulta com ${consulta.profissionalNome}`}
+                className="flex-1"
+              >
                 Confirmar cancelamento
               </Button>
-              <Button variante="secundario" onClick={() => setConfirmando(false)}>
+              <Button
+                variante="secundario"
+                onClick={() => setConfirmando(false)}
+                aria-label="Desistir do cancelamento"
+              >
                 Voltar
               </Button>
             </div>
@@ -58,6 +68,7 @@ export default function CartaoConsulta({ consulta, onCancelar }: CartaoConsultaP
               <Button
                 variante="secundario"
                 onClick={() => setRemarcando(true)}
+                aria-label={`Remarcar consulta com ${consulta.profissionalNome}`}
                 className="flex-1"
               >
                 Remarcar
@@ -65,6 +76,7 @@ export default function CartaoConsulta({ consulta, onCancelar }: CartaoConsultaP
               <Button
                 variante="secundario"
                 onClick={() => setConfirmando(true)}
+                aria-label={`Cancelar consulta com ${consulta.profissionalNome}`}
                 className="flex-1 text-red-600 hover:text-red-700"
               >
                 Cancelar consulta

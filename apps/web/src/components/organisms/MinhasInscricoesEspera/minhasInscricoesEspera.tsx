@@ -28,7 +28,7 @@ export default function MinhasInscricoesEspera() {
   }
 
   return (
-    <Card className="space-y-3 border-amber-200 bg-amber-50/40 dark:border-amber-900/40 dark:bg-amber-950/10">
+    <Card aria-live="polite" className="space-y-3 border-amber-200 bg-amber-50/40 dark:border-amber-900/40 dark:bg-amber-950/10">
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-base font-semibold text-amber-950 dark:text-amber-200">
           Suas Inscrições na Lista de Espera ({ativas.length})
@@ -61,6 +61,7 @@ export default function MinhasInscricoesEspera() {
               tamanho="compacto"
               disabled={cancelando}
               onClick={() => cancelar(item.id)}
+              aria-label={`Sair da lista de espera para ${item.profissionalNome ?? 'profissional'} no dia ${formatarData(item.data)}`}
             >
               Sair da fila
             </Button>
