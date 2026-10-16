@@ -5,6 +5,7 @@ export type { Agenda, Profissional, TipoConsulta }
 export interface ListarProfissionaisParams {
   data?: string
   profissionalId?: string
+  especialidade?: string
 }
 
 export interface BuscarAgendaParams {

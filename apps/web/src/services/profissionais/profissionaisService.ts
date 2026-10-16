@@ -6,8 +6,13 @@ export async function listarProfissionais(params?: ListarProfissionaisParams): P
   const query = new URLSearchParams()
   if (params?.data) query.set('data', params.data)
   if (params?.profissionalId) query.set('profissionalId', params.profissionalId)
+  if (params?.especialidade) query.set('especialidade', params.especialidade)
   const qs = query.toString()
   return api<Profissional[]>(qs ? `/profissionais?${qs}` : '/profissionais')
+}
+
+export async function listarEspecialidades(): Promise<string[]> {
+  return api<string[]>('/profissionais/especialidades')
 }
 
 export async function buscarAgenda(profissionalId: string, data: string): Promise<Agenda> {

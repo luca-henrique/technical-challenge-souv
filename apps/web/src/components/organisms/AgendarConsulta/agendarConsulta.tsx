@@ -12,10 +12,12 @@ import Card from '@/components/atoms/Card/card'
 import Skeleton from '@/components/atoms/Skeleton/skeleton'
 import CardEntrarListaEspera from '@/components/molecules/CardEntrarListaEspera/cardEntrarListaEspera'
 import SeletorData from '@/components/molecules/SeletorData/seletorData'
+import SeletorEspecialidade from '@/components/molecules/SeletorEspecialidade/seletorEspecialidade'
 import SeletorHorario from '@/components/molecules/SeletorHorario/seletorHorario'
 import SeletorProfissional from '@/components/molecules/SeletorProfissional/seletorProfissional'
 import SeletorTipoConsulta from '@/components/molecules/SeletorTipoConsulta/seletorTipoConsulta'
 import { useAgendarConsulta } from '@/hooks/useAgendarConsulta'
+import { useEspecialidades } from '@/hooks/useEspecialidades'
 import { useHorarios } from '@/hooks/useHorarios'
 import { useProfissionais } from '@/hooks/useProfissionais'
 import { agendarConsultaPacienteSchema, type DadosAgendarConsultaPaciente } from './schema'
@@ -45,6 +47,9 @@ export default function AgendarConsulta({
     },
   })
 
+  const [especialidadeFiltro, setEspecialidadeFiltro] = useState('')
+  const { data: especialidades = [] } = useEspecialidades()
+
   const formProfissionalId = useWatch({ control, name: 'profissionalId' })
   const formData = useWatch({ control, name: 'data' })
   const formTipo = useWatch({ control, name: 'tipo' })
@@ -54,7 +59,10 @@ export default function AgendarConsulta({
     data: profissionais = [],
     isLoading: carregandoProfissionais,
     error: erroProfissionais,
-  } = useProfissionais(formData ? { data: formData } : undefined)
+  } = useProfissionais({
+    ...(formData ? { data: formData } : {}),
+    ...(especialidadeFiltro ? { especialidade: especialidadeFiltro } : {}),
+  })
 
   const {
     data: horarios = [],
@@ -97,6 +105,18 @@ export default function AgendarConsulta({
 
       <Card className="space-y-4">
         <form onSubmit={onSubmit} noValidate className="space-y-4">
+          {especialidades.length > 0 && (
+            <SeletorEspecialidade
+              especialidades={especialidades}
+              valor={especialidadeFiltro}
+              onChange={(novaEsp) => {
+                setEspecialidadeFiltro(novaEsp)
+                setValue('profissionalId', '', { shouldValidate: true })
+                setValue('hora', '', { shouldValidate: true })
+              }}
+            />
+          )}
+
           <Controller
             name="profissionalId"
             control={control}

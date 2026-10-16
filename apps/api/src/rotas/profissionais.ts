@@ -6,18 +6,31 @@ import { prisma } from '../prisma'
 
 export const rotasProfissionais = Router()
 
+rotasProfissionais.get('/especialidades', async (_req, res) => {
+  const lista = await prisma.profissional.findMany({
+    select: { especialidade: true },
+    distinct: ['especialidade'],
+    orderBy: { especialidade: 'asc' },
+  })
+  res.json(lista.map((p) => p.especialidade))
+})
+
 rotasProfissionais.get('/', async (req, res) => {
   const data = req.query.data ? String(req.query.data) : undefined
   const profissionalId = req.query.profissionalId ? String(req.query.profissionalId) : undefined
+  const especialidade = req.query.especialidade ? String(req.query.especialidade) : undefined
 
   if (data && !dataValida(data)) {
     res.status(400).json({ erro: 'Informe a data no formato AAAA-MM-DD' })
     return
   }
 
-  const where: { id?: string } = {}
+  const where: { id?: string; especialidade?: { equals: string; mode?: 'insensitive' } } = {}
   if (profissionalId) {
     where.id = profissionalId
+  }
+  if (especialidade) {
+    where.especialidade = { equals: especialidade, mode: 'insensitive' }
   }
 
   const profissionais = await prisma.profissional.findMany({
