@@ -5,6 +5,7 @@ export interface SeletorDataProps
   valor: string
   onChange: (data: string) => void
   label?: string
+  hint?: string
   erro?: string
   className?: string
 }

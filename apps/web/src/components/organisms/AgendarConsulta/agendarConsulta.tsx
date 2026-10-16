@@ -97,8 +97,8 @@ export default function AgendarConsulta({
   return (
     <div className={`mx-auto max-w-md space-y-4 ${className}`}>
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-xl font-semibold">Marcar consulta</h1>
-        <Link href="/paciente" className="text-sm text-teal-700 underline">
+        <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Marcar consulta</h1>
+        <Link href="/paciente" className="text-sm text-teal-700 hover:text-teal-800 dark:text-teal-400 underline">
           Voltar
         </Link>
       </div>
@@ -168,7 +168,7 @@ export default function AgendarConsulta({
 
           {formProfissionalId && formData && diaUtil(formData) && (
             <fieldset>
-              <legend className="block text-sm font-medium text-gray-700">Horário</legend>
+              <legend className="block text-sm font-medium text-gray-700 dark:text-gray-300">Horário</legend>
               {carregandoHorarios ? (
                 <div className="mt-2 space-y-2" role="status" aria-label="Carregando horários">
                   <Skeleton className="h-9 w-full" />

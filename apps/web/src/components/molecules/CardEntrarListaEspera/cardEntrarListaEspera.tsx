@@ -61,10 +61,10 @@ export default function CardEntrarListaEspera({
         <Alert variante="sucesso">{mensagemSucesso}</Alert>
       ) : (
         <div className="space-y-3">
-          <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <fieldset>
+            <legend className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
               Preferência de turno
-            </label>
+            </legend>
             <Controller
               name="turno"
               control={control}
@@ -77,7 +77,7 @@ export default function CardEntrarListaEspera({
                   ].map((opcao) => (
                     <label
                       key={opcao.valor}
-                      className={`flex cursor-pointer items-center justify-center rounded-md border p-2 text-xs font-medium transition-colors text-center ${
+                      className={`flex min-h-11 cursor-pointer items-center justify-center rounded-md border p-2 text-xs font-medium transition-colors text-center ${
                         field.value === opcao.valor
                           ? 'border-amber-600 bg-amber-600 text-white dark:border-amber-500 dark:bg-amber-500'
                           : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300'
@@ -96,7 +96,7 @@ export default function CardEntrarListaEspera({
                 </div>
               )}
             />
-          </div>
+          </fieldset>
 
           {mensagemErro && <Alert>{mensagemErro}</Alert>}
 
