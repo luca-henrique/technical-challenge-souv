@@ -1,7 +1,11 @@
 import type { StatusConsulta, TipoConsulta } from '@bemviver/shared'
 
 export function formatarData(data: string) {
-  const [ano, mes, dia] = data.slice(0, 10).split('-').map(Number)
+  if (!data) return ''
+  const parteData = data.slice(0, 10)
+  const [ano, mes, dia] = parteData.split('-').map(Number)
+  if (Number.isNaN(ano) || Number.isNaN(mes) || Number.isNaN(dia)) return data
+
   return new Date(Date.UTC(ano, mes - 1, dia)).toLocaleDateString('pt-BR', {
     weekday: 'long',
     day: '2-digit',

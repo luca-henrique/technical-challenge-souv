@@ -55,7 +55,19 @@ Componentes como [`AgendaDoDia`](file:///Users/lucas1/Desktop/projects/technical
 
 ## 4. Testes Automatizados de Validação
 
+- **Front-end (Regressão Dedicada)**: [`apps/web/test/bugs/bug-01-discrepancia-fuso.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/bugs/bug-01-discrepancia-fuso.test.ts)
+  - `relato da clínica: consulta na quarta nunca deve retroceder para terça na recepção ou no paciente`
+  - `mantém consistência para viradas de mês e início de ano em qualquer fuso horário UTC negativo`
+  - `lida com timestamps ISO completos sem aplicar deslocamento de fuso local que cause D-1`
 - **Front-end**: [`apps/web/test/rn02-formato-data-fuso.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/rn02-formato-data-fuso.test.ts)
   - `formata data mantendo exatamente o dia da semana e o dia do mês sem retrocesso (bug D-1)`: valida que `"2026-10-15"` gera `"quinta-feira, 15/10"`, `"2026-10-14"` gera `"quarta-feira, 14/10"`, e `"2026-10-16"` gera `"sexta-feira, 16/10"`.
 - **Back-end**: [`apps/api/test/rn02-fuso-horario-e-grade.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/rn02-fuso-horario-e-grade.test.ts)
   - `gera timestamps com offset de Recife (-03:00) consistentes`: valida que `instante("2026-10-26", "09:00")` grava `2026-10-26T12:00:00.000Z` sem distorção.
+
+---
+
+## 5. Status da Resolução: Concluído e Validado ✅
+
+- **Diagnóstico confirmado**: Causa raiz identificada no offset do construtor local `Date`.
+- **Correção aplicada**: [`formatarData`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/lib/formato.ts) com decomposição pura e `Date.UTC`.
+- **Cobertura de testes**: 100% dos testes de regressão passando sem falhas.
