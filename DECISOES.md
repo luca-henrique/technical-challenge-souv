@@ -44,7 +44,35 @@ Use uma seção para cada problema investigado ou decisão tomada, copiando o bl
 - **Canais adicionais (Omnichannel)**: Integração com WhatsApp Business API (Evolution API, Twilio ou Z-API) e SMS para pacientes que não acessam e-mail com frequência.
 - **Ações diretas (Magic Links)**: Inclusão de links com tokens JWT de uso único no corpo do e-mail ("Confirmar presença com 1 clique" e "Remarcar consulta"), permitindo ao paciente atualizar o status sem login manual prévio.
 - **Observabilidade**: Adição de nó *Error Trigger* no n8n reportando falhas de conexão ou erros de entrega SMTP para canal de alerta (Slack/Discord/Sentry).
-- **Provedor SMTP Transacional**: Substituição do Mailpit local por serviço em nuvem de alta entregabilidade (AWS SES, Resend ou SendGrid) com DKIM, SPF e DMARC devidamente configurados.
+## Envio Assíncrono de E-mails com BullMQ e Nodemailer (Mailpit)
+
+**O que eu vi**
+O disparo transacional síncrono de e-mails diretamente nas requisições HTTP (criação de consulta, cancelamento, notificação de fila de espera) adiciona latência de rede na resposta do usuário e falha caso o servidor SMTP esteja temporariamente indisponível.
+
+**O que achei que era**
+Disparar `mailTransporter.sendMail()` diretamente dentro das rotas do Express.
+
+**Como confirmei**
+Qualquer instabilidade ou lentidão no SMTP atrasa a resposta da API para o paciente. Sem fila, falhas temporárias resultam em perda definitiva de notificações aos pacientes sem política de retry.
+
+**O que fiz e por quê**
+1. **Fila BullMQ (`src/infra/jobs/emailQueue.ts`)**: Criada a fila `envio-email` com 3 tentativas automáticas via backoff exponencial e limitação de taxa (máximo de 10 e-mails por segundo).
+2. **Worker Dedicado (`src/infra/jobs/emailWorker.ts`)**: Inicializado no boot da API, consumindo a fila e despachando e-mails via Nodemailer conectado ao Mailpit (`localhost:1025`).
+3. **Templates HTML Corporativos (`emailTemplates.ts`)**: Templates estilizados para confirmação de agendamento, cancelamento de consulta e aviso de vaga liberada na lista de espera.
+4. **Desacoplamento nos Casos de Uso**: `criarConsulta` e `cancelarConsulta` enfileiram o job de forma assíncrona sem travar o retorno HTTP para o cliente.
+
+**Como testei**
+- Testes automatizados em `apps/api/test/features/feat-email-worker.test.ts` validando templates e integridade da fila no Redis.
+- Suíte completa de 10 arquivos e 43 testes da API passando com 100% de sucesso.
+
+**O que considerei e descartei**
+- Envio síncrono no Express: Descartado por bloquear o Event Loop e impactar o SLA de resposta.
+
+**Quanto tempo levou**
+30 minutos.
+
+---
+
 ## Geração de PDF com Worker em Background usando BullMQ e Redis (FEAT-09)
 
 **O que eu vi**

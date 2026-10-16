@@ -19,7 +19,7 @@ export class CriarConsultaUseCase {
 
     const { profissionalId, pacienteId, data, hora, tipo } = dados
 
-    return prisma.$transaction(async (tx) => {
+    const consultaCriada = await prisma.$transaction(async (tx) => {
       // Bloqueio atômico por profissional + data contra race condition (RN04 / BUG-06)
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${profissionalId} || '_' || ${data}))`
 
@@ -44,5 +44,43 @@ export class CriarConsultaUseCase {
         data: { profissionalId, pacienteId, data, hora, tipo, inicio, fim },
       })
     })
+
+    // Enfileira o e-mail de confirmação em background via BullMQ
+    try {
+      const [paciente, profissional] = await Promise.all([
+        prisma.usuario.findUnique({ where: { id: dados.pacienteId } }),
+        prisma.profissional.findUnique({
+          where: { id: dados.profissionalId },
+          include: { usuario: { select: { nome: true } } },
+        }),
+      ])
+
+      if (paciente?.email && profissional?.usuario?.nome) {
+        const { enfileirarEmail, gerarEmailConfirmacaoAgendamento } = await import(
+          '../../../infra/jobs'
+        )
+        const emailDados = gerarEmailConfirmacaoAgendamento({
+          pacienteNome: paciente.nome,
+          profissionalNome: profissional.usuario.nome,
+          especialidade: profissional.especialidade,
+          data: consultaCriada.data,
+          hora: consultaCriada.hora,
+          tipo: consultaCriada.tipo,
+        })
+
+        await enfileirarEmail({
+          para: paciente.email,
+          assunto: emailDados.assunto,
+          html: emailDados.html,
+          texto: emailDados.texto,
+          tipo: 'confirmacao_agendamento',
+          metadados: { consultaId: consultaCriada.id },
+        })
+      }
+    } catch (err) {
+      console.error('[CriarConsulta] Falha ao enfileirar e-mail de confirmação:', err)
+    }
+
+    return consultaCriada
   }
 }
