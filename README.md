@@ -150,16 +150,18 @@ A senha de todos é `bemviver123`.
 
 Ordene todas as funcionalidades abaixo por prioridade, com a justificativa de cada posição, e implemente duas delas.
 
-- Lembrete automático da consulta, enviado 24 horas antes. Pode ser feito com n8n, como bônus (veja abaixo).
-- Lista de espera para horários que forem liberados.
-- Confirmação de presença pelo paciente.
-- Remarcação pelo próprio paciente.
-- Bloqueio de agenda por período, como férias.
-- Histórico de consultas do paciente.
-- Relatório de faltas.
-- Busca de profissionais por especialidade.
-- Exportação da agenda do dia em PDF.
-- Tema escuro na área do paciente.
+> 📄 **Planejamento Estratégico e Matriz RICE**: Consulte o documento mestre **[docs/novas-features/README.md](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/novas-features/README.md)** com o ranking completo de 1º a 10º lugar, justificativas posição por posição e a seleção das duas funcionalidades implementadas.
+
+1. **[Lembrete automático da consulta, enviado 24 horas antes (com n8n - Bônus)](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/novas-features/FEAT-01-lembrete-automatico-consultas-n8n.md)** *(1º Lugar - RICE: 20.0)*
+2. **[Confirmação de presença pelo paciente](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/novas-features/FEAT-02-confirmacao-presenca-paciente.md)** *(2º Lugar - RICE: 15.0)*
+3. **[Remarcação pelo próprio paciente](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/novas-features/FEAT-03-remarcacao-pelo-paciente.md)** *(3º Lugar - RICE: 9.0)*
+4. **[Lista de espera para horários que forem liberados](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/novas-features/FEAT-04-lista-de-espera-horarios-liberados.md)** *(4º Lugar - RICE: 5.6)*
+5. **[Bloqueio de agenda por período, como férias](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/novas-features/FEAT-05-bloqueio-agenda-por-periodo.md)** *(5º Lugar - RICE: 7.6)*
+6. **[Relatório de faltas](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/novas-features/FEAT-06-relatorio-de-faltas.md)** *(6º Lugar - RICE: 6.7)*
+7. **[Histórico de consultas do paciente](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/novas-features/FEAT-07-historico-consultas-paciente.md)** *(7º Lugar - RICE: 10.0)*
+8. **[Busca de profissionais por especialidade](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/novas-features/FEAT-08-busca-profissionais-especialidade.md)** *(8º Lugar - RICE: 10.5)*
+9. **[Exportação da agenda do dia em PDF](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/novas-features/FEAT-09-exportacao-agenda-pdf.md)** *(9º Lugar - RICE: 2.7)*
+10. **[Tema escuro na área do paciente](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/novas-features/FEAT-10-tema-escuro-area-paciente.md)** *(10º Lugar - RICE: 1.4)*
 
 ### Lembrete automático com n8n (bônus)
 
