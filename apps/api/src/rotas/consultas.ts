@@ -1,8 +1,9 @@
 import { Router } from 'express'
 import { DURACAO_MINUTOS, hojeEmRecife } from '@bemviver/shared'
-import { ehTipoConsulta, instante, temConflito, validarHorario } from '../agenda'
+import { instante, temConflito } from '../agenda'
 import { permitir } from '../auth'
 import { prisma } from '../prisma'
+import { criarConsultaSchema } from '../schemas/consultaSchema'
 
 export const rotasConsultas = Router()
 
@@ -23,25 +24,29 @@ rotasConsultas.get('/minhas', permitir('paciente'), async (req, res) => {
 })
 
 rotasConsultas.post('/', permitir('paciente', 'recepcao'), async (req, res) => {
-  const profissionalId = String(req.body?.profissionalId ?? '')
-  const data = String(req.body?.data ?? '')
-  const hora = String(req.body?.hora ?? '')
-  const tipo = req.body?.tipo
-  // O paciente só marca para ele mesmo. A recepção escolhe o paciente.
-  const pacienteId = req.usuario.perfil === 'paciente' ? req.usuario.id : String(req.body?.pacienteId ?? '')
+  const pacienteId =
+    req.usuario.perfil === 'paciente'
+      ? req.usuario.id
+      : req.body?.pacienteId
 
-  if (!ehTipoConsulta(tipo)) {
-    res.status(400).json({ erro: 'Informe o tipo da consulta' })
+  const validacao = criarConsultaSchema.safeParse({
+    profissionalId: req.body?.profissionalId,
+    pacienteId,
+    data: req.body?.data,
+    hora: req.body?.hora,
+    tipo: req.body?.tipo,
+  })
+
+  if (!validacao.success) {
+    res.status(400).json({ erro: validacao.error.issues[0].message })
     return
   }
-  const motivo = validarHorario(data, hora, tipo)
-  if (motivo) {
-    res.status(400).json({ erro: motivo })
-    return
-  }
+
+  const { profissionalId, data, hora, tipo } = validacao.data
+  const idPacienteFinal = validacao.data.pacienteId
 
   const [paciente, profissional] = await Promise.all([
-    prisma.usuario.findFirst({ where: { id: pacienteId, perfil: 'paciente' } }),
+    prisma.usuario.findFirst({ where: { id: idPacienteFinal, perfil: 'paciente' } }),
     prisma.profissional.findUnique({ where: { id: profissionalId } }),
   ])
   if (!paciente || !profissional) {
@@ -64,7 +69,7 @@ rotasConsultas.post('/', permitir('paciente', 'recepcao'), async (req, res) => {
   const inicio = instante(data, hora)
   const fim = new Date(inicio.getTime() + DURACAO_MINUTOS[tipo] * 60_000)
   const consulta = await prisma.consulta.create({
-    data: { profissionalId, pacienteId, data, hora, tipo, inicio, fim },
+    data: { profissionalId, pacienteId: idPacienteFinal, data, hora, tipo, inicio, fim },
   })
   res.status(201).json(consulta)
 })

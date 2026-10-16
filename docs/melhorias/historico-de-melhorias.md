@@ -173,5 +173,26 @@ Todas as alterações contam com validação contínua nos scripts do projeto:
 - `npm run typecheck`: **0 erros de TypeScript** em todos os workspaces (`@bemviver/shared`, `@bemviver/api`, `@bemviver/web`).
 - `npm run lint`: **0 advertências ou erros no ESLint**.
 - Testes automatizados com Vitest:
-  - Backend: [`test/auth.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/auth.test.ts), [`test/profissionais.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/profissionais.test.ts), [`test/integracoes.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/integracoes.test.ts).
-  - Frontend: [`test/login.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/login.test.tsx), [`test/middleware.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/middleware.test.ts), [`test/recepcao.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/recepcao.test.tsx), [`test/agendaDoDia.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/agendaDoDia.test.tsx), [`test/minhasConsultas.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/minhasConsultas.test.tsx), [`test/agendarConsulta.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/agendarConsulta.test.tsx).
+  - Backend: [`test/auth.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/auth.test.ts), [`test/profissionais.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/profissionais.test.ts), [`test/integracoes.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/integracoes.test.ts), [`test/rn01-horario-expediente.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/rn01-horario-expediente.test.ts).
+  - Frontend: [`test/login.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/login.test.tsx), [`test/middleware.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/middleware.test.ts), [`test/recepcao.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/recepcao.test.tsx), [`test/agendaDoDia.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/agendaDoDia.test.tsx), [`test/minhasConsultas.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/minhasConsultas.test.tsx), [`test/agendarConsulta.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/agendarConsulta.test.tsx), [`test/seletorTipoConsulta.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/seletorTipoConsulta.test.tsx).
+
+---
+
+## 9. Implementação da Regra de Negócio RN01 (Expediente e Intervalo de Almoço)
+
+Implementação completa das restrições e validações da [RN01](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN01-horario-expediente-e-almoco.md):
+
+- **Centralização das Regras em [`@bemviver/shared`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/packages/shared/src/index.ts)**:
+  - Funções reutilizáveis e puras compartilhadas entre API e Web: `diaUtil`, `cabeNoExpediente`, `validarHorario`, `dataValida`, `gradePorTipo` e `instante`.
+- **Backend com Zod (`@bemviver/api`)**:
+  - Adicionado schema [`criarConsultaSchema`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/src/schemas/consultaSchema.ts) validando obrigatoriedade, dias úteis, grade de horários, expediente e almoço com mensagens descritivas.
+  - Bloqueio de primeira consulta (60min) às 11:30 (invade o almoço das 12h às 13h) e às 17:30 (invade após 18h).
+  - Bloqueio de sábados e domingos com a mensagem oficial `"A clínica só atende de segunda a sexta"`.
+  - Filtro em `horariosDisponiveis` garantindo que horários incompatíveis não sejam sequer ofertados pela API.
+  - 16 testes automatizados cobrindo todos os cenários da RN01 em [`apps/api/test/rn01-horario-expediente.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/rn01-horario-expediente.test.ts).
+- **Frontend com Zod e Bloqueio Proativo (`@bemviver/web`)**:
+  - Schema de validação Zod reativo (`mode: 'onChange'`) em [`AgendarConsulta`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/AgendarConsulta/agendarConsulta.tsx).
+  - Bloqueio imediato da seleção de horários e do botão de confirmação ao escolher sábado ou domingo.
+  - Proteção pré-requisição no hook [`useAgendarConsulta`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/hooks/useAgendarConsulta.ts) e otimização de chamadas no [`useHorarios`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/hooks/useHorarios.ts).
+  - Atualização do formulário da recepção [`MarcarConsulta`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/MarcarConsulta/marcarConsulta.tsx) para filtrar slots incompatíveis via `gradePorTipo`.
+

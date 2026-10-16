@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { hojeEmRecife } from '@bemviver/shared'
+import { diaUtil, hojeEmRecife } from '@bemviver/shared'
 import Alert from '@/components/atoms/Alert/alert'
 import Button from '@/components/atoms/Button/button'
 import Card from '@/components/atoms/Card/card'
@@ -35,6 +35,7 @@ export default function AgendarConsulta({
     formState: { errors },
   } = useForm<DadosAgendarConsultaPaciente>({
     resolver: zodResolver(agendarConsultaPacienteSchema),
+    mode: 'onChange',
     defaultValues: {
       profissionalId: '',
       data: '',
@@ -143,7 +144,7 @@ export default function AgendarConsulta({
             )}
           />
 
-          {formProfissionalId && formData && (
+          {formProfissionalId && formData && diaUtil(formData) && (
             <fieldset>
               <legend className="block text-sm font-medium text-gray-700">Horário</legend>
               {carregandoHorarios ? (
@@ -170,7 +171,7 @@ export default function AgendarConsulta({
 
           <Button
             type="submit"
-            disabled={!formHora || enviando || carregandoProfissionais}
+            disabled={!formHora || enviando || carregandoProfissionais || (Boolean(formData) && !diaUtil(formData))}
             className="w-full"
           >
             {enviando ? 'Marcando...' : 'Confirmar consulta'}

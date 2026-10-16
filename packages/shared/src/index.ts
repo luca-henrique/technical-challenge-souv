@@ -81,3 +81,42 @@ export const GRADE = EXPEDIENTE.flatMap((periodo) => {
 export function hojeEmRecife(agora = new Date()) {
   return new Intl.DateTimeFormat('en-CA', { timeZone: FUSO }).format(agora)
 }
+
+export function dataValida(data: string) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(data) && !isNaN(new Date(`${data}T12:00:00Z`).getTime()) && new Date(`${data}T12:00:00Z`).toISOString().startsWith(data)
+}
+
+export function diaUtil(data: string) {
+  const diaDaSemana = new Date(`${data}T12:00:00Z`).getUTCDay()
+  return diaDaSemana >= 1 && diaDaSemana <= 5
+}
+
+// Recife não tem horário de verão, então o deslocamento é sempre -03:00
+export function instante(data: string, hora: string) {
+  return new Date(`${data}T${hora}:00-03:00`)
+}
+
+export function ehTipoConsulta(tipo: unknown): tipo is TipoConsulta {
+  return tipo === 'primeira' || tipo === 'retorno'
+}
+
+export function cabeNoExpediente({ hora, tipo }: { hora: string; tipo: TipoConsulta }) {
+  const inicio = paraMinutos(hora)
+  const fim = inicio + (DURACAO_MINUTOS[tipo] ?? 30)
+  return EXPEDIENTE.some((periodo) => inicio >= periodo.inicio && fim <= periodo.fim)
+}
+
+export function gradePorTipo(tipo: TipoConsulta) {
+  return GRADE.filter((hora) => cabeNoExpediente({ hora, tipo }))
+}
+
+// Devolve o motivo quando o horário não pode ser marcado de acordo com a RN01
+export function validarHorario(data: string, hora: string, tipo: TipoConsulta, agora = new Date()) {
+  if (!dataValida(data)) return 'Informe a data no formato AAAA-MM-DD'
+  if (!diaUtil(data)) return 'A clínica só atende de segunda a sexta'
+  if (!GRADE.includes(hora)) return 'Escolha um horário da grade de 30 minutos'
+  if (!cabeNoExpediente({ hora, tipo })) return 'A consulta precisa terminar antes do almoço ou do fim do expediente'
+  if (instante(data, hora) <= agora) return 'Esse horário já passou'
+  return null
+}
+

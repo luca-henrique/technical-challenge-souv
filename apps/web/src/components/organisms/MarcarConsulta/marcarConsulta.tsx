@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { GRADE } from '@bemviver/shared'
+import { useForm, useWatch } from 'react-hook-form'
+import { GRADE, gradePorTipo } from '@bemviver/shared'
 import Alert from '@/components/atoms/Alert/alert'
 import Button from '@/components/atoms/Button/button'
 import Card from '@/components/atoms/Card/card'
@@ -23,6 +23,7 @@ export default function MarcarConsulta({ profissionalId, data, onMarcada }: Marc
 
   const {
     register,
+    control,
     handleSubmit,
     reset,
     formState: { errors },
@@ -34,6 +35,9 @@ export default function MarcarConsulta({ profissionalId, data, onMarcada }: Marc
       hora: GRADE[0],
     },
   })
+
+  const formTipo = useWatch({ control, name: 'tipo' })
+  const gradeDisponivel = gradePorTipo(formTipo ?? 'primeira')
 
   const onSubmit = handleSubmit(async (valores) => {
     setMensagemSucesso('')
@@ -86,7 +90,7 @@ export default function MarcarConsulta({ profissionalId, data, onMarcada }: Marc
         </Field>
         <Field label="Horário" erro={errors.hora?.message}>
           <Select {...register('hora')} aria-invalid={Boolean(errors.hora)}>
-            {GRADE.map((h) => (
+            {gradeDisponivel.map((h) => (
               <option key={h} value={h}>
                 {h}
               </option>

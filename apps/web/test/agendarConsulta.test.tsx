@@ -39,7 +39,7 @@ describe('AgendarConsulta', () => {
         return {
           id: 'c-100',
           profissionalId: 'prof-1',
-          data: '2026-10-25',
+          data: '2026-10-26',
           hora: '09:00',
           tipo: 'primeira',
           status: 'agendada',
@@ -58,8 +58,8 @@ describe('AgendarConsulta', () => {
     // Selecionar profissional
     fireEvent.change(screen.getByLabelText('Profissional'), { target: { value: 'prof-1' } })
 
-    // Selecionar data
-    fireEvent.change(screen.getByLabelText('Data'), { target: { value: '2026-10-25' } })
+    // Selecionar data (segunda-feira)
+    fireEvent.change(screen.getByLabelText('Data'), { target: { value: '2026-10-26' } })
 
     // Aguardar horários
     await waitFor(() => {
@@ -102,5 +102,40 @@ describe('AgendarConsulta', () => {
       expect(screen.getByRole('button', { name: 'Primeira Vez' })).toBeDefined()
     })
   })
+
+  it('bloqueia e exibe erro ao selecionar sábado ou domingo (RN01)', async () => {
+    entrarComo('paciente')
+    simularApi((url) => {
+      if (url.includes('/api/profissionais')) {
+        return [{ id: 'prof-1', nome: 'Dr. Roberto', especialidade: 'Cardiologia' }]
+      }
+      return null
+    })
+
+    renderComQuery(<AgendarConsulta />)
+
+    await waitFor(() => {
+      expect(screen.getByText(/Dr\. Roberto/)).toBeDefined()
+    })
+
+    // Selecionar profissional
+    fireEvent.change(screen.getByLabelText('Profissional'), { target: { value: 'prof-1' } })
+
+    // Selecionar domingo (2026-10-25)
+    fireEvent.change(screen.getByLabelText('Data'), { target: { value: '2026-10-25' } })
+
+    // Aguardar mensagem de erro da RN01
+    await waitFor(() => {
+      expect(screen.getByText('A clínica só atende de segunda a sexta')).toBeDefined()
+    })
+
+    // Botão de submissão desabilitado
+    const botaoConfirmar = screen.getByRole('button', { name: 'Confirmar consulta' })
+    expect(botaoConfirmar.getAttribute('disabled')).not.toBeNull()
+
+    // Não deve renderizar grade de horários
+    expect(screen.queryByRole('button', { name: '09:00' })).toBeNull()
+  })
 })
+
 
