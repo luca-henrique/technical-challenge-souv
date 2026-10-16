@@ -1,4 +1,4 @@
-import Button from "@/components/atoms/Button/button";
+import SegmentedControl from "@/components/molecules/SegmentedControl/segmentedControl";
 import { NOME_TIPO } from "@/lib/formato";
 import type { TipoConsulta } from "@bemviver/shared";
 import type {
@@ -36,7 +36,7 @@ export default function SeletorTipoConsulta({
   className = "",
   disabled = false,
 }: SeletorTipoConsultaProps) {
-  const tipoAtual = valor ?? selecionado;
+  const tipoAtual = valor ?? selecionado ?? "primeira";
   const itens = opcoes.map(normalizarOpcao);
 
   const aoMudar = (tipo: TipoConsulta) => {
@@ -44,41 +44,16 @@ export default function SeletorTipoConsulta({
     onSelecionar?.(tipo);
   };
 
-  const gridColsClass =
-    itens.length === 1
-      ? "grid-cols-1"
-      : itens.length === 2
-        ? "grid-cols-2"
-        : itens.length === 3
-          ? "grid-cols-3"
-          : "grid-cols-2 sm:grid-cols-4";
-
   return (
-    <fieldset className={className}>
-      {label && (
-        <legend className="block text-sm font-medium text-gray-700">
-          {label}
-        </legend>
-      )}
-      <div className={`mt-1 flex flex-col gap-2 ${gridColsClass}`}>
-        {itens.map((opcao) => {
-          const ativo = tipoAtual === opcao.valor;
-          return (
-            <Button
-              key={opcao.valor}
-              type="button"
-              variante={ativo ? "primario" : "secundario"}
-              aria-pressed={ativo}
-              disabled={disabled}
-              onClick={() => aoMudar(opcao.valor)}
-              className="w-full"
-            >
-              {opcao.rotulo}
-            </Button>
-          );
-        })}
-      </div>
-      {erro && <p className="mt-1 text-sm text-red-600">{erro}</p>}
-    </fieldset>
+    <SegmentedControl
+      opcoes={itens}
+      valor={tipoAtual}
+      onChange={aoMudar}
+      label={label}
+      erro={erro}
+      disabled={disabled}
+      className={className}
+    />
   );
 }
+

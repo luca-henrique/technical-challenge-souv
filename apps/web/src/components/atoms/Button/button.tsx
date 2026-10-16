@@ -10,13 +10,13 @@ const VARIANTES: Record<VarianteBotao, string> = {
 }
 
 const TAMANHOS: Record<TamanhoBotao, string> = {
-  normal: 'px-4 py-2',
-  compacto: 'px-3 py-1 text-sm',
-  estreito: 'px-1 py-2',
+  normal: 'h-10 px-4 py-2 text-sm',
+  compacto: 'h-9 px-3 py-1.5 text-sm',
+  estreito: 'h-9 px-2 text-sm',
 }
 
 export function classesDoBotao(variante: VarianteBotao = 'primario', tamanho: TamanhoBotao = 'normal') {
-  return `rounded-md font-medium transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 ${VARIANTES[variante]} ${TAMANHOS[tamanho]}`
+  return `inline-flex items-center justify-center shrink-0 rounded-md font-medium whitespace-nowrap transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 ${VARIANTES[variante]} ${TAMANHOS[tamanho]}`
 }
 
 export default function Button({ variante, tamanho, type = 'button', className = '', ...props }: ButtonProps) {

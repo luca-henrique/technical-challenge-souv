@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import type { SeletorDataProps } from './types'
 import Input from '@/components/atoms/Input/input'
 import Field from '@/components/molecules/Field/field'
@@ -10,9 +11,11 @@ export default function SeletorData({
   hint = 'Atendimento de segunda a sexta-feira',
   className = '',
   required = true,
-  id = 'seletor-data-input',
+  id: idProp,
   ...props
 }: SeletorDataProps) {
+  const generatedId = useId()
+  const id = idProp ?? generatedId
   return (
     <Field id={id} label={label} erro={erro} hint={hint} className={className}>
       <Input

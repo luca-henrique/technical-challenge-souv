@@ -79,7 +79,7 @@ describe('FEAT-07: Histórico de consultas do paciente (Front-end)', () => {
     })
 
     // 2. Clica na aba Histórico
-    const abaHistorico = screen.getByRole('button', { name: /histórico/i })
+    const abaHistorico = screen.getByRole('tab', { name: /histórico/i })
     fireEvent.click(abaHistorico)
 
     // 3. Exibe consultas do histórico
@@ -92,7 +92,7 @@ describe('FEAT-07: Histórico de consultas do paciente (Front-end)', () => {
     })
 
     // 4. Clica de volta para Próximas consultas
-    const abaProximas = screen.getByRole('button', { name: /próximas consultas/i })
+    const abaProximas = screen.getByRole('tab', { name: /próximas consultas/i })
     fireEvent.click(abaProximas)
 
     await waitFor(() => {

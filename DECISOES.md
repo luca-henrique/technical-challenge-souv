@@ -132,10 +132,12 @@ A ordem estabelecida para as 10 funcionalidades é:
 ## Cache com Redis e Paginação (api/profissionais e api/relatorios/faltas)
 
 **O que eu vi**
+
 1. A rota `GET /profissionais` é consultada com frequência em quase todos os fluxos de agendamento e filtragem de recepção/paciente. Sem cache, executa queries com `join` no Prisma a cada requisição.
 2. A rota `GET /relatorios/faltas` realizava agregações pesadas em memória sobre todo o histórico de consultas de absenteísmo, e a lista de reincidentes era retornada por inteiro sem paginação, impactando a performance à medida que o histórico de faltas cresce.
 
 **O que fiz e por quê**
+
 1. **Infraestrutura de Cache com Redis (`CacheService`)**:
    - Criada classe `CacheService` com métodos `obter<T>()`, `salvar()`, `remover()` e `invalidarPadrao()`.
    - Implementado cabeçalho HTTP `X-Cache: HIT` e `X-Cache: MISS` para transparência e observabilidade das respostas cacheadas.
@@ -151,6 +153,7 @@ A ordem estabelecida para as 10 funcionalidades é:
    - Integração da paginação na `TabelaReincidentes` e na página `recepcao/relatorios/page.tsx`, sincronizando a troca de páginas via TanStack Query e resetando para a página 1 ao aplicar ou limpar filtros.
 
 **Como testei**
+
 - Testes automatizados com Vitest e Supertest na API (`apps/api/test/profissionais.test.ts` e `apps/api/test/features/feat-06-relatorio-faltas.test.ts`), verificando `X-Cache: MISS`, `X-Cache: HIT`, invalidação após folga e recorte por páginas.
 - Testes no Frontend (`apps/web/test/features/feat-06-relatorio-faltas.test.tsx`), simulando a navegação entre páginas de reincidentes.
 - Execução completa do `typecheck` e testes automatizados.
@@ -169,5 +172,6 @@ A ordem estabelecida para as 10 funcionalidades é:
 
 ## O que ficou de fora
 
-BFF, SSR, trocar props drilling entre components por context ( talvez um gerenciador de estado ), gerar cache pelos mais buscados, teste unitarios dentro dos components, storybook, design system, padronizar tudo para inglês ( costume, achei estranho tudo em português, mas faz parte do desafio ), melhorias de ui/ux, teste de performance,
+BFF, SSR, trocar props drilling entre components por context ( talvez um gerenciador de estado ), gerar cache pelos mais buscados, teste unitarios dentro dos components, storybook, design system, padronizar tudo para inglês ( costume, achei estranho tudo em português, mas faz parte do desafio ), melhorias de ui/ux, teste de performance, ci/cd
 
+OBS: documentei muita coisa para me ajudar nas implementações e organização, talvez seja até exagero, mas me ajudou a visualizar e entender melhor o projeto e suas regras e necessidades.

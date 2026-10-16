@@ -62,7 +62,6 @@ export default function MinhasInscricoesEspera() {
               tamanho="compacto"
               disabled={cancelando}
               onClick={() => cancelar(item.id)}
-              aria-label={`Sair da lista de espera para ${item.profissionalNome ?? 'profissional'} no dia ${formatarData(item.data)}`}
             >
               Sair da fila
             </Button>

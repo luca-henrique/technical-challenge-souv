@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Button from '@/components/atoms/Button/button'
 import Badge from '@/components/atoms/Badge/badge'
 import Card from '@/components/atoms/Card/card'
+import InlineConfirmButton from '@/components/molecules/InlineConfirmButton/inlineConfirmButton'
 import ModalRemarcarConsulta from '@/components/molecules/ModalRemarcarConsulta/modalRemarcarConsulta'
 import { useConfirmarConsulta } from '@/hooks/useConfirmarConsulta'
 import { NOME_STATUS, NOME_TIPO, formatarData } from '@/lib/formato'
@@ -16,14 +17,8 @@ export default function CartaoConsulta({
   const [remarcando, setRemarcando] = useState(false)
   const { mutate: confirmarPresenca, isPending: confirmandoPresenca } = useConfirmarConsulta()
 
-  const dataHoraConsulta = new Date(`${consulta.data}T${consulta.hora}`)
-  const horarioPassou = !isNaN(dataHoraConsulta.getTime()) && dataHoraConsulta <= new Date()
-  const ehPassadaOuHistorico = historico || horarioPassou
-
-  const statusExibicao =
-    consulta.status === 'agendada' && ehPassadaOuHistorico && !consulta.confirmadaEm
-      ? 'cancelada'
-      : NOME_STATUS[consulta.status].toLowerCase()
+  const ehPassadaOuHistorico = historico
+  const statusExibicao = NOME_STATUS[consulta.status].toLowerCase()
 
   return (
     <>
@@ -58,46 +53,34 @@ export default function CartaoConsulta({
           </div>
         ) : null}
 
-        {!ehPassadaOuHistorico &&
-          consulta.status === 'agendada' &&
-          (confirmando ? (
-            <div className="flex gap-2 pt-2">
-              <Button
-                variante="perigo"
-                onClick={() => onCancelar(consulta.id)}
-                aria-label={`Confirmar cancelamento da consulta com ${consulta.profissionalNome}`}
-                className="flex-1"
-              >
-                Confirmar cancelamento
-              </Button>
+        {!ehPassadaOuHistorico && consulta.status === 'agendada' && (
+          <div className="flex gap-2 pt-2">
+            {!confirmando && (
               <Button
                 variante="secundario"
-                onClick={() => setConfirmando(false)}
-                aria-label="Desistir do cancelamento"
-              >
-                Voltar
-              </Button>
-            </div>
-          ) : (
-            <div className="flex gap-2 pt-2">
-              <Button
-                variante="secundario"
+                tamanho="compacto"
                 onClick={() => setRemarcando(true)}
-                aria-label={`Remarcar consulta com ${consulta.profissionalNome}`}
                 className="flex-1"
               >
                 Remarcar
               </Button>
-              <Button
-                variante="secundario"
-                onClick={() => setConfirmando(true)}
-                aria-label={`Cancelar consulta com ${consulta.profissionalNome}`}
-                className="flex-1 text-red-600 hover:text-red-700"
-              >
-                Cancelar consulta
-              </Button>
-            </div>
-          ))}
+            )}
+            <InlineConfirmButton
+              labelTrigger="Cancelar consulta"
+              labelConfirmar="Confirmar cancelamento"
+              labelCancelar="Voltar"
+              confirmando={confirmando}
+              onConfirmandoChange={setConfirmando}
+              onConfirmar={() => onCancelar(consulta.id)}
+              varianteTrigger="secundario"
+              varianteConfirmar="perigo"
+              varianteCancelar="secundario"
+              tamanho="compacto"
+              classNameTrigger="flex-1 text-red-600 hover:text-red-700"
+              classNameContainer="contents"
+            />
+          </div>
+        )}
       </Card>
 
       <ModalRemarcarConsulta

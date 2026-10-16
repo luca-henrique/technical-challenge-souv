@@ -7,9 +7,8 @@ import { diaUtil, hojeEmRecife } from '@bemviver/shared'
 import Alert from '@/components/atoms/Alert/alert'
 import Button from '@/components/atoms/Button/button'
 import Modal from '@/components/molecules/Modal/modal'
-import Skeleton from '@/components/atoms/Skeleton/skeleton'
+import SecaoHorario from '@/components/molecules/SecaoHorario/secaoHorario'
 import SeletorData from '@/components/molecules/SeletorData/seletorData'
-import SeletorHorario from '@/components/molecules/SeletorHorario/seletorHorario'
 import { useHorarios } from '@/hooks/useHorarios'
 import { useRemarcarConsulta } from '@/hooks/useRemarcarConsulta'
 import { formatarData } from '@/lib/formato'
@@ -98,25 +97,14 @@ export default function ModalRemarcarConsulta({
           />
 
           {formNovaData && diaUtil(formNovaData) && (
-            <fieldset>
-              <legend className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Novo horário
-              </legend>
-              {carregandoHorarios ? (
-                <div className="mt-2 space-y-2" role="status" aria-label="Carregando horários">
-                  <Skeleton className="h-9 w-full" />
-                </div>
-              ) : (
-                <SeletorHorario
-                  horarios={horarios}
-                  selecionado={formNovaHora}
-                  onSelecionar={(hora) => setValue('novaHora', hora, { shouldValidate: true })}
-                />
-              )}
-              {errors.novaHora && (
-                <p className="mt-1 text-sm text-red-600">{errors.novaHora.message}</p>
-              )}
-            </fieldset>
+            <SecaoHorario
+              label="Novo horário"
+              horarios={horarios}
+              selecionado={formNovaHora}
+              carregando={carregandoHorarios}
+              erro={errors.novaHora?.message}
+              onSelecionar={(hora) => setValue('novaHora', hora, { shouldValidate: true })}
+            />
           )}
 
           {(erroMutacao || erroHorarios?.message) && (

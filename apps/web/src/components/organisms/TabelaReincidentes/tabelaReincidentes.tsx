@@ -1,4 +1,6 @@
 import Card from '@/components/atoms/Card/card'
+import Table from '@/components/atoms/Table/table'
+import EmptyState from '@/components/molecules/EmptyState/emptyState'
 import Paginacao from '@/components/molecules/Paginacao/paginacao'
 import type { TabelaReincidentesProps } from './types'
 
@@ -9,11 +11,10 @@ export default function TabelaReincidentes({
 }: TabelaReincidentesProps) {
   if (reincidentes.length === 0) {
     return (
-      <Card>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Nenhum paciente reincidente em faltas registrado no período.
-        </p>
-      </Card>
+      <EmptyState
+        variante="card"
+        titulo="Nenhum paciente reincidente em faltas registrado no período."
+      />
     )
   }
 
@@ -22,29 +23,26 @@ export default function TabelaReincidentes({
       <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
         Pacientes com faltas no período
       </h3>
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm text-gray-700 dark:text-gray-300">
-          <caption className="sr-only">Pacientes com faltas no período selecionado</caption>
-          <thead>
-            <tr className="border-b border-gray-200 dark:border-gray-800 text-xs font-semibold text-gray-500 dark:text-gray-400">
-              <th scope="col" className="py-2 pr-4">Paciente</th>
-              <th scope="col" className="py-2 pr-4">E-mail</th>
-              <th scope="col" className="py-2 text-right">Faltas registradas</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-            {reincidentes.map((p) => (
-              <tr key={p.pacienteId}>
-                <td className="py-2 pr-4 font-medium text-gray-900 dark:text-gray-100">{p.nome}</td>
-                <td className="py-2 pr-4 text-gray-500 dark:text-gray-400">{p.email}</td>
-                <td className="py-2 text-right font-semibold text-rose-600 dark:text-rose-400">
-                  {p.totalFaltas} {p.totalFaltas === 1 ? 'falta' : 'faltas'}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Table caption="Pacientes com faltas no período selecionado">
+        <Table.Header>
+          <Table.Row>
+            <Table.Head>Paciente</Table.Head>
+            <Table.Head>E-mail</Table.Head>
+            <Table.Head className="text-right">Faltas registradas</Table.Head>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {reincidentes.map((p) => (
+            <Table.Row key={p.pacienteId}>
+              <Table.Cell className="font-medium text-gray-900 dark:text-gray-100">{p.nome}</Table.Cell>
+              <Table.Cell className="text-gray-500 dark:text-gray-400">{p.email}</Table.Cell>
+              <Table.Cell className="text-right font-semibold text-rose-600 dark:text-rose-400">
+                {p.totalFaltas} {p.totalFaltas === 1 ? 'falta' : 'faltas'}
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table>
 
       {paginacao && aoMudarPagina && (
         <Paginacao

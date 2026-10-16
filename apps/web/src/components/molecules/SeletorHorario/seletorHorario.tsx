@@ -22,7 +22,6 @@ export default function SeletorHorario({ horarios, selecionado, onSelecionar }: 
           variante={selecionado === hora ? 'primario' : 'secundario'}
           tamanho="estreito"
           aria-pressed={selecionado === hora}
-          aria-label={`Selecionar horário ${hora}`}
           onClick={() => onSelecionar(hora)}
           className="min-h-11"
         >

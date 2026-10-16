@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
 import Button from '@/components/atoms/Button/button'
 import Card from '@/components/atoms/Card/card'
-import SeletorData from '@/components/molecules/SeletorData/seletorData'
+import SeletorIntervaloDatas from '@/components/molecules/SeletorIntervaloDatas/seletorIntervaloDatas'
 import { bloquearPeriodoSchema, type DadosBloquearPeriodo } from './schema'
 import type { FormBloquearPeriodoProps } from './types'
 
@@ -37,35 +37,26 @@ export default function FormBloquearPeriodo({
       </div>
 
       <form onSubmit={handleSubmit(onConfirmar)} className="space-y-4">
-        <div className="flex flex-wrap items-start gap-4">
-          <Controller
-            name="dataInicio"
-            control={control}
-            render={({ field }) => (
-              <SeletorData
-                valor={field.value}
-                onChange={field.onChange}
-                label="Data de início"
-                erro={errors.dataInicio?.message}
-                className="flex-1 min-w-44"
-              />
-            )}
-          />
-
-          <Controller
-            name="dataFim"
-            control={control}
-            render={({ field }) => (
-              <SeletorData
-                valor={field.value}
-                onChange={field.onChange}
-                label="Data de término"
-                erro={errors.dataFim?.message}
-                className="flex-1 min-w-44"
-              />
-            )}
-          />
-        </div>
+        <Controller
+          name="dataInicio"
+          control={control}
+          render={({ field: fieldInicio }) => (
+            <Controller
+              name="dataFim"
+              control={control}
+              render={({ field: fieldFim }) => (
+                <SeletorIntervaloDatas
+                  dataInicio={fieldInicio.value}
+                  dataFim={fieldFim.value}
+                  onChangeInicio={fieldInicio.onChange}
+                  onChangeFim={fieldFim.onChange}
+                  erroInicio={errors.dataInicio?.message}
+                  erroFim={errors.dataFim?.message}
+                />
+              )}
+            />
+          )}
+        />
 
         <div className="flex justify-end gap-2">
           <Button type="button" variante="secundario" tamanho="compacto" onClick={onCancelar} disabled={bloqueando}>

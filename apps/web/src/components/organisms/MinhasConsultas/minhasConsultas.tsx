@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import Alert from '@/components/atoms/Alert/alert'
-import Heading from '@/components/atoms/Heading/heading'
+import PageHeader from '@/components/molecules/PageHeader/pageHeader'
 import LinkButton from '@/components/atoms/LinkButton/linkButton'
-import Text from '@/components/atoms/Text/text'
+import EmptyState from '@/components/molecules/EmptyState/emptyState'
 import { TabContent, Tabs, TabsList, TabTrigger } from '@/components/molecules/Tabs/tabs'
 import CartaoConsulta from '@/components/molecules/CartaoConsulta/cartaoConsulta'
 import MinhasInscricoesEspera from '@/components/organisms/MinhasInscricoesEspera/minhasInscricoesEspera'
@@ -37,12 +37,10 @@ export default function MinhasConsultas() {
 
   return (
     <div className="mx-auto max-w-md space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <Heading as="h1" variante="pagina">
-          Minhas consultas
-        </Heading>
-        <LinkButton href="/paciente/agendar">Marcar consulta</LinkButton>
-      </div>
+      <PageHeader
+        titulo="Minhas consultas"
+        acoes={<LinkButton href="/paciente/agendar">Marcar consulta</LinkButton>}
+      />
 
       <Tabs valor={abaAtiva} onChange={(v) => setAbaAtiva(v as 'proximas' | 'historico')}>
         <TabsList aria-label="Tipo de consultas">
@@ -56,11 +54,14 @@ export default function MinhasConsultas() {
           {carregando ? (
             <MinhasConsultasSkeleton />
           ) : consultas.length === 0 ? (
-            <Text variante="corpo" cor="secundario">
-              {abaAtiva === 'proximas'
-                ? 'Você não possui consultas agendadas no momento.'
-                : 'Nenhuma consulta encontrada no seu histórico.'}
-            </Text>
+            <EmptyState
+              variante="inline"
+              titulo={
+                abaAtiva === 'proximas'
+                  ? 'Você não possui consultas agendadas no momento.'
+                  : 'Nenhuma consulta encontrada no seu histórico.'
+              }
+            />
           ) : (
             <ul className="space-y-3">
               {consultas.map((consulta) => (

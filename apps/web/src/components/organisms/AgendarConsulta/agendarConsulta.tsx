@@ -1,6 +1,6 @@
 'use client'
 
-import Heading from '@/components/atoms/Heading/heading'
+import PageHeader from '@/components/molecules/PageHeader/pageHeader'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -10,11 +10,10 @@ import { diaUtil, hojeEmRecife } from '@bemviver/shared'
 import Alert from '@/components/atoms/Alert/alert'
 import Button from '@/components/atoms/Button/button'
 import Card from '@/components/atoms/Card/card'
-import Skeleton from '@/components/atoms/Skeleton/skeleton'
 import CardEntrarListaEspera from '@/components/molecules/CardEntrarListaEspera/cardEntrarListaEspera'
+import SecaoHorario from '@/components/molecules/SecaoHorario/secaoHorario'
 import SeletorData from '@/components/molecules/SeletorData/seletorData'
 import SeletorEspecialidade from '@/components/molecules/SeletorEspecialidade/seletorEspecialidade'
-import SeletorHorario from '@/components/molecules/SeletorHorario/seletorHorario'
 import SeletorProfissional from '@/components/molecules/SeletorProfissional/seletorProfissional'
 import SeletorTipoConsulta from '@/components/molecules/SeletorTipoConsulta/seletorTipoConsulta'
 import { useAgendarConsulta } from '@/hooks/useAgendarConsulta'
@@ -97,14 +96,14 @@ export default function AgendarConsulta({
 
   return (
     <div className={`mx-auto max-w-md space-y-4 ${className}`}>
-      <div className="flex items-center justify-between gap-4">
-        <Heading as="h1" variante="pagina">
-          Marcar consulta
-        </Heading>
-        <Link href="/paciente" className="text-sm text-teal-700 hover:text-teal-800 dark:text-teal-400 underline">
-          Voltar
-        </Link>
-      </div>
+      <PageHeader
+        titulo="Marcar consulta"
+        acoes={
+          <Link href="/paciente" className="text-sm text-teal-700 hover:text-teal-800 dark:text-teal-400 underline">
+            Voltar
+          </Link>
+        }
+      />
 
       <Card className="space-y-4">
         <form onSubmit={onSubmit} noValidate className="space-y-4">
@@ -170,37 +169,22 @@ export default function AgendarConsulta({
           />
 
           {formProfissionalId && formData && diaUtil(formData) && (
-            <fieldset>
-              <legend className="block text-sm font-medium text-gray-700 dark:text-gray-300">Horário</legend>
-              {carregandoHorarios ? (
-                <div className="mt-2 space-y-2" role="status" aria-label="Carregando horários">
-                  <Skeleton className="h-9 w-full" />
-                  <span className="sr-only">Carregando horários disponíveis...</span>
-                </div>
-              ) : (
-                <>
-                  <SeletorHorario
-                    horarios={horarios}
-                    selecionado={formHora}
-                    onSelecionar={(horaEscolhida) => {
-                      setValue('hora', horaEscolhida, { shouldValidate: true })
-                    }}
-                  />
-                  {horarios.length === 0 && (
-                    <div className="mt-3">
-                      <CardEntrarListaEspera
-                        profissionalId={formProfissionalId}
-                        data={formData}
-                        tipo={formTipo}
-                      />
-                    </div>
-                  )}
-                </>
-              )}
-              {errors.hora && (
-                <p className="mt-1 text-sm text-red-600">{errors.hora.message}</p>
-              )}
-            </fieldset>
+            <SecaoHorario
+              horarios={horarios}
+              selecionado={formHora}
+              carregando={carregandoHorarios}
+              erro={errors.hora?.message}
+              onSelecionar={(horaEscolhida) => {
+                setValue('hora', horaEscolhida, { shouldValidate: true })
+              }}
+              slotVazio={
+                <CardEntrarListaEspera
+                  profissionalId={formProfissionalId}
+                  data={formData}
+                  tipo={formTipo}
+                />
+              }
+            />
           )}
 
           {erroGeral && <Alert>{erroGeral}</Alert>}

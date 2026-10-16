@@ -9,6 +9,7 @@ export default function BotaoExportarPdf({
   className = '',
   rotulo = 'Exportar PDF',
   onExportar,
+  tamanho = 'normal',
   tipo,
   filtros,
 }: BotaoExportarPdfProps) {
@@ -32,7 +33,7 @@ export default function BotaoExportarPdf({
     <div className="inline-flex flex-col items-end">
       <Button
         variante="secundario"
-        tamanho="compacto"
+        tamanho={tamanho}
         onClick={handleExportar}
         disabled={gerando}
         className={`print:hidden inline-flex items-center gap-1.5 ${className}`}

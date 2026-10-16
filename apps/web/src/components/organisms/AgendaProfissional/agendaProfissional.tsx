@@ -4,14 +4,12 @@ import { useEffect, useState } from 'react'
 import { hojeEmRecife, type Agenda } from '@bemviver/shared'
 import Alert from '@/components/atoms/Alert/alert'
 import Button from '@/components/atoms/Button/button'
-import Card from '@/components/atoms/Card/card'
-import BotaoExportarPdf from '@/components/molecules/BotaoExportarPdf/botaoExportarPdf'
 import FormBloquearPeriodo from '@/components/molecules/FormBloquearPeriodo/formBloquearPeriodo'
+import InlineConfirmButton from '@/components/molecules/InlineConfirmButton/inlineConfirmButton'
 import SeletorData from '@/components/molecules/SeletorData/seletorData'
-import TabelaConsultas from '@/components/organisms/TabelaConsultas/tabelaConsultas'
+import CardAgendaDia from '@/components/organisms/CardAgendaDia/cardAgendaDia'
 import { useSessao } from '@/hooks/useSessao'
 import { api } from '@/lib/api'
-import { formatarData } from '@/lib/formato'
 
 export default function AgendaProfissional() {
   const profissionalId = useSessao()?.usuario.id
@@ -72,23 +70,24 @@ export default function AgendaProfissional() {
           }}
         />
         <div className="flex flex-wrap items-center gap-2">
-          {agenda && !agenda.folga && !confirmando && !exibindoPeriodo && (
-            <Button variante="secundario" onClick={() => setConfirmando(true)}>
-              Bloquear este dia como folga
-            </Button>
+          {agenda && !agenda.folga && !exibindoPeriodo && (
+            <InlineConfirmButton
+              labelTrigger="Bloquear este dia como folga"
+              labelConfirmar="Confirmar folga"
+              labelCancelar="Voltar"
+              confirmando={confirmando}
+              onConfirmandoChange={setConfirmando}
+              onConfirmar={bloquearDia}
+              varianteTrigger="secundario"
+              varianteConfirmar="primario"
+              varianteCancelar="secundario"
+              tamanho="normal"
+            />
           )}
           {!exibindoPeriodo && !confirmando && (
             <Button variante="secundario" onClick={() => setExibindoPeriodo(true)}>
               Bloquear período (férias)
             </Button>
-          )}
-          {confirmando && (
-            <div className="flex gap-2">
-              <Button onClick={bloquearDia}>Confirmar folga</Button>
-              <Button variante="secundario" onClick={() => setConfirmando(false)}>
-                Voltar
-              </Button>
-            </div>
           )}
         </div>
       </div>
@@ -104,20 +103,12 @@ export default function AgendaProfissional() {
       {erro && <Alert>{erro}</Alert>}
 
       {agenda && (
-        <Card className="space-y-3">
-          <div className="flex items-center justify-between gap-4">
-            <h2 className="text-lg font-semibold first-letter:uppercase">{formatarData(agenda.data)}</h2>
-            <BotaoExportarPdf
-              tipo="agenda"
-              filtros={{
-                data,
-                profissionalId,
-              }}
-            />
-          </div>
-          {agenda.folga && <Alert variante="aviso">Este dia está bloqueado como folga.</Alert>}
-          <TabelaConsultas consultas={agenda.consultas} />
-        </Card>
+        <CardAgendaDia
+          agenda={agenda}
+          profissionalId={profissionalId}
+          data={data}
+          mensagemFolga="Este dia está bloqueado como folga."
+        />
       )}
     </div>
   )

@@ -5,12 +5,11 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import Alert from "@/components/atoms/Alert/alert";
 import Button from "@/components/atoms/Button/button";
-import Heading from "@/components/atoms/Heading/heading";
 import LinkButton from "@/components/atoms/LinkButton/linkButton";
 import Spinner from "@/components/atoms/Spinner/spinner";
-import Text from "@/components/atoms/Text/text";
+import PageHeader from "@/components/molecules/PageHeader/pageHeader";
 import BotaoExportarPdf from "@/components/molecules/BotaoExportarPdf/botaoExportarPdf";
-import SeletorData from "@/components/molecules/SeletorData/seletorData";
+import SeletorIntervaloDatas from "@/components/molecules/SeletorIntervaloDatas/seletorIntervaloDatas";
 import SeletorProfissional from "@/components/molecules/SeletorProfissional/seletorProfissional";
 import MetricasRelatorio from "@/components/organisms/MetricasRelatorio/metricasRelatorio";
 import TabelaReincidentes from "@/components/organisms/TabelaReincidentes/tabelaReincidentes";
@@ -56,30 +55,26 @@ export default function RelatoriosPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <Heading as="h1" variante="pagina">
-            Relatório de Absenteísmo (No-Show)
-          </Heading>
-          <Text variante="corpo" cor="secundario">
-            Métricas consolidadas de faltas e lista de pacientes reincidentes.
-          </Text>
-        </div>
-        <div className="flex items-center gap-2 print:hidden">
-          <LinkButton href="/recepcao" variante="secundario">
-            Voltar para Agenda
-          </LinkButton>
-          <BotaoExportarPdf
-            rotulo="Exportar Relatório"
-            tipo="absenteismo"
-            filtros={{
-              dataInicio: filtrosAtivos.dataInicio,
-              dataFim: filtrosAtivos.dataFim,
-              profissionalId: filtrosAtivos.profissionalId,
-            }}
-          />
-        </div>
-      </div>
+      <PageHeader
+        titulo="Relatório de Absenteísmo (No-Show)"
+        subtitulo="Métricas consolidadas de faltas e lista de pacientes reincidentes."
+        acoes={
+          <div className="flex items-center gap-2 print:hidden">
+            <LinkButton href="/recepcao" variante="secundario">
+              Voltar para Agenda
+            </LinkButton>
+            <BotaoExportarPdf
+              rotulo="Exportar Relatório"
+              tipo="absenteismo"
+              filtros={{
+                dataInicio: filtrosAtivos.dataInicio,
+                dataFim: filtrosAtivos.dataFim,
+                profissionalId: filtrosAtivos.profissionalId,
+              }}
+            />
+          </div>
+        }
+      />
 
       {/* Filtros com React Hook Form e Zod */}
       <form
@@ -89,25 +84,21 @@ export default function RelatoriosPage() {
         <Controller
           name="dataInicio"
           control={control}
-          render={({ field }) => (
-            <SeletorData
-              valor={field.value ?? ""}
-              onChange={field.onChange}
-              label="Data de início"
-              required={false}
-            />
-          )}
-        />
-
-        <Controller
-          name="dataFim"
-          control={control}
-          render={({ field }) => (
-            <SeletorData
-              valor={field.value ?? ""}
-              onChange={field.onChange}
-              label="Data de término"
-              required={false}
+          render={({ field: fieldInicio }) => (
+            <Controller
+              name="dataFim"
+              control={control}
+              render={({ field: fieldFim }) => (
+                <SeletorIntervaloDatas
+                  dataInicio={fieldInicio.value ?? ""}
+                  dataFim={fieldFim.value ?? ""}
+                  onChangeInicio={fieldInicio.onChange}
+                  onChangeFim={fieldFim.onChange}
+                  required={false}
+                  className="flex flex-wrap items-end gap-3"
+                  itemClassName="w-auto"
+                />
+              )}
             />
           )}
         />

@@ -1,9 +1,9 @@
 "use client";
 
 import { Controller } from "react-hook-form";
-import Heading from "@/components/atoms/Heading/heading";
 import LinkButton from "@/components/atoms/LinkButton/linkButton";
 import Alert from "@/components/atoms/Alert/alert";
+import PageHeader from "@/components/molecules/PageHeader/pageHeader";
 import SeletorData from "@/components/molecules/SeletorData/seletorData";
 import SeletorProfissional from "@/components/molecules/SeletorProfissional/seletorProfissional";
 import AgendaDoDia from "@/components/organisms/AgendaDoDia/agendaDoDia";
@@ -28,14 +28,14 @@ export default function RecepcaoPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <Heading as="h1" variante="pagina">
-          Agenda da Recepção
-        </Heading>
-        <LinkButton href="/recepcao/relatorios" variante="secundario">
-          Relatório de faltas
-        </LinkButton>
-      </div>
+      <PageHeader
+        titulo="Agenda da Recepção"
+        acoes={
+          <LinkButton href="/recepcao/relatorios" variante="secundario">
+            Relatório de faltas
+          </LinkButton>
+        }
+      />
 
       <form
         className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start"
