@@ -7,10 +7,23 @@ import { useConfirmarConsulta } from '@/hooks/useConfirmarConsulta'
 import { NOME_STATUS, NOME_TIPO, formatarData } from '@/lib/formato'
 import type { CartaoConsultaProps } from './types'
 
-export default function CartaoConsulta({ consulta, onCancelar }: CartaoConsultaProps) {
+export default function CartaoConsulta({
+  consulta,
+  onCancelar,
+  historico = false,
+}: CartaoConsultaProps) {
   const [confirmando, setConfirmando] = useState(false)
   const [remarcando, setRemarcando] = useState(false)
   const { mutate: confirmarPresenca, isPending: confirmandoPresenca } = useConfirmarConsulta()
+
+  const dataHoraConsulta = new Date(`${consulta.data}T${consulta.hora}`)
+  const horarioPassou = !isNaN(dataHoraConsulta.getTime()) && dataHoraConsulta <= new Date()
+  const ehPassadaOuHistorico = historico || horarioPassou
+
+  const statusExibicao =
+    consulta.status === 'agendada' && ehPassadaOuHistorico && !consulta.confirmadaEm
+      ? 'cancelada'
+      : NOME_STATUS[consulta.status].toLowerCase()
 
   return (
     <>
@@ -22,7 +35,7 @@ export default function CartaoConsulta({ consulta, onCancelar }: CartaoConsultaP
           {consulta.profissionalNome} ({consulta.especialidade})
         </p>
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          {NOME_TIPO[consulta.tipo]}, {NOME_STATUS[consulta.status].toLowerCase()}
+          {NOME_TIPO[consulta.tipo]}, {statusExibicao}
         </p>
 
         {consulta.confirmadaEm ? (
@@ -31,7 +44,7 @@ export default function CartaoConsulta({ consulta, onCancelar }: CartaoConsultaP
               ✓ Presença confirmada
             </Badge>
           </div>
-        ) : consulta.status === 'agendada' ? (
+        ) : !ehPassadaOuHistorico && consulta.status === 'agendada' ? (
           <div className="pt-1">
             <Button
               variante="outline-primario"
@@ -44,7 +57,9 @@ export default function CartaoConsulta({ consulta, onCancelar }: CartaoConsultaP
             </Button>
           </div>
         ) : null}
-        {consulta.status === 'agendada' &&
+
+        {!ehPassadaOuHistorico &&
+          consulta.status === 'agendada' &&
           (confirmando ? (
             <div className="flex gap-2 pt-2">
               <Button

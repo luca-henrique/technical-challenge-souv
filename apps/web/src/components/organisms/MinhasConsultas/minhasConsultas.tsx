@@ -65,7 +65,11 @@ export default function MinhasConsultas() {
             <ul className="space-y-3">
               {consultas.map((consulta) => (
                 <li key={consulta.id}>
-                  <CartaoConsulta consulta={consulta} onCancelar={cancelar} />
+                  <CartaoConsulta
+                    consulta={consulta}
+                    onCancelar={cancelar}
+                    historico={abaAtiva === 'historico'}
+                  />
                 </li>
               ))}
             </ul>
