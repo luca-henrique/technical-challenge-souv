@@ -11,7 +11,7 @@ import Select from '@/components/atoms/Select/select'
 import Field from '@/components/molecules/Field/field'
 import { useAgenda } from '@/hooks/useAgenda'
 import { usePacientes } from '@/hooks/usePacientes'
-import { NOME_TIPO } from '@/lib/formato'
+import { NOME_TIPO_COM_DURACAO } from '@/lib/formato'
 import { agendarConsultaSchema, type DadosAgendarConsulta } from './schema'
 import type { MarcarConsultaProps } from './types'
 
@@ -84,8 +84,8 @@ export default function MarcarConsulta({ profissionalId, data, onMarcada }: Marc
         </Field>
         <Field label="Tipo" erro={errors.tipo?.message}>
           <Select {...register('tipo')} aria-invalid={Boolean(errors.tipo)}>
-            <option value="primeira">{NOME_TIPO.primeira}</option>
-            <option value="retorno">{NOME_TIPO.retorno}</option>
+            <option value="primeira">{NOME_TIPO_COM_DURACAO.primeira}</option>
+            <option value="retorno">{NOME_TIPO_COM_DURACAO.retorno}</option>
           </Select>
         </Field>
         <Field label="Horário" erro={errors.hora?.message}>

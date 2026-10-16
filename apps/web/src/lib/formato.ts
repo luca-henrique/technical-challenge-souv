@@ -15,6 +15,11 @@ export const NOME_TIPO: Record<TipoConsulta, string> = {
   retorno: 'Retorno',
 }
 
+export const NOME_TIPO_COM_DURACAO: Record<TipoConsulta, string> = {
+  primeira: 'Primeira consulta (60 min)',
+  retorno: 'Retorno (30 min)',
+}
+
 export const NOME_STATUS: Record<StatusConsulta, string> = {
   agendada: 'Agendada',
   cancelada: 'Cancelada',

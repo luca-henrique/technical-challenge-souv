@@ -215,4 +215,29 @@ Revisão e validação estrita da [RN02](file:///Users/lucas1/Desktop/projects/t
   - Backend: [`apps/api/test/rn02-fuso-horario-e-grade.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/rn02-fuso-horario-e-grade.test.ts) (7 testes).
   - Frontend: [`apps/web/test/rn02-formato-data-fuso.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/rn02-formato-data-fuso.test.ts) (4 testes).
 
+## 11. Implementação e Revisão da Regra de Negócio RN03 (Duração de Consultas e Tipos)
+
+Revisão e implementação completa da [RN03](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN03-duracao-consultas-e-tipos.md):
+
+- **Tipos de Consulta e Duração Canônica**:
+  - Definição em `@bemviver/shared`:
+    - `primeira`: Duração de **60 minutos** (ocupa 2 blocos consecutivos de 30 minutos).
+    - `retorno`: Duração de **30 minutos** (ocupa 1 bloco de 30 minutos).
+  - `DURACAO_MINUTOS` exportado centralmente (`{ primeira: 60, retorno: 30 }`).
+- **Validação de Expediente e Limites de Horário (`cabeNoExpediente`)**:
+  - `primeira` (60 min) não pode iniciar às `11:30` (invadiria o almoço 12h-13h) nem às `17:30` (ultrapassaria o encerramento do expediente às 18h).
+  - `retorno` (30 min) pode iniciar às `11:30` (termina às 12:00) e às `17:30` (termina às 18:00).
+- **Detecção de Conflitos e Sobreposição de Intervalos (`temConflito`)**:
+  - Implementação precisa de sobreposição por intervalos de tempo (`iniNova < fimMarcada && fimNova > iniMarcada`).
+  - Bloqueio correto de blocos múltiplos:
+    - Uma primeira consulta marcada às `09:00` bloqueia tanto as `09:00` quanto as `09:30`.
+    - Uma consulta existente às `10:00` impede o agendamento de uma primeira consulta (60 min) às `09:30` (pois iria até as 10:30), mas permite o agendamento de um retorno (30 min) às `09:30`.
+- **Interface e Experiência do Usuário (Front-end)**:
+  - Adicionado `NOME_TIPO_COM_DURACAO` em `apps/web/src/lib/formato.ts` exibindo rótulos intuitivos como `Primeira consulta (60 min)` e `Retorno (30 min)`.
+  - Atualizado formulário de marcação em [`MarcarConsulta`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/MarcarConsulta/marcarConsulta.tsx) e [`AgendarConsulta`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/AgendarConsulta/agendarConsulta.tsx) para filtrar slots dinamicamente de acordo com o tipo selecionado (`gradePorTipo`) e consultar a API com o tipo selecionado.
+- **Cobertura de Testes Automatizados**:
+  - Backend: [`apps/api/test/rn03-duracao-consultas-e-tipos.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/rn03-duracao-consultas-e-tipos.test.ts) (8 testes cobrindo durações, conflitos parciais, grade de horários e rota de agendamento).
+  - Frontend: [`apps/web/test/rn03-duracao-consultas-e-tipos.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/rn03-duracao-consultas-e-tipos.test.tsx) (4 testes cobrindo mapeamento de tipos, grade filtrada por duração e integração com o formulário).
+
+
 
