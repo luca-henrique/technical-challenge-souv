@@ -89,7 +89,7 @@ rotasProfissionais.get('/:id/horarios', async (req, res) => {
     return
   }
 
-  const marcadas = await prisma.consulta.findMany({ where: { profissionalId, data } })
+  const marcadas = await prisma.consulta.findMany({ where: { profissionalId, data, status: 'agendada' } })
   res.json({ horarios: horariosDisponiveis(marcadas, tipo, data) })
 })
 

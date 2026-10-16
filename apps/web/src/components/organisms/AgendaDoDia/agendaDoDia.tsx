@@ -12,7 +12,7 @@ import Field from "@/components/molecules/Field/field";
 import TabelaConsultas from "@/components/organisms/TabelaConsultas/tabelaConsultas";
 import { useAgenda } from "@/hooks/useAgenda";
 import { usePacientes } from "@/hooks/usePacientes";
-import { NOME_TIPO } from "@/lib/formato";
+import { formatarData, NOME_TIPO } from "@/lib/formato";
 import { agendarConsultaSchema, type DadosAgendarConsulta } from "./schema";
 import type { AgendaDoDiaProps } from "./types";
 
@@ -106,12 +106,7 @@ export default function AgendaDoDia({
     <div className="grid items-start gap-6 lg:grid-cols-[1fr_320px]">
       <Card className="space-y-3">
         <h2 className="text-lg font-semibold first-letter:uppercase">
-          {new Date(agenda.data).toLocaleDateString("pt-BR", {
-            weekday: "long",
-            day: "2-digit",
-            month: "2-digit",
-            timeZone: "UTC",
-          })}
+          {formatarData(agenda.data)}
         </h2>
         {agenda.folga && (
           <Alert variante="aviso">

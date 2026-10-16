@@ -196,3 +196,23 @@ Implementação completa das restrições e validações da [RN01](file:///Users
   - Proteção pré-requisição no hook [`useAgendarConsulta`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/hooks/useAgendarConsulta.ts) e otimização de chamadas no [`useHorarios`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/hooks/useHorarios.ts).
   - Atualização do formulário da recepção [`MarcarConsulta`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/MarcarConsulta/marcarConsulta.tsx) para filtrar slots incompatíveis via `gradePorTipo`.
 
+---
+
+## 10. Implementação e Revisão da Regra de Negócio RN02 (Fuso Horário e Grade de 30 Minutos)
+
+Revisão e validação estrita da [RN02](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN02-fuso-horario-e-grade-30min.md):
+
+- **Fuso Horário de Referência Canônico (`America/Recife`)**:
+  - Constante `FUSO = 'America/Recife'` e função `hojeEmRecife()` garantindo que a data corrente seja sempre extraída no fuso oficial da clínica, independente da localização do servidor ou máquina do cliente.
+  - Função `instante(data, hora)` gerando timestamps absolutos com offset `-03:00`, gravados em instantes UTC precisos no banco de dados.
+- **Resolução Definitiva do Bug de Regressão de Data (D-1)**:
+  - Padronização de [`formatarData`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/lib/formato.ts) utilizando `Date.UTC` e `timeZone: "UTC"`.
+  - Atualização de [`AgendaDoDia`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/AgendaDoDia/agendaDoDia.tsx) para usar `formatarData`, eliminando discrepâncias onde a mesma data aparecia em dias diferentes para o paciente e a recepção.
+- **Granularidade da Grade de 30 Minutos**:
+  - `GRADE` canônica em intervalos de 30 minutos (`08:00`, `08:30`, ..., `17:30`).
+  - Correção na listagem de horários livres da API para considerar apenas consultas com `status: 'agendada'`, liberando imediatamente o slot na grade de 30min se uma consulta for cancelada.
+- **Cobertura de Testes Automatizados**:
+  - Backend: [`apps/api/test/rn02-fuso-horario-e-grade.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/rn02-fuso-horario-e-grade.test.ts) (7 testes).
+  - Frontend: [`apps/web/test/rn02-formato-data-fuso.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/rn02-formato-data-fuso.test.ts) (4 testes).
+
+

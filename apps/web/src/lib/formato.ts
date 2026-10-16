@@ -1,11 +1,12 @@
 import type { StatusConsulta, TipoConsulta } from '@bemviver/shared'
 
 export function formatarData(data: string) {
-  const [ano, mes, dia] = data.split('-').map(Number)
-  return new Date(ano, mes - 1, dia).toLocaleDateString('pt-BR', {
+  const [ano, mes, dia] = data.slice(0, 10).split('-').map(Number)
+  return new Date(Date.UTC(ano, mes - 1, dia)).toLocaleDateString('pt-BR', {
     weekday: 'long',
     day: '2-digit',
     month: '2-digit',
+    timeZone: 'UTC',
   })
 }
 
