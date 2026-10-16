@@ -1,6 +1,7 @@
 "use client";
 
 import { Controller } from "react-hook-form";
+import LinkButton from "@/components/atoms/LinkButton/linkButton";
 import Alert from "@/components/atoms/Alert/alert";
 import SeletorData from "@/components/molecules/SeletorData/seletorData";
 import SeletorProfissional from "@/components/molecules/SeletorProfissional/seletorProfissional";
@@ -26,6 +27,15 @@ export default function RecepcaoPage() {
 
   return (
     <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+          Agenda da Recepção
+        </h1>
+        <LinkButton href="/recepcao/relatorios" variante="secundario">
+          Relatório de faltas
+        </LinkButton>
+      </div>
+
       <form
         className="flex flex-wrap items-end gap-4"
         onSubmit={(e) => e.preventDefault()}

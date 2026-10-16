@@ -19,6 +19,10 @@ export function useTema() {
   const [tema, setTemaState] = useState<Tema>(obterTemaInicial)
 
   useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return
+    }
+
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
     function aplicarTema(atual: Tema) {

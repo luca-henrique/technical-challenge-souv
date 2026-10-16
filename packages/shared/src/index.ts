@@ -44,6 +44,34 @@ export interface Agenda {
   consultas: Consulta[]
 }
 
+export interface RelatorioFaltas {
+  periodo: {
+    dataInicio?: string
+    dataFim?: string
+  }
+  totais: {
+    agendadas: number
+    realizadas: number
+    canceladas: number
+    faltas: number
+  }
+  taxaFaltas: number
+  reincidentes: Array<{
+    pacienteId: string
+    nome: string
+    email: string
+    totalFaltas: number
+  }>
+  faltasPorProfissional: Array<{
+    profissionalId: string
+    nome: string
+    especialidade: string
+    totalConsultas: number
+    faltas: number
+    taxaFaltas: number
+  }>
+}
+
 export const FUSO = 'America/Recife'
 
 export const DURACAO_MINUTOS: Record<TipoConsulta, number> = {
