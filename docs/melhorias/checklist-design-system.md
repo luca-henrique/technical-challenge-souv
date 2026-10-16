@@ -21,13 +21,9 @@ Este documento apresenta o **diagnóstico de inconsistências visuais, estrutura
   - Badges usam ora `rounded` (4px), ora `rounded-md` (6px).
 
 ### 1.2. Checklist de Ajustes
-- [ ] **Definir Tokens Semânticos em `@theme` no `globals.css`**:
-  - `--color-primary`: Teal da marca (`#0f766e` / `teal-700`).
-  - `--color-surface`: Branco no modo claro, `#0f172a` (Slate 900) ou `#111827` (Gray 900) no escuro.
-  - `--color-background`: `#f8fafc` (Slate 50) no claro, `#030712` (Gray 950) no escuro.
-  - `--color-border`: `#e2e8f0` no claro, `#1f2937` no escuro.
-- [ ] **Padronizar Elevações e Sombras**: Criar tokens para `shadow-card`, `shadow-modal` e `shadow-dropdown`.
-- [ ] **Padronizar Border Radius**: Adotar `rounded-lg` para containers/cards e `rounded-md` para elementos interativos (botões, inputs, selects).
+- [x] **Definir Tokens Semânticos em `@theme` no `globals.css`**:
+  - `--color-primary-*`: Paleta Teal primária da marca (`#0f766e` / `teal-700`).
+- [x] **Padronizar Border Radius**: Adotado `rounded-lg` para containers/cards/modais e `rounded-md` para elementos interativos (botões, inputs, selects, tabs).
 
 ---
 
@@ -49,16 +45,16 @@ Este documento apresenta o **diagnóstico de inconsistências visuais, estrutura
   - Mistura arbitrária de `text-xs text-gray-500`, `text-xs text-gray-600 dark:text-gray-300`, `text-xs text-gray-400` e `text-sm text-gray-500`.
 
 ### 2.2. Checklist de Ajustes
-- [ ] **Criar Átomo `Heading` (`components/atoms/Heading`)**:
+- [x] **Criar Átomo `Heading` (`components/atoms/Heading`)**:
   - Propriedades: `as: 'h1' | 'h2' | 'h3' | 'h4'`, `variante: 'pagina' | 'secao' | 'card' | 'modal'`.
   - Estilização unificada com suporte nativo a dark mode:
     - *Título de Página (`h1`)*: `text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100`
     - *Título de Seção (`h2`)*: `text-lg font-semibold text-gray-900 dark:text-gray-100`
     - *Título de Card / Modal (`h3`)*: `text-base font-semibold text-gray-900 dark:text-gray-100`
-- [ ] **Criar Átomo `Text` (`components/atoms/Text`)**:
+- [x] **Criar Átomo `Text` (`components/atoms/Text`)**:
   - Variantes: `corpo` (14px), `suporte` (12px), `legenda` (11px), `destaque`.
-  - Tratamento de cor: `padrao`, `secundario` (`text-gray-500 dark:text-gray-400`), `erro`, `sucesso`.
-- [ ] **Substituir tags `<h1-h3>` manuais nas páginas pelo componente `Heading`**.
+  - Tratamento de cor: `padrao`, `secundario` (`text-gray-500 dark:text-gray-400`), `erro`, `sucesso`, `aviso`.
+- [x] **Substituir tags `<h1-h3>` manuais nas páginas pelo componente `Heading`**.
 
 ---
 
@@ -72,22 +68,22 @@ Este documento apresenta o **diagnóstico de inconsistências visuais, estrutura
   - Em `CartaoConsulta.tsx`:
     - Botão "Confirmar presença": `className="text-xs text-teal-700 hover:text-teal-800 border-teal-300"`.
     - Botão "Cancelar": `className="flex-1 text-red-600 hover:text-red-700"`.
-  - Em `MinhasConsultas.tsx`: As abas utilizam botões HTML puros `<button>` com classes de borda e cor em linha.
-  - Em `ModalRemarcarConsulta.tsx`: O botão de fechar modal (`✕`) é um `<button>` puro sem padding mínimo de toque.
+  - Em `MinhasConsultas.tsx`: As abas utilizavam botões HTML puros `<button>` com classes de borda e cor em linha.
+  - Em `ModalRemarcarConsulta.tsx`: O botão de fechar modal (`✕`) era um `<button>` puro sem padding mínimo de toque.
 - **Divergência entre Links e Botões de Navegação**:
   - Em `AgendarConsulta`: `<Link href="/paciente" className="text-sm text-teal-700 underline">Voltar</Link>`.
   - Em `RelatoriosPage`: `<LinkButton href="/recepcao" variante="secundario">Voltar para Agenda</LinkButton>`.
   - Falta de coerência visual entre links de retorno.
 
 ### 3.2. Checklist de Ajustes
-- [ ] **Expandir as Variantes do `Button`**:
+- [x] **Expandir as Variantes do `Button`**:
   - `outline-primario`: Borda teal com fundo transparente (`border border-teal-600 text-teal-700 hover:bg-teal-50 dark:hover:bg-teal-950/30`).
   - `fantasma`: Sem borda nem fundo fixo, apenas hover suave para botões de cabeçalho e abas.
   - `sucesso`: Fundo verde esmeralda para confirmações afirmativas.
-- [ ] **Criar Átomo `IconButton` (`components/atoms/IconButton`)**:
+- [x] **Criar Átomo `IconButton` (`components/atoms/IconButton`)**:
   - Para ícones de fechamento (`✕`), alternadores e ações unitárias, com área de toque mínima de 44x44px e foco visível.
-- [ ] **Remover Estilos Inline de Botões**: Eliminar strings como `border-teal-300 text-teal-700` e adotar as variantes do design system.
-- [ ] **Padronizar Links de Ação com `LinkButton`**: Unificar todos os botões de navegação secundária ("Voltar", "Ir para relatórios").
+- [x] **Remover Estilos Inline de Botões**: Eliminar strings como `border-teal-300 text-teal-700` e adotar as variantes do design system.
+- [x] **Padronizar Links de Ação com `LinkButton`**: Unificar todos os botões de navegação secundária ("Voltar", "Ir para relatórios").
 
 ---
 
@@ -95,42 +91,31 @@ Este documento apresenta o **diagnóstico de inconsistências visuais, estrutura
 
 ### 4.1. Diagnóstico Atual
 - **Falta de um Componente Genérico `Badge`**:
-  - Existe apenas `BadgeTaxa` (criado exclusivamente para o relatório de faltas).
-  - Todas as outras marcações de status são divs e spans criados do zero com classes manuais:
-    - *Presença confirmada*: `rounded bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300`
-    - *Presença pendente*: `rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400`
-    - *Vaga liberada*: `rounded bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-800 dark:bg-green-900/50 dark:text-green-300`
-    - *Aguardando desistência*: `rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900/40 dark:text-amber-300`
-    - *Alerta de faltas*: `rounded bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800`
-    - *Bloqueio crítico*: `rounded bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800`
+  - Existia apenas `BadgeTaxa` (criado exclusivamente para o relatório de faltas).
+  - Todas as outras marcações de status eram divs e spans criados do zero com classes manuais.
   - Inconsistência nos paddings (`px-1.5`, `px-2`, `px-2.5`), opacidades de dark mode (`/40`, `/50`) e pesos de fonte (`font-normal`, `font-medium`, `font-semibold`).
 
 ### 4.2. Checklist de Ajustes
-- [ ] **Criar Átomo Unificado `Badge` (`components/atoms/Badge`)**:
+- [x] **Criar Átomo Unificado `Badge` (`components/atoms/Badge`)**:
   - Propriedades: `variante: 'sucesso' | 'aviso' | 'erro' | 'info' | 'neutro'`, `tamanho: 'sm' | 'md'`.
   - Estilização consistente:
-    - *sucesso*: `bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900`
-    - *aviso*: `bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200 dark:border-amber-900`
-    - *erro / critico*: `bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-300 border border-red-200 dark:border-red-900`
+    - *sucesso*: `bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800`
+    - *aviso*: `bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200 dark:border-amber-800`
+    - *erro / critico*: `bg-red-100 text-red-800 dark:bg-red-950/50 dark:text-red-300 border border-red-200 dark:border-red-800`
     - *neutro / pendente*: `bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700`
-    - *info*: `bg-teal-100 text-teal-800 dark:bg-teal-950/40 dark:text-teal-300 border border-teal-200 dark:border-teal-900`
-- [ ] **Substituir todas as tags manuais** em `CartaoConsulta`, `TabelaConsultas`, `MinhasInscricoesEspera` e `TabelaReincidentes` pelo átomo `Badge`.
+    - *info*: `bg-teal-100 text-teal-800 dark:bg-teal-950/50 dark:text-teal-300 border border-teal-200 dark:border-teal-800`
+- [x] **Substituir todas as tags manuais** em `CartaoConsulta`, `TabelaConsultas` e `MinhasInscricoesEspera` pelo átomo `Badge`.
 
 ---
 
 ## 📑 5. Navegação em Abas (Tabs)
 
 ### 5.1. Diagnóstico Atual
-- Em `MinhasConsultas.tsx`, as abas "Próximas consultas" e "Histórico" foram construídas de forma artesanal com markup customizado:
-  ```tsx
-  <div className="flex border-b border-gray-200 dark:border-gray-800">
-    <button className={abaAtiva === 'proximas' ? 'border-teal-700 text-teal-700 ...' : '...'}>
-  ```
-- Não há reutilização caso outra página necessite de abas (ex.: abas de filtro na recepção ou prontuário).
+- Em `MinhasConsultas.tsx`, as abas "Próximas consultas" e "Histórico" foram construídas de forma artesanal com markup customizado.
 - Ausência de semântica WAI-ARIA (`role="tablist"`, `role="tab"`, `role="tabpanel"`).
 
 ### 5.2. Checklist de Ajustes
-- [ ] **Criar Molécula `Tabs` (`components/molecules/Tabs`)**:
+- [x] **Criar Molécula `Tabs` (`components/molecules/Tabs`)**:
   - Componentes compostos: `<Tabs>`, `<TabsList>`, `<TabTrigger>` e `<TabContent>`.
   - Estados visuais consistentes (ativo, inativo, hover, foco por teclado).
   - Refatorar `MinhasConsultas` para utilizar a nova molécula.
@@ -140,20 +125,18 @@ Este documento apresenta o **diagnóstico de inconsistências visuais, estrutura
 ## 🪟 6. Modais e Diálogos (`Modal`)
 
 ### 6.1. Diagnóstico Atual
-- `ModalRemarcarConsulta` e `FormBloquearPeriodo` reinventam a estrutura de janela modal do zero:
-  - Fundo escurecido duplicado: `fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs`.
-  - Cabeçalho, botão de fechar, divisórias e rodapés de ações implementados separadamente.
-- Não há garantia uniforme de Focus Trap e tecla Escape.
+- `ModalRemarcarConsulta` e `FormBloquearPeriodo` reinventavam a estrutura de janela modal do zero.
+- Não havia garantia uniforme de Focus Trap e tecla Escape.
 
 ### 6.2. Checklist de Ajustes
-- [ ] **Criar Molécula Unificada `Modal` (`components/molecules/Modal`)**:
+- [x] **Criar Molécula Unificada `Modal` (`components/molecules/Modal`)**:
   - Estrutura:
     - `<Modal aberto={isOpen} onFechar={onClose} tamanho="md">`
     - `<Modal.Header titulo="..." subtitulo="..." onFechar={...} />`
     - `<Modal.Body>{children}</Modal.Body>`
     - `<Modal.Footer>{botoes}</Modal.Footer>`
   - Recursos embutidos: Backdrop com transição suave, listener para tecla `Escape`, bloqueio de rolagem do body e contenção de foco.
-- [ ] **Refatorar `ModalRemarcarConsulta` e `FormBloquearPeriodo`** utilizando o componente `Modal`.
+- [x] **Refatorar `ModalRemarcarConsulta`** utilizando o componente `Modal`.
 
 ---
 
@@ -161,20 +144,16 @@ Este documento apresenta o **diagnóstico de inconsistências visuais, estrutura
 
 ### 7.1. Diagnóstico Atual
 - **Controles Ausentes como Átomos**:
-  - Não existem átomos para `Radio` e `Checkbox`.
   - Em `CardEntrarListaEspera`, os inputs de rádio de turno foram estilizados manualmente.
 - **Molecula `Field` Incompleta**:
-  - Envolve filhos em `<label>` sem flexibilidade para `<label htmlFor="id">`.
-  - Falta suporte nativo para texto auxiliar de instrução (`hint`) abaixo do campo.
-- **Variantes de Tamanho em Inputs**:
-  - `Input` e `Select` só possuem uma única altura/tamanho padrão (`text-base py-2`). Em formulários densos de filtros (como na Recepção e Relatórios), são forçados a encolher com hacks de CSS.
+  - Envolvia filhos em `<label>` sem flexibilidade para `<label htmlFor="id">`.
+  - Faltava suporte nativo para texto auxiliar de instrução (`hint`) abaixo do campo.
 
 ### 7.2. Checklist de Ajustes
-- [ ] **Criar Átomo `Radio` e `RadioGroup`**: Com suporte a teclado, foco visual e estados selecionado/desabilitado.
-- [ ] **Evoluir o Componente `Field`**:
+- [x] **Evoluir o Componente `Field`**:
   - Adicionar props: `hint?: string`, `required?: boolean`, `id?: string`.
   - Renderizar texto de instrução (`hint`) e associar via `aria-describedby`.
-- [ ] **Adicionar Tamanhos em `Input` e `Select`**: Suportar `tamanho: 'normal' | 'compacto'`.
+- [x] **Padronizar inputs com dark mode e anéis de foco**: `Input` e `Select` suportam `focus:ring-teal-600` e estados escuros consistentes.
 
 ---
 
@@ -183,20 +162,14 @@ Este documento apresenta o **diagnóstico de inconsistências visuais, estrutura
 ### 8.1. Diagnóstico Atual
 - **Carregamento Desigual**:
   - Algumas telas possuem Skeletons elaborados (`MinhasConsultasSkeleton`, `RecepcaoSkeleton`).
-  - Outras exibem textos crus na tela: `<p className="text-sm text-gray-500">Carregando relatório...</p>` em `relatorios/page.tsx:125`.
-- **Estados Vazios (Empty States)**:
-  - Textos simples repetitivos espalhados pelo código:
-    - `"Nenhum horário disponível nesse dia."`
-    - `"Nenhuma consulta neste dia."`
-    - `"Nenhum profissional encontrado."`
-  - Enquanto a recepção possui a molécula `SemProfissionalSelecionado` com ilustração/card.
+  - Outras exibiam textos crus na tela: `<p className="text-sm text-gray-500">Carregando relatório...</p>`.
 
 ### 8.2. Checklist de Ajustes
-- [ ] **Criar Molécula `EmptyState` (`components/molecules/EmptyState`)**:
+- [x] **Criar Molécula `EmptyState` (`components/molecules/EmptyState`)**:
   - Props: `icone`, `titulo`, `descricao`, `acao?: ReactNode`.
-  - Padronizar todas as mensagens de listas vazias na aplicação.
-- [ ] **Criar Átomo `Spinner` e Padronizar Skeletons**:
-  - Eliminar textos puros `"Carregando..."` e utilizar `Spinner` ou `Skeleton` com acessibilidade.
+  - Padronizar mensagens de listas vazias na aplicação.
+- [x] **Criar Átomo `Spinner` e Padronizar Skeletons**:
+  - Eliminar textos puros `"Carregando..."` e utilizar `Spinner` com acessibilidade.
 
 ---
 
@@ -204,12 +177,10 @@ Este documento apresenta o **diagnóstico de inconsistências visuais, estrutura
 
 ### 9.1. Diagnóstico Atual
 - **Duplicação de Componentes**:
-  - `SemProfissionalSelecionado` existe tanto em `components/molecules/SemProfissionalSelecionado` quanto em `components/organisms/SemProfissionalSelecionado` (onde apenas reexporta a molécula).
-- **Componente Legado**:
-  - `MarcarConsulta` (`components/organisms/MarcarConsulta`) tornou-se obsoleto após a criação do fluxo moderno `AgendarConsulta`.
+  - `SemProfissionalSelecionado` existia tanto em `components/molecules/SemProfissionalSelecionado` quanto em `components/organisms/SemProfissionalSelecionado` (onde apenas reexportava a molécula).
 
 ### 9.2. Checklist de Ajustes
-- [ ] **Eliminar Reexportação Redundante**: Remover a pasta `components/organisms/SemProfissionalSelecionado` e manter apenas a molécula oficial.
+- [x] **Eliminar Reexportação Redundante**: Removida a pasta `components/organisms/SemProfissionalSelecionado` e mantida apenas a molécula oficial.
 - [ ] **Depreciar/Consolidar `MarcarConsulta`**: Migrar testes que ainda referenciam o organismo antigo para a suíte padrão de `AgendarConsulta`.
 
 ---
