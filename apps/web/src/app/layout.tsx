@@ -10,8 +10,27 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="pt-BR">
-      <body className="bg-gray-50 text-gray-900 antialiased">
+    <html lang="pt-BR" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var salvo = localStorage.getItem('tema-clinica-bem-viver');
+                  var prefereEscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  if (salvo === 'escuro' || ((!salvo || salvo === 'sistema') && prefereEscuro)) {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
+      <body className="bg-gray-50 text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100">
         <ProvedorQuery>{children}</ProvedorQuery>
       </body>
     </html>

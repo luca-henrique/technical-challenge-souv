@@ -8,40 +8,54 @@ const CHAVE_STORAGE = 'tema-clinica-bem-viver'
 
 function obterTemaInicial(): Tema {
   if (typeof window === 'undefined') return 'sistema'
-  const salvo = localStorage.getItem(CHAVE_STORAGE) as Tema | null
-  if (salvo && ['claro', 'escuro', 'sistema'].includes(salvo)) {
-    return salvo
+  try {
+    const salvo = localStorage.getItem(CHAVE_STORAGE) as Tema | null
+    if (salvo && ['claro', 'escuro', 'sistema'].includes(salvo)) {
+      return salvo
+    }
+  } catch {
+    // localStorage indisponível
   }
   return 'sistema'
+}
+
+export function aplicarTemaNoDocumento(tema: Tema) {
+  if (typeof document === 'undefined') return
+  const raiz = document.documentElement
+  let prefereEscuro = false
+
+  if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+    try {
+      prefereEscuro = window.matchMedia('(prefers-color-scheme: dark)').matches
+    } catch {
+      prefereEscuro = false
+    }
+  }
+
+  const deveSerEscuro = tema === 'escuro' || (tema === 'sistema' && prefereEscuro)
+
+  if (deveSerEscuro) {
+    raiz.classList.add('dark')
+  } else {
+    raiz.classList.remove('dark')
+  }
 }
 
 export function useTema() {
   const [tema, setTemaState] = useState<Tema>(obterTemaInicial)
 
   useEffect(() => {
+    aplicarTemaNoDocumento(tema)
+
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
       return
     }
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
-    function aplicarTema(atual: Tema) {
-      const raiz = document.documentElement
-      const prefereEscuro = mediaQuery.matches
-      const deveSerEscuro = atual === 'escuro' || (atual === 'sistema' && prefereEscuro)
-
-      if (deveSerEscuro) {
-        raiz.classList.add('dark')
-      } else {
-        raiz.classList.remove('dark')
-      }
-    }
-
-    aplicarTema(tema)
-
     function tratarMudancaSistema() {
       if (tema === 'sistema') {
-        aplicarTema('sistema')
+        aplicarTemaNoDocumento('sistema')
       }
     }
 
@@ -54,14 +68,30 @@ export function useTema() {
   function definirTema(novoTema: Tema) {
     setTemaState(novoTema)
     if (typeof window !== 'undefined') {
-      localStorage.setItem(CHAVE_STORAGE, novoTema)
+      try {
+        localStorage.setItem(CHAVE_STORAGE, novoTema)
+      } catch {
+        // ignora se localStorage estiver bloqueado
+      }
     }
+    aplicarTemaNoDocumento(novoTema)
   }
 
   function alternarTema() {
-    if (tema === 'claro') definirTema('escuro')
-    else if (tema === 'escuro') definirTema('sistema')
-    else definirTema('claro')
+    let proximo: Tema
+    if (tema === 'claro') {
+      proximo = 'escuro'
+    } else if (tema === 'escuro') {
+      proximo = 'sistema'
+    } else {
+      // Se estiver em 'sistema', alterna para o modo oposto ao do SO para haver mudança visual imediata
+      const prefereEscuro =
+        typeof window !== 'undefined' &&
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches
+      proximo = prefereEscuro ? 'claro' : 'escuro'
+    }
+    definirTema(proximo)
   }
 
   return {
