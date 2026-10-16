@@ -48,7 +48,17 @@ export function useAgenda(profissionalId: string, data: string) {
 
 ## 4. Testes Automatizados de Validação
 
+- **Front-end (Regressão Dedicada)**: [`apps/web/test/bugs/bug-04-cache-troca-profissional.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/bugs/bug-04-cache-troca-profissional.test.tsx)
+  - `relato da clínica: ao trocar de profissional, a agenda do anterior não deve continuar aparecendo`: simula a alternância no dropdown entre Dr. Roberto e Dra. Julia e comprova que a tabela de consultas limpa imediatamente os dados do médico anterior e renderiza os dados exclusivos do novo médico sem efeito fantasma.
 - **Front-end**: [`apps/web/test/recepcao.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/recepcao.test.tsx)
   - `carrega a lista de profissionais e exibe a agenda do primeiro profissional`
 - **Front-end**: [`apps/web/test/agendaDoDia.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/agendaDoDia.test.tsx)
   - Valida o isolamento das consultas e reactividade da agenda por profissional e data.
+
+---
+
+## 5. Status da Resolução: Concluído e Validado ✅
+
+- **Diagnóstico confirmado**: Requisições soltas em `useEffect` sem segregação de cache retinham o estado do profissional anterior quando o usuário alternava médicos rapidamente.
+- **Correção aplicada**: Chave composta no TanStack Query (`['agenda', profissionalId, data]`) que descarta respostas antigas e isola o cache de cada médico.
+- **Cobertura de testes**: 100% dos testes de isolamento de agenda e alternância de médicos validados.
