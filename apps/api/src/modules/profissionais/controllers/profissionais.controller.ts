@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
-import { dataValida, ehTipoConsulta, type TipoConsulta } from '../../../agenda'
+import type { TipoConsulta } from '@bemviver/shared'
+import { dataValida, ehTipoConsulta } from '../../../agenda'
 import { PrismaProfissionaisRepository } from '../repositories/profissionais.repository'
 import { BloquearFolgaUseCase } from '../usecases/bloquearFolga.usecase'
 import { BloquearPeriodoFolgaUseCase } from '../usecases/bloquearPeriodoFolga.usecase'
@@ -53,7 +54,7 @@ export class ProfissionaisController {
   }
 
   obterAgenda = async (req: Request, res: Response): Promise<void> => {
-    const profissionalId = req.params.id
+    const profissionalId = String(req.params.id)
     const data = String(req.query.data ?? '')
 
     if (req.usuario.perfil === 'profissional' && req.usuario.id !== profissionalId) {
@@ -84,7 +85,7 @@ export class ProfissionaisController {
   }
 
   listarHorarios = async (req: Request, res: Response): Promise<void> => {
-    const profissionalId = req.params.id
+    const profissionalId = String(req.params.id)
     const data = String(req.query.data ?? '')
     const tipo = req.query.tipo
 
@@ -102,7 +103,7 @@ export class ProfissionaisController {
   }
 
   bloquearFolga = async (req: Request, res: Response): Promise<void> => {
-    const profissionalId = req.params.id
+    const profissionalId = String(req.params.id)
     const data = String(req.body?.data ?? '')
 
     if (req.usuario.id !== profissionalId) {
@@ -154,7 +155,7 @@ export class ProfissionaisController {
   }
 
   bloquearPeriodo = async (req: Request, res: Response): Promise<void> => {
-    const profissionalId = req.params.id
+    const profissionalId = String(req.params.id)
     const dataInicio = String(req.body?.dataInicio ?? '')
     const dataFim = String(req.body?.dataFim ?? '')
 

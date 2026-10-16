@@ -171,3 +171,9 @@ export async function notificarProximoListaEspera(
 ) {
   return listaEsperaController.notificarProximo(profissionalId, data, horaConsulta)
 }
+
+export const inscreverListaEspera = listaEsperaController.inscrever
+export const listarListaEspera = listaEsperaController.listar
+export const listarMinhasEspera = listaEsperaController.listarMinhas
+export const removerListaEspera = listaEsperaController.remover
+

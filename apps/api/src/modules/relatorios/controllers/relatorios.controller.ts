@@ -38,3 +38,4 @@ export class RelatoriosController {
 }
 
 export const relatoriosController = new RelatoriosController()
+export const gerarRelatorioFaltas = relatoriosController.gerarRelatorioFaltas

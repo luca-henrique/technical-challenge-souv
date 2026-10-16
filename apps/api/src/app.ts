@@ -1,12 +1,13 @@
-import express, { type NextFunction, type Request, type Response } from 'express'
-import { autenticar } from './auth'
-import { rotasAuth } from './rotas/auth'
-import { rotasConsultas } from './rotas/consultas'
-import { rotasIntegracoes } from './rotas/integracoes'
-import { rotasPacientes } from './rotas/pacientes'
-import { rotasProfissionais } from './rotas/profissionais'
-import { rotasRelatorios } from './rotas/relatorios'
-import { rotasListaEspera } from './rotas/listaEspera'
+import express from 'express'
+import { autenticar } from './middlewares/authMiddleware'
+import { errorHandler } from './middlewares/errorHandler'
+import { rotasAuth } from './modules/auth/routes'
+import { rotasConsultas } from './modules/consultas/routes'
+import { rotasIntegracoes } from './modules/integracoes/routes'
+import { rotasListaEspera } from './modules/listaEspera/routes'
+import { rotasPacientes } from './modules/pacientes/routes'
+import { rotasProfissionais } from './modules/profissionais/routes'
+import { rotasRelatorios } from './modules/relatorios/routes'
 
 export const app = express()
 
@@ -22,11 +23,4 @@ app.use('/pacientes', rotasPacientes)
 app.use('/relatorios', rotasRelatorios)
 app.use('/lista-espera', rotasListaEspera)
 
-app.use((erro: { status?: number }, _req: Request, res: Response, _next: NextFunction) => {
-  if (erro.status === 400) {
-    res.status(400).json({ erro: 'Corpo da requisição inválido' })
-    return
-  }
-  console.error(erro)
-  res.status(500).json({ erro: 'Erro inesperado no servidor' })
-})
+app.use(errorHandler)
