@@ -45,6 +45,13 @@ export interface Agenda {
   consultas: Consulta[]
 }
 
+export interface Paginacao {
+  pagina: number
+  limite: number
+  totalItens: number
+  totalPaginas: number
+}
+
 export interface RelatorioFaltas {
   periodo: {
     dataInicio?: string
@@ -71,6 +78,7 @@ export interface RelatorioFaltas {
     faltas: number
     taxaFaltas: number
   }>
+  paginacao?: Paginacao
 }
 
 export type TurnoListaEspera = 'manha' | 'tarde' | 'qualquer'

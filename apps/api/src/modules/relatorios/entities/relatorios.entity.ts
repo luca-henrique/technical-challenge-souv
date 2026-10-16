@@ -6,6 +6,8 @@ export interface FiltroRelatorioFaltas {
   dataInicio?: string
   dataFim?: string
   profissionalId?: string
+  pagina?: number
+  limite?: number
 }
 
 export interface ConsultaRelatorioEntity {

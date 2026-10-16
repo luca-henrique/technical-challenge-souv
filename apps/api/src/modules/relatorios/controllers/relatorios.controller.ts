@@ -1,10 +1,13 @@
 import fs from 'node:fs'
 import type { Request, Response } from 'express'
-import { dataValida } from '../../../agenda'
+import { cacheService } from '../../../infra/cache/cacheService'
 import { pdfQueue } from '../../../infra/jobs/pdfQueue'
 import { PrismaRelatoriosRepository } from '../repositories/relatorios.repository'
 import { GerarRelatorioFaltasUseCase } from '../usecases/gerarRelatorioFaltas.usecase'
-import { gerarPdfBodySchema } from '../validations/relatorios.validation'
+import {
+  gerarPdfBodySchema,
+  relatorioFaltasQuerySchema,
+} from '../validations/relatorios.validation'
 
 export class RelatoriosController {
   private readonly gerarRelatorioFaltasUseCase: GerarRelatorioFaltasUseCase
@@ -14,20 +17,19 @@ export class RelatoriosController {
   }
 
   gerarRelatorioFaltas = async (req: Request, res: Response): Promise<void> => {
-    const dataInicio = req.query.dataInicio ? String(req.query.dataInicio) : undefined
-    const dataFim = req.query.dataFim ? String(req.query.dataFim) : undefined
-    const profissionalId = req.query.profissionalId ? String(req.query.profissionalId) : undefined
+    const validacao = relatorioFaltasQuerySchema.safeParse(req.query)
+    if (!validacao.success) {
+      res.status(400).json({ erro: validacao.error.issues[0]?.message ?? 'Parâmetros inválidos' })
+      return
+    }
 
-    if (dataInicio && !dataValida(dataInicio)) {
-      res.status(400).json({ erro: 'Data de início inválida. Use o formato AAAA-MM-DD' })
-      return
-    }
-    if (dataFim && !dataValida(dataFim)) {
-      res.status(400).json({ erro: 'Data de término inválida. Use o formato AAAA-MM-DD' })
-      return
-    }
-    if (dataInicio && dataFim && dataInicio > dataFim) {
-      res.status(400).json({ erro: 'A data de início não pode ser posterior à data de término' })
+    const { dataInicio, dataFim, profissionalId, pagina, limite } = validacao.data
+
+    const chaveCache = `cache:relatorios:faltas:${dataInicio ?? ''}:${dataFim ?? ''}:${profissionalId ?? ''}:${pagina}:${limite}`
+    const cacheado = await cacheService.obter(chaveCache)
+    if (cacheado) {
+      res.setHeader('X-Cache', 'HIT')
+      res.json(cacheado)
       return
     }
 
@@ -35,7 +37,12 @@ export class RelatoriosController {
       dataInicio,
       dataFim,
       profissionalId,
+      pagina,
+      limite,
     })
+
+    await cacheService.salvar(chaveCache, relatorio, 60)
+    res.setHeader('X-Cache', 'MISS')
     res.json(relatorio)
   }
 

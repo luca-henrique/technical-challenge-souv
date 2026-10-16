@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express'
 import type { TipoConsulta } from '@bemviver/shared'
 import { dataValida, ehTipoConsulta } from '../../../agenda'
+import { cacheService } from '../../../infra/cache/cacheService'
 import { PrismaProfissionaisRepository } from '../repositories/profissionais.repository'
 import { BloquearFolgaUseCase } from '../usecases/bloquearFolga.usecase'
 import { BloquearPeriodoFolgaUseCase } from '../usecases/bloquearPeriodoFolga.usecase'
@@ -45,11 +46,22 @@ export class ProfissionaisController {
       return
     }
 
+    const chaveCache = `cache:profissionais:${data ?? ''}:${profissionalId ?? ''}:${especialidade ?? ''}`
+    const cacheado = await cacheService.obter(chaveCache)
+    if (cacheado) {
+      res.setHeader('X-Cache', 'HIT')
+      res.json(cacheado)
+      return
+    }
+
     const profissionais = await this.listarProfissionaisUseCase.executar({
       data,
       profissionalId,
       especialidade,
     })
+
+    await cacheService.salvar(chaveCache, profissionais, 120)
+    res.setHeader('X-Cache', 'MISS')
     res.json(profissionais)
   }
 
@@ -127,6 +139,7 @@ export class ProfissionaisController {
         data: validacao.data.data,
         usuarioId: req.usuario.id,
       })
+      await cacheService.invalidarPadrao('cache:profissionais:*')
       res.status(201).json(folga)
     } catch (erro) {
       if (erro instanceof Error) {
@@ -184,6 +197,7 @@ export class ProfissionaisController {
         usuarioPerfil: req.usuario.perfil,
         usuarioId: req.usuario.id,
       })
+      await cacheService.invalidarPadrao('cache:profissionais:*')
       res.status(201).json(resultado)
     } catch (erro) {
       if (erro instanceof Error) {

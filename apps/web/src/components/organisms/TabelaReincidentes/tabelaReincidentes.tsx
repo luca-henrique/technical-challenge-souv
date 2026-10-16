@@ -1,7 +1,12 @@
 import Card from '@/components/atoms/Card/card'
+import Paginacao from '@/components/molecules/Paginacao/paginacao'
 import type { TabelaReincidentesProps } from './types'
 
-export default function TabelaReincidentes({ reincidentes }: TabelaReincidentesProps) {
+export default function TabelaReincidentes({
+  reincidentes,
+  paginacao,
+  aoMudarPagina,
+}: TabelaReincidentesProps) {
   if (reincidentes.length === 0) {
     return (
       <Card>
@@ -40,6 +45,15 @@ export default function TabelaReincidentes({ reincidentes }: TabelaReincidentesP
           </tbody>
         </table>
       </div>
+
+      {paginacao && aoMudarPagina && (
+        <Paginacao
+          pagina={paginacao.pagina}
+          totalPaginas={paginacao.totalPaginas}
+          totalItens={paginacao.totalItens}
+          aoMudarPagina={aoMudarPagina}
+        />
+      )}
     </Card>
   )
 }

@@ -53,4 +53,30 @@ describe('profissionais', () => {
     const encontrado = resposta.body.find((p: { id: string }) => p.id === profissional.id)
     expect(encontrado?.folga).toBe(true)
   })
+
+  it('armazena a listagem em cache com cabeçalhos X-Cache e invalida após bloqueio de folga', async () => {
+    const profissional = await criarUsuario('profissional', 'Dr. Cache')
+
+    // Primeira requisição: MISS
+    const res1 = await request(app).get('/profissionais').set('Authorization', profissional.auth)
+    expect(res1.status).toBe(200)
+    expect(res1.headers['x-cache']).toBe('MISS')
+
+    // Segunda requisição idêntica: HIT
+    const res2 = await request(app).get('/profissionais').set('Authorization', profissional.auth)
+    expect(res2.status).toBe(200)
+    expect(res2.headers['x-cache']).toBe('HIT')
+
+    // Bloqueia uma folga: deve invalidar o cache
+    await request(app)
+      .post(`/profissionais/${profissional.id}/folgas`)
+      .set('Authorization', profissional.auth)
+      .send({ data: '2026-10-25' })
+
+    // Terceira requisição: MISS novamente
+    const res3 = await request(app).get('/profissionais').set('Authorization', profissional.auth)
+    expect(res3.status).toBe(200)
+    expect(res3.headers['x-cache']).toBe('MISS')
+  })
 })
+

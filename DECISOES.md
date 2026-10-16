@@ -43,7 +43,8 @@ Use uma seção para cada problema investigado ou decisão tomada, copiando o bl
 - **Idempotência**: Criação de campo `lembreteEnviadoEm DateTime?` na tabela `consultas` e gravação de timestamp após cada disparo bem-sucedido, garantindo que reexecuções manuais ou retries do n8n não dupliquem e-mails aos pacientes.
 - **Canais adicionais (Omnichannel)**: Integração com WhatsApp Business API (Evolution API, Twilio ou Z-API) e SMS para pacientes que não acessam e-mail com frequência.
 - **Ações diretas (Magic Links)**: Inclusão de links com tokens JWT de uso único no corpo do e-mail ("Confirmar presença com 1 clique" e "Remarcar consulta"), permitindo ao paciente atualizar o status sem login manual prévio.
-- **Observabilidade**: Adição de nó *Error Trigger* no n8n reportando falhas de conexão ou erros de entrega SMTP para canal de alerta (Slack/Discord/Sentry).
+- **Observabilidade**: Adição de nó _Error Trigger_ no n8n reportando falhas de conexão ou erros de entrega SMTP para canal de alerta (Slack/Discord/Sentry).
+
 ## Envio Assíncrono de E-mails com BullMQ e Nodemailer (Mailpit)
 
 **O que eu vi**
@@ -56,16 +57,19 @@ Disparar `mailTransporter.sendMail()` diretamente dentro das rotas do Express.
 Qualquer instabilidade ou lentidão no SMTP atrasa a resposta da API para o paciente. Sem fila, falhas temporárias resultam em perda definitiva de notificações aos pacientes sem política de retry.
 
 **O que fiz e por quê**
+
 1. **Fila BullMQ (`src/infra/jobs/emailQueue.ts`)**: Criada a fila `envio-email` com 3 tentativas automáticas via backoff exponencial e limitação de taxa (máximo de 10 e-mails por segundo).
 2. **Worker Dedicado (`src/infra/jobs/emailWorker.ts`)**: Inicializado no boot da API, consumindo a fila e despachando e-mails via Nodemailer conectado ao Mailpit (`localhost:1025`).
 3. **Templates HTML Corporativos (`emailTemplates.ts`)**: Templates estilizados para confirmação de agendamento, cancelamento de consulta e aviso de vaga liberada na lista de espera.
 4. **Desacoplamento nos Casos de Uso**: `criarConsulta` e `cancelarConsulta` enfileiram o job de forma assíncrona sem travar o retorno HTTP para o cliente.
 
 **Como testei**
+
 - Testes automatizados em `apps/api/test/features/feat-email-worker.test.ts` validando templates e integridade da fila no Redis.
 - Suíte completa de 10 arquivos e 43 testes da API passando com 100% de sucesso.
 
 **O que considerei e descartei**
+
 - Envio síncrono no Express: Descartado por bloquear o Event Loop e impactar o SLA de resposta.
 
 **Quanto tempo levou**
@@ -85,6 +89,7 @@ Execução puramente client-side com `window.print()` era simples, porém vulner
 Em ambiente de alta concorrência com múltiplos recepcionistas e médicos solicitando relatórios simultaneamente, requisições HTTP bloqueadas para compilar PDFs degradam a latência e causam timeouts de rede.
 
 **O que fiz e por quê**
+
 1. **Infraestrutura**: Adicionado serviço Redis 7 Alpine no `docker-compose.yml` (porta 6380 para evitar conflitos locais) e variáveis no `.env`.
 2. **Fila Assíncrona (BullMQ)**: Criada a fila `geracao-pdf` (`src/infra/jobs/pdfQueue.ts`) com política de retentativas automáticas (3 tentativas com backoff exponencial) e retenção temporária de arquivos concluídos.
 3. **Worker Dedicado (Puppeteer)**: Implementado `pdfWorker.ts` processando de forma isolada os jobs enfileirados, compilando templates HTML responsivos corporativos da clínica e gerando arquivos PDF A4 padronizados em `/uploads/pdfs/`.
@@ -95,10 +100,12 @@ Em ambiente de alta concorrência com múltiplos recepcionistas e médicos solic
 5. **Frontend**: Hook reativo `useExportarPdf` integrado ao componente `BotaoExportarPdf`, fornecendo feedback em tempo real de carregamento, percentual de progresso e acionamento automático de download.
 
 **Como testei**
+
 - Testes automatizados em `apps/api/test/features/feat-09-geracao-pdf-worker.test.ts` cobrindo enfileiramento, RBAC, consulta de status e rejeição de tipos inválidos.
 - Typecheck em ambos os workspaces (`apps/api` e `apps/web`) com 0 erros.
 
 **O que considerei e descartei**
+
 - PDFKit sem worker: Mais leve, porém com formatação visual rígida e incapaz de refletir os componentes e tokens de design do sistema web.
 - Geração síncrona no Express: Descartada pelo alto risco de bloqueio da thread principal de I/O em picos de uso.
 
@@ -106,7 +113,6 @@ Em ambiente de alta concorrência com múltiplos recepcionistas e médicos solic
 40 minutos.
 
 ---
-
 
 A priorização detalhada e a fundamentação estratégica completa estão documentadas em **[docs/novas-features/README.md](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/novas-features/README.md)** utilizando o framework **RICE** (Reach, Impact, Confidence, Effort).
 
@@ -123,7 +129,45 @@ A ordem estabelecida para as 10 funcionalidades é:
 9. **[Exportação da agenda do dia em PDF](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/novas-features/FEAT-09-exportacao-agenda-pdf.md)** (RICE: 2.7): Apoio operacional e contingência para impressão física de lista de chamada da recepção.
 10. **[Tema escuro na área do paciente](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/novas-features/FEAT-10-tema-escuro-area-paciente.md)** (RICE: 1.4): Conforto visual moderno, porém sem impacto clínico ou financeiro na operação médica.
 
+## Cache com Redis e Paginação (api/profissionais e api/relatorios/faltas)
+
+**O que eu vi**
+1. A rota `GET /profissionais` é consultada com frequência em quase todos os fluxos de agendamento e filtragem de recepção/paciente. Sem cache, executa queries com `join` no Prisma a cada requisição.
+2. A rota `GET /relatorios/faltas` realizava agregações pesadas em memória sobre todo o histórico de consultas de absenteísmo, e a lista de reincidentes era retornada por inteiro sem paginação, impactando a performance à medida que o histórico de faltas cresce.
+
+**O que fiz e por quê**
+1. **Infraestrutura de Cache com Redis (`CacheService`)**:
+   - Criada classe `CacheService` com métodos `obter<T>()`, `salvar()`, `remover()` e `invalidarPadrao()`.
+   - Implementado cabeçalho HTTP `X-Cache: HIT` e `X-Cache: MISS` para transparência e observabilidade das respostas cacheadas.
+2. **Cache na rota `GET /profissionais`**:
+   - Chave: `cache:profissionais:${data ?? ''}:${profissionalId ?? ''}:${especialidade ?? ''}` com TTL de 120 segundos.
+   - Invalidação automática (`invalidarPadrao('cache:profissionais:*')`) ao registrar folga única ou bloqueio por período.
+3. **Paginação e Cache na rota `GET /relatorios/faltas`**:
+   - Adicionados query parameters validados com Zod: `pagina` (default 1) e `limite` (default 10, max 100).
+   - Chave de cache particionada por filtros e paginação (`cache:relatorios:faltas:${dataInicio}:${dataFim}:${profissionalId}:${pagina}:${limite}`) com TTL de 60 segundos.
+   - Resposta paginada de pacientes reincidentes com metadados `paginacao: { pagina, limite, totalItens, totalPaginas }`.
+4. **Paginação no Frontend (`apps/web`)**:
+   - Criação da molécula acessível `Paginacao` (`apps/web/src/components/molecules/Paginacao/paginacao.tsx`) seguindo o Design System (`Button`, variantes, acessibilidade e modo escuro).
+   - Integração da paginação na `TabelaReincidentes` e na página `recepcao/relatorios/page.tsx`, sincronizando a troca de páginas via TanStack Query e resetando para a página 1 ao aplicar ou limpar filtros.
+
+**Como testei**
+- Testes automatizados com Vitest e Supertest na API (`apps/api/test/profissionais.test.ts` e `apps/api/test/features/feat-06-relatorio-faltas.test.ts`), verificando `X-Cache: MISS`, `X-Cache: HIT`, invalidação após folga e recorte por páginas.
+- Testes no Frontend (`apps/web/test/features/feat-06-relatorio-faltas.test.tsx`), simulando a navegação entre páginas de reincidentes.
+- Execução completa do `typecheck` e testes automatizados.
+
 ## Como usei IA
 
+- codificação
+- Detalhamento de bugs ( analisando o projeto e documentação )
+- Detalhamento de features ( analisando o projeto e documentação )
+- Brainstorming de arquitetura
+- Otimização de código
+- Geração de testes ( tdd )
+- Geração de documentação
+- Refatoração de código
+- Implementação da nova arquitetura do backend
+
 ## O que ficou de fora
+
+BFF, SSR, trocar props drilling entre components por context ( talvez um gerenciador de estado ), gerar cache pelos mais buscados, teste unitarios dentro dos components, storybook, design system, padronizar tudo para inglês ( costume, achei estranho tudo em português, mas faz parte do desafio ), melhorias de ui/ux, teste de performance,
 

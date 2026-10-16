@@ -119,4 +119,75 @@ describe('FEAT-06: Relatório de Faltas (Back-end)', () => {
     expect(resInvertida.status).toBe(400)
     expect(resInvertida.body.erro).toContain('não pode ser posterior')
   })
+
+  it('suporta paginação na lista de reincidentes e armazena resultado em cache', async () => {
+    const recepcao = await criarUsuario('recepcao')
+    const profissional = await criarUsuario('profissional')
+    const paciente1 = await criarUsuario('paciente', 'Paciente Um')
+    const paciente2 = await criarUsuario('paciente', 'Paciente Dois')
+
+    const data = proximaSegunda()
+
+    // Paciente 1 tem 2 faltas
+    await criarConsulta({
+      profissionalId: profissional.id,
+      pacienteId: paciente1.id,
+      data,
+      hora: '08:00',
+      status: 'faltou',
+    })
+    await criarConsulta({
+      profissionalId: profissional.id,
+      pacienteId: paciente1.id,
+      data,
+      hora: '08:30',
+      status: 'faltou',
+    })
+
+    // Paciente 2 tem 1 falta
+    await criarConsulta({
+      profissionalId: profissional.id,
+      pacienteId: paciente2.id,
+      data,
+      hora: '09:00',
+      status: 'faltou',
+    })
+
+    // 1. Primeira página com limite 1 (MISS no cache)
+    const resPagina1 = await request(app)
+      .get(`/relatorios/faltas?dataInicio=${data}&dataFim=${data}&pagina=1&limite=1`)
+      .set('Authorization', recepcao.auth)
+
+    expect(resPagina1.status).toBe(200)
+    expect(resPagina1.headers['x-cache']).toBe('MISS')
+    expect(resPagina1.body.reincidentes).toHaveLength(1)
+    expect(resPagina1.body.reincidentes[0].pacienteId).toBe(paciente1.id)
+    expect(resPagina1.body.paginacao).toEqual({
+      pagina: 1,
+      limite: 1,
+      totalItens: 2,
+      totalPaginas: 2,
+    })
+
+    // 2. Mesma requisição deve responder com HIT de cache
+    const resCacheHit = await request(app)
+      .get(`/relatorios/faltas?dataInicio=${data}&dataFim=${data}&pagina=1&limite=1`)
+      .set('Authorization', recepcao.auth)
+
+    expect(resCacheHit.status).toBe(200)
+    expect(resCacheHit.headers['x-cache']).toBe('HIT')
+    expect(resCacheHit.body.reincidentes[0].pacienteId).toBe(paciente1.id)
+
+    // 3. Segunda página (MISS no cache)
+    const resPagina2 = await request(app)
+      .get(`/relatorios/faltas?dataInicio=${data}&dataFim=${data}&pagina=2&limite=1`)
+      .set('Authorization', recepcao.auth)
+
+    expect(resPagina2.status).toBe(200)
+    expect(resPagina2.headers['x-cache']).toBe('MISS')
+    expect(resPagina2.body.reincidentes).toHaveLength(1)
+    expect(resPagina2.body.reincidentes[0].pacienteId).toBe(paciente2.id)
+    expect(resPagina2.body.paginacao.pagina).toBe(2)
+  })
 })
+

@@ -111,4 +111,66 @@ describe('FEAT-06: Relatório de Faltas e Absenteísmo (Front-end)', () => {
     const botaoLimpar = screen.getByRole('button', { name: 'Limpar' })
     fireEvent.click(botaoLimpar)
   })
+
+  it('permite navegar entre páginas de pacientes reincidentes', async () => {
+    entrarComo('recepcao')
+
+    simularApi((url) => {
+      if (url.includes('/api/relatorios/faltas')) {
+        const paginaMatch = url.match(/[?&]pagina=(\d+)/)
+        const paginaSolicitada = paginaMatch ? Number(paginaMatch[1]) : 1
+
+        return {
+          periodo: {},
+          totais: { agendadas: 15, realizadas: 10, canceladas: 0, faltas: 5 },
+          taxaFaltas: 33.3,
+          reincidentes:
+            paginaSolicitada === 1
+              ? [
+                  {
+                    pacienteId: 'pac-1',
+                    nome: 'Paciente Pagina 1',
+                    email: 'p1@teste.com',
+                    totalFaltas: 4,
+                  },
+                ]
+              : [
+                  {
+                    pacienteId: 'pac-2',
+                    nome: 'Paciente Pagina 2',
+                    email: 'p2@teste.com',
+                    totalFaltas: 2,
+                  },
+                ],
+          faltasPorProfissional: [],
+          paginacao: {
+            pagina: paginaSolicitada,
+            limite: 1,
+            totalItens: 2,
+            totalPaginas: 2,
+          },
+        }
+      }
+      if (url.includes('/api/profissionais')) return []
+      return null
+    })
+
+    renderComQuery(<RelatoriosPage />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Paciente Pagina 1')).toBeDefined()
+      expect(screen.getByText(/Página/)).toBeDefined()
+    })
+
+    const botaoProxima = screen.getByRole('button', { name: 'Ir para a próxima página' })
+    expect(botaoProxima).toBeDefined()
+    expect(botaoProxima.hasAttribute('disabled')).toBe(false)
+
+    fireEvent.click(botaoProxima)
+
+    await waitFor(() => {
+      expect(screen.getByText('Paciente Pagina 2')).toBeDefined()
+    })
+  })
 })
+

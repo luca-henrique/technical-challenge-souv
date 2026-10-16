@@ -1,3 +1,5 @@
+import type { Paginacao } from '@bemviver/shared'
+
 export interface PacienteReincidente {
   pacienteId: string
   nome: string
@@ -7,4 +9,7 @@ export interface PacienteReincidente {
 
 export interface TabelaReincidentesProps {
   reincidentes: PacienteReincidente[]
+  paginacao?: Paginacao
+  aoMudarPagina?: (novaPagina: number) => void
 }
+

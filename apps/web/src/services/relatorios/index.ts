@@ -8,6 +8,8 @@ export async function buscarRelatorioFaltas(filtros?: FiltrosRelatorioFaltas): P
   if (filtros?.dataInicio) params.append('dataInicio', filtros.dataInicio)
   if (filtros?.dataFim) params.append('dataFim', filtros.dataFim)
   if (filtros?.profissionalId) params.append('profissionalId', filtros.profissionalId)
+  if (filtros?.pagina) params.append('pagina', String(filtros.pagina))
+  if (filtros?.limite) params.append('limite', String(filtros.limite))
 
   const query = params.toString() ? `?${params.toString()}` : ''
   return api<RelatorioFaltas>(`/relatorios/faltas${query}`)

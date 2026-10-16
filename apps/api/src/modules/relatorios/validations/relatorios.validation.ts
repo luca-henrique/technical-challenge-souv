@@ -16,6 +16,8 @@ export const relatorioFaltasQuerySchema = z
         message: 'Data de término inválida. Use o formato AAAA-MM-DD',
       }),
     profissionalId: z.string().optional(),
+    pagina: z.coerce.number().int().min(1).default(1),
+    limite: z.coerce.number().int().min(1).max(100).default(10),
   })
   .superRefine((dados, ctx) => {
     if (dados.dataInicio && dados.dataFim && dados.dataInicio > dados.dataFim) {

@@ -72,6 +72,16 @@ export class GerarRelatorioFaltasUseCase {
       (a, b) => b.totalFaltas - a.totalFaltas
     )
 
+    const totalItens = reincidentes.length
+    const pagina = filtro.pagina ?? 1
+    const limite = filtro.limite ?? 10
+    const totalPaginas = Math.max(1, Math.ceil(totalItens / limite))
+
+    const reincidentesPaginados =
+      filtro.pagina !== undefined
+        ? reincidentes.slice((pagina - 1) * limite, pagina * limite)
+        : reincidentes
+
     const faltasPorProfissional = Array.from(mapaProfissionais.values()).map((p) => ({
       ...p,
       taxaFaltas: p.totalConsultas > 0 ? Number(((p.faltas / p.totalConsultas) * 100).toFixed(1)) : 0,
@@ -89,8 +99,14 @@ export class GerarRelatorioFaltasUseCase {
         faltas: totalFaltas,
       },
       taxaFaltas,
-      reincidentes,
+      reincidentes: reincidentesPaginados,
       faltasPorProfissional,
+      paginacao: {
+        pagina,
+        limite,
+        totalItens,
+        totalPaginas,
+      },
     }
   }
 }
