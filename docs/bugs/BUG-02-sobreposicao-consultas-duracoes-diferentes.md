@@ -64,9 +64,20 @@ export function temConflito(marcadas: Horario[], nova: Horario) {
 
 ## 4. Testes Automatizados de Validação
 
+- **Back-end (Regressão Dedicada)**: [`apps/api/test/bugs/bug-02-sobreposicao-duracoes.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/bugs/bug-02-sobreposicao-duracoes.test.ts)
+  - `relato da clínica: doutor não pode ficar com dois pacientes no mesmo horário quando um deles tem consulta de 60 min`
+  - Valida bloqueio de slot subsequente (`10:30`), bloqueio de invasão antecedente (`09:30` primeira), liberação de retorno limítrofe (`09:30` retorno) e grade de horários da rota.
 - **Back-end**: [`apps/api/test/rn03-duracao-consultas-e-tipos.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/rn03-duracao-consultas-e-tipos.test.ts)
   - `Caso 3: Primeira consulta às 09:00 bloqueia início às 09:00 e às 09:30`
   - `Caso 4: Consulta existente às 10:00 impede primeira consulta (60min) às 09:30`
 - **Back-end**: [`apps/api/test/rn04-exclusividade-e-conflitos.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/rn04-exclusividade-e-conflitos.test.ts)
   - `detecta colisão quando uma consulta de 60 minutos bloqueia o slot seguinte`
   - `detecta colisão quando uma nova consulta de 60 minutos invade consulta existente posterior`
+
+---
+
+## 5. Status da Resolução: Concluído e Validado ✅
+
+- **Diagnóstico confirmado**: Verificação ingênua por igualdade de string (`hora === novaHora`) permitia invasões em consultas de 60 minutos.
+- **Correção aplicada**: Algoritmo de interseção contínua de intervalos em [`temConflito`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/src/agenda.ts) e [`consultasController`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/src/controllers/consultasController.ts).
+- **Cobertura de testes**: 100% dos cenários de sobreposição de durações validados ponta a ponta no banco de dados.
