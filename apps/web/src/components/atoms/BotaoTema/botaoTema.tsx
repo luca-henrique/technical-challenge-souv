@@ -28,7 +28,7 @@ export default function BotaoTema({ className = '' }: BotaoTemaProps) {
     <button
       type="button"
       onClick={alternarTema}
-      className={`inline-flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 transition-colors ${className}`}
+      className={`inline-flex min-h-9.5 items-center gap-1.5 rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-xs hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 transition-colors ${className}`}
       aria-label={descricaoTema}
       title={descricaoTema}
     >

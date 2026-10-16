@@ -35,13 +35,15 @@ export default function AreaTemplate({ perfil, titulo, children }: AreaTemplateP
           <div className="flex items-center gap-3 text-sm">
             <BotaoTema />
             <span className="hidden text-gray-600 dark:text-gray-300 sm:inline">{sessao.usuario.nome}</span>
-            <Button variante="secundario" tamanho="compacto" onClick={sair}>
+            <Button variante="secundario" tamanho="compacto" onClick={sair} aria-label="Sair da conta">
               Sair
             </Button>
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-5xl p-4">{children}</main>
+      <main id="conteudo-principal" tabIndex={-1} className="mx-auto max-w-5xl p-4 outline-none">
+        {children}
+      </main>
     </div>
   )
 }

@@ -1,9 +1,9 @@
 import type { ButtonProps, TamanhoBotao, VarianteBotao } from './types'
 
 const VARIANTES: Record<VarianteBotao, string> = {
-  primario: 'bg-teal-700 text-white hover:bg-teal-800',
-  secundario: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
-  perigo: 'bg-red-700 text-white hover:bg-red-800',
+  primario: 'bg-teal-700 text-white hover:bg-teal-800 focus-visible:ring-teal-600',
+  secundario: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 focus-visible:ring-teal-600',
+  perigo: 'bg-red-700 text-white hover:bg-red-800 focus-visible:ring-red-600',
 }
 
 const TAMANHOS: Record<TamanhoBotao, string> = {
@@ -13,7 +13,7 @@ const TAMANHOS: Record<TamanhoBotao, string> = {
 }
 
 export function classesDoBotao(variante: VarianteBotao = 'primario', tamanho: TamanhoBotao = 'normal') {
-  return `rounded-md font-medium disabled:opacity-50 ${VARIANTES[variante]} ${TAMANHOS[tamanho]}`
+  return `rounded-md font-medium transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 ${VARIANTES[variante]} ${TAMANHOS[tamanho]}`
 }
 
 export default function Button({ variante, tamanho, type = 'button', className = '', ...props }: ButtonProps) {
