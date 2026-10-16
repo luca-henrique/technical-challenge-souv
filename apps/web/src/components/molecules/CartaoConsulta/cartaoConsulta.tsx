@@ -34,12 +34,11 @@ export default function CartaoConsulta({ consulta, onCancelar }: CartaoConsultaP
         ) : consulta.status === 'agendada' ? (
           <div className="pt-1">
             <Button
-              variante="secundario"
+              variante="outline-primario"
               tamanho="compacto"
               disabled={confirmandoPresenca}
               onClick={() => confirmarPresenca(consulta.id)}
               aria-label={`Confirmar presença na consulta com ${consulta.profissionalNome} no dia ${formatarData(consulta.data)} às ${consulta.hora}`}
-              className="text-xs text-teal-700 hover:text-teal-800 border-teal-300"
             >
               {confirmandoPresenca ? 'Confirmando...' : 'Confirmar presença'}
             </Button>

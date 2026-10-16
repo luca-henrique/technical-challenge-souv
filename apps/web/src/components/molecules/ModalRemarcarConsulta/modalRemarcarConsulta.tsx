@@ -7,6 +7,8 @@ import { diaUtil, hojeEmRecife } from '@bemviver/shared'
 import Alert from '@/components/atoms/Alert/alert'
 import Button from '@/components/atoms/Button/button'
 import Card from '@/components/atoms/Card/card'
+import Heading from '@/components/atoms/Heading/heading'
+import IconButton from '@/components/atoms/IconButton/iconButton'
 import Skeleton from '@/components/atoms/Skeleton/skeleton'
 import SeletorData from '@/components/molecules/SeletorData/seletorData'
 import SeletorHorario from '@/components/molecules/SeletorHorario/seletorHorario'
@@ -84,21 +86,19 @@ export default function ModalRemarcarConsulta({
       <Card className="w-full max-w-md space-y-4 shadow-xl">
         <div className="flex items-center justify-between border-b pb-3 dark:border-gray-800">
           <div>
-            <h2 id="modal-remarcar-titulo" className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            <Heading id="modal-remarcar-titulo" as="h2" variante="modal">
               Remarcar consulta
-            </h2>
+            </Heading>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               {consulta.profissionalNome} ({consulta.especialidade})
             </p>
           </div>
-          <button
-            type="button"
+          <IconButton
             onClick={onFechar}
-            className="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 dark:hover:bg-gray-800 dark:hover:text-gray-200 transition-colors"
             aria-label="Fechar modal de remarcação"
           >
             ✕
-          </button>
+          </IconButton>
         </div>
 
         <p className="text-xs text-gray-600 dark:text-gray-300">
