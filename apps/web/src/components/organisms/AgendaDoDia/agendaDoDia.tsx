@@ -8,6 +8,7 @@ import Alert from "@/components/atoms/Alert/alert";
 import Button from "@/components/atoms/Button/button";
 import Card from "@/components/atoms/Card/card";
 import Select from "@/components/atoms/Select/select";
+import BotaoExportarPdf from "@/components/molecules/BotaoExportarPdf/botaoExportarPdf";
 import Field from "@/components/molecules/Field/field";
 import TabelaConsultas from "@/components/organisms/TabelaConsultas/tabelaConsultas";
 import { useAgenda } from "@/hooks/useAgenda";
@@ -105,9 +106,12 @@ export default function AgendaDoDia({
   return (
     <div className="grid items-start gap-6 lg:grid-cols-[1fr_320px]">
       <Card className="space-y-3">
-        <h2 className="text-lg font-semibold first-letter:uppercase">
-          {formatarData(agenda.data)}
-        </h2>
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-lg font-semibold first-letter:uppercase">
+            {formatarData(agenda.data)}
+          </h2>
+          <BotaoExportarPdf />
+        </div>
         {agenda.folga && (
           <Alert variante="aviso">
             Dia bloqueado como folga do profissional.

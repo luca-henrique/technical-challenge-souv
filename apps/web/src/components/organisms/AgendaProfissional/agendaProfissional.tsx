@@ -5,6 +5,7 @@ import { hojeEmRecife, type Agenda } from '@bemviver/shared'
 import Alert from '@/components/atoms/Alert/alert'
 import Button from '@/components/atoms/Button/button'
 import Card from '@/components/atoms/Card/card'
+import BotaoExportarPdf from '@/components/molecules/BotaoExportarPdf/botaoExportarPdf'
 import SeletorData from '@/components/molecules/SeletorData/seletorData'
 import TabelaConsultas from '@/components/organisms/TabelaConsultas/tabelaConsultas'
 import { useSessao } from '@/hooks/useSessao'
@@ -68,7 +69,10 @@ export default function AgendaProfissional() {
 
       {agenda && (
         <Card className="space-y-3">
-          <h2 className="text-lg font-semibold first-letter:uppercase">{formatarData(agenda.data)}</h2>
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-lg font-semibold first-letter:uppercase">{formatarData(agenda.data)}</h2>
+            <BotaoExportarPdf />
+          </div>
           {agenda.folga && <Alert variante="aviso">Este dia está bloqueado como folga.</Alert>}
           <TabelaConsultas consultas={agenda.consultas} />
         </Card>
