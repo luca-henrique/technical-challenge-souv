@@ -52,24 +52,46 @@ export async function criarConsulta(req: Request, res: Response) {
     return
   }
 
-  const folga = await prisma.folga.findUnique({ where: { profissionalId_data: { profissionalId, data } } })
-  if (folga) {
-    res.status(409).json({ erro: 'O profissional está de folga nesse dia' })
-    return
-  }
+  try {
+    const consulta = await prisma.$transaction(async (tx) => {
+      // Bloqueio atômico por profissional + data contra race condition (RN04)
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${profissionalId} || '_' || ${data}))`
 
-  const marcadas = await prisma.consulta.findMany({ where: { profissionalId, data, status: 'agendada' } })
-  if (temConflito(marcadas, { hora, tipo })) {
-    res.status(409).json({ erro: 'Esse horário já está ocupado' })
-    return
-  }
+      const folga = await tx.folga.findUnique({
+        where: { profissionalId_data: { profissionalId, data } },
+      })
+      if (folga) {
+        throw new Error('O profissional está de folga nesse dia')
+      }
 
-  const inicio = instante(data, hora)
-  const fim = new Date(inicio.getTime() + DURACAO_MINUTOS[tipo] * 60_000)
-  const consulta = await prisma.consulta.create({
-    data: { profissionalId, pacienteId: idPacienteFinal, data, hora, tipo, inicio, fim },
-  })
-  res.status(201).json(consulta)
+      const marcadas = await tx.consulta.findMany({
+        where: { profissionalId, data, status: 'agendada' },
+      })
+      if (temConflito(marcadas, { hora, tipo })) {
+        throw new Error('Esse horário já está ocupado')
+      }
+
+      const inicio = instante(data, hora)
+      const fim = new Date(inicio.getTime() + DURACAO_MINUTOS[tipo] * 60_000)
+
+      return tx.consulta.create({
+        data: { profissionalId, pacienteId: idPacienteFinal, data, hora, tipo, inicio, fim },
+      })
+    })
+
+    res.status(201).json(consulta)
+  } catch (erro: unknown) {
+    if (erro instanceof Error) {
+      if (
+        erro.message === 'Esse horário já está ocupado' ||
+        erro.message === 'O profissional está de folga nesse dia'
+      ) {
+        res.status(409).json({ erro: erro.message })
+        return
+      }
+    }
+    throw erro
+  }
 }
 
 export async function cancelarConsulta(req: Request, res: Response) {
@@ -82,6 +104,11 @@ export async function cancelarConsulta(req: Request, res: Response) {
   }
   if (consulta.status !== 'agendada') {
     res.status(409).json({ erro: 'Só é possível cancelar uma consulta agendada' })
+    return
+  }
+
+  if (req.usuario.perfil === 'paciente' && consulta.pacienteId !== req.usuario.id) {
+    res.status(403).json({ erro: 'Você só pode cancelar suas próprias consultas' })
     return
   }
 

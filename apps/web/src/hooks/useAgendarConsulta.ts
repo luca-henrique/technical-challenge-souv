@@ -23,5 +23,10 @@ export function useAgendarConsulta() {
       queryClient.invalidateQueries({ queryKey: ['agenda', variaveis.profissionalId, variaveis.data] })
       queryClient.invalidateQueries({ queryKey: ['horarios', variaveis.profissionalId, variaveis.data] })
     },
+    onSettled: (_, __, variaveis) => {
+      if (variaveis) {
+        queryClient.invalidateQueries({ queryKey: ['horarios', variaveis.profissionalId, variaveis.data] })
+      }
+    },
   })
 }

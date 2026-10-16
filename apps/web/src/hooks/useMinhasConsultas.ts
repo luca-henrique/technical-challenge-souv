@@ -17,6 +17,7 @@ export function useMinhasConsultas() {
     mutationFn: (consultaId: string) => consultasService.cancelarConsulta(consultaId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: chaveMinhasConsultas })
+      queryClient.invalidateQueries({ queryKey: ['horarios'] })
     },
   })
 

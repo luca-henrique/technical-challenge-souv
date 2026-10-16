@@ -79,6 +79,7 @@ export default function AgendarConsulta({
       }
     } catch (e) {
       setErroMutacao((e as Error).message)
+      setValue('hora', '', { shouldValidate: true })
     }
   })
 

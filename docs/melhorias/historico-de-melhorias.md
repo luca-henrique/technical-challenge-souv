@@ -239,5 +239,47 @@ Revisão e implementação completa da [RN03](file:///Users/lucas1/Desktop/proje
   - Backend: [`apps/api/test/rn03-duracao-consultas-e-tipos.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/rn03-duracao-consultas-e-tipos.test.ts) (8 testes cobrindo durações, conflitos parciais, grade de horários e rota de agendamento).
   - Frontend: [`apps/web/test/rn03-duracao-consultas-e-tipos.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/rn03-duracao-consultas-e-tipos.test.tsx) (4 testes cobrindo mapeamento de tipos, grade filtrada por duração e integração com o formulário).
 
+## 12. Implementação e Revisão da Regra de Negócio RN04 (Exclusividade de Atendimento e Prevenção de Conflitos)
+
+Revisão e implementação completa da [RN04](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN04-exclusividade-atendimento-e-conflitos.md):
+
+- **Isolamento de Concorrência e Prevenção de Race Conditions**:
+  - Implementada transação interativa do Prisma com bloqueio consultivo em nível de transação do PostgreSQL ([`pg_advisory_xact_lock`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/src/controllers/consultasController.ts#L58)) chaveado por `hashtext(profissionalId || '_' || data)`.
+  - Garante atomicidade absoluta quando múltiplas requisições chegam simultaneamente para o mesmo profissional e data: a primeira adquire o lock e conclui o agendamento; a subsequente lê a consulta recém-gravada e é rejeitada com `409 Conflict` ("Esse horário já está ocupado").
+- **Exclusividade e Defesa em Profundidade em `temConflito`**:
+  - Atualizada [`temConflito`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/src/agenda.ts#L27-L40) para desconsiderar consultas canceladas (`status !== 'cancelada'`), assegurando que horários liberados por cancelamento possam ser reagendados de imediato por outros pacientes.
+- **Tratamento Visual no Front-end e Invalidação de Cache**:
+  - [`useAgendarConsulta`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/hooks/useAgendarConsulta.ts#L26-L30) atualizado com `onSettled` para revalidar a lista de horários disponíveis mesmo se a mutação falhar com 409, garantindo que o slot ocupado por outrem suma da tela do usuário.
+  - [`AgendarConsulta`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/AgendarConsulta/agendarConsulta.tsx) limpa o horário selecionado e exibe `<Alert>{erroMutacao}</Alert>` orientando o usuário a escolher um novo horário.
+- **Cobertura de Testes Automatizados**:
+  - Backend: [`apps/api/test/rn04-exclusividade-e-conflitos.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/rn04-exclusividade-e-conflitos.test.ts) (7 testes cobrindo colisões matemáticas, exclusão de canceladas, resposta HTTP 409 e teste de concorrência com requisições paralelas via `Promise.all`).
+  - Frontend: [`apps/web/test/rn04-exclusividade-e-conflitos.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/rn04-exclusividade-e-conflitos.test.tsx) (2 testes cobrindo tratamento visual de conflito 409 no paciente e na recepção, invalidação de query e reset do botão).
+
+## 13. Implementação e Revisão da Regra de Negócio RN05 (Cancelamento de Consultas e Liberação de Horário)
+
+Revisão e implementação completa da [RN05](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN05-cancelamento-de-consultas.md):
+
+- **Soft Delete e Preservação Histórica**:
+  - O cancelamento nunca remove registros fisicamente do banco de dados (`DELETE FROM Consulta` vedado).
+  - Atualização do campo `status` para `'cancelada'` e timestamp `canceladaEm` gravado no instante exato.
+- **Autorização e Controle de Acesso (RBAC)**:
+  - Adicionada validação de posse em [`cancelarConsulta`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/src/controllers/consultasController.ts#L110-L113): pacientes são terminantemente impedidos de cancelar consultas de outros pacientes, recebendo `403 Forbidden` (`{ erro: 'Você só pode cancelar suas próprias consultas' }`).
+  - Usuários da recepção possuem permissão para cancelar consultas de qualquer paciente.
+  - Profissionais são bloqueados pelo middleware de rota (`403 Forbidden`).
+- **Validações de Estado e Conflito**:
+  - Cancelamento de consulta inexistente retorna `404 Not Found`.
+  - Tentativa de cancelar consulta já cancelada ou com falta registrada retorna `409 Conflict` (`{ erro: 'Só é possível cancelar uma consulta agendada' }`).
+- **Liberação Imediata de Slot**:
+  - Tanto a rota de horários disponíveis (`GET /profissionais/:id/horarios`) quanto o algoritmo de conflito (`temConflito`) desconsideram consultas canceladas, liberando imediatamente o slot na grade para novos agendamentos por qualquer usuário.
+- **Interface e Experiência do Usuário (Front-end)**:
+  - [`MinhasConsultas`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/MinhasConsultas/minhasConsultas.tsx) e [`CartaoConsulta`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/molecules/CartaoConsulta/cartaoConsulta.tsx): botão de cancelamento visível apenas em consultas `agendada`, com confirmação inline de segurança antes do disparo.
+  - [`AgendaDoDia`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/components/organisms/AgendaDoDia/agendaDoDia.tsx): botão de cancelamento disponível para a recepção em consultas ativas.
+  - Invalidação automática dos caches de `['consultas', 'minhas']`, `['agenda']` e `['horarios']` via TanStack Query.
+- **Cobertura de Testes Automatizados**:
+  - Backend: [`apps/api/test/rn05-cancelamento-de-consultas.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/rn05-cancelamento-de-consultas.test.ts) (7 testes cobrindo cancelamento por paciente/recepção, bloqueio de cancelamento de terceiros, 404, 409 e liberação imediata do slot).
+  - Frontend: [`apps/web/test/rn05-cancelamento-de-consultas.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/rn05-cancelamento-de-consultas.test.tsx) (3 testes cobrindo fluxo com confirmação inline no paciente, tratamento de erro da API e cancelamento na recepção com invalidação).
+
+
+
 
 

@@ -14,6 +14,7 @@ import {
 export interface Horario {
   hora: string
   tipo: TipoConsulta
+  status?: string
 }
 
 export { cabeNoExpediente, dataValida, diaUtil, ehTipoConsulta, instante, validarHorario }
@@ -29,6 +30,9 @@ export function temConflito(marcadas: Horario[], nova: Horario) {
   const fimNova = iniNova + (DURACAO_MINUTOS[nova.tipo] ?? 30)
 
   return marcadas.some((marcada) => {
+    if (marcada.status === 'cancelada') {
+      return false
+    }
     const iniMarcada = paraMinutos(marcada.hora)
     const fimMarcada = iniMarcada + (DURACAO_MINUTOS[marcada.tipo] ?? 30)
     return iniNova < fimMarcada && fimNova > iniMarcada

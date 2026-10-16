@@ -20,6 +20,7 @@ export function useAgenda(profissionalId: string, data: string) {
     mutationFn: (consultaId: string) => consultasService.cancelarConsulta(consultaId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: chaveAgenda })
+      queryClient.invalidateQueries({ queryKey: ['horarios', profissionalId, data] })
     },
   })
 

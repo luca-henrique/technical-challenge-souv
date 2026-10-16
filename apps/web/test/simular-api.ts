@@ -10,6 +10,16 @@ export function simularApi(responder: (caminho: string, opcoes?: RequestInit) =>
     if (corpo instanceof Error) {
       return new Response(JSON.stringify({ erro: corpo.message }), { status: 500 })
     }
+    if (
+      corpo !== null &&
+      typeof corpo === 'object' &&
+      'status' in corpo &&
+      'body' in corpo &&
+      typeof (corpo as { status: unknown }).status === 'number'
+    ) {
+      const resp = corpo as { status: number; body: unknown }
+      return new Response(JSON.stringify(resp.body), { status: resp.status })
+    }
     return new Response(JSON.stringify(corpo), { status: 200 })
   })
 }
