@@ -58,7 +58,18 @@ Nos hooks de cancelamento ([`useMinhasConsultas`](file:///Users/lucas1/Desktop/p
 
 ## 4. Testes Automatizados de Validação
 
+- **Back-end (Regressão Dedicada)**: [`apps/api/test/bugs/bug-03-slot-cancelamento.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/bugs/bug-03-slot-cancelamento.test.ts)
+  - `relato da clínica: quando alguém cancela, o horário deve ser liberado imediatamente para outro paciente marcar`: valida agendamento, desaparecimento da grade, bloqueio de segundo paciente, cancelamento, reaparecimento imediato na grade e novo agendamento com 201.
+  - `libera ambos os blocos de 30min quando uma primeira consulta (60 min) é cancelada`: valida que tanto o slot principal quanto o slot subsequente são desocupados.
 - **Back-end**: [`apps/api/test/rn05-cancelamento-de-consultas.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/rn05-cancelamento-de-consultas.test.ts)
   - `libera imediatamente o horário cancelado para nova consulta na rota de horários e no agendamento`: cancela consulta às 16:00 e valida que o slot reaparece em `/horarios` e permite agendamento por outro paciente com status 201.
 - **Front-end**: [`apps/web/test/rn05-cancelamento-de-consultas.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/rn05-cancelamento-de-consultas.test.tsx)
   - Valida fluxo de cancelamento e invalidação automática da agenda da recepção e lista do paciente.
+
+---
+
+## 5. Status da Resolução: Concluído e Validado ✅
+
+- **Diagnóstico confirmado**: Queries de horários disponíveis no Prisma não filtravam `status: 'agendada'`, considerando consultas com soft delete (`status: 'cancelada'`) como ocupadas.
+- **Correção aplicada**: Filtro estrito de status ativo no banco de dados e checagem defensiva em [`temConflito`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/src/agenda.ts), além de invalidação reativa no cache do cliente TanStack Query.
+- **Cobertura de testes**: 100% dos testes de cancelamento e reaproveitamento de horário passando.
