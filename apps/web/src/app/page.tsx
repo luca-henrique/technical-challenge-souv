@@ -1,10 +1,11 @@
-import FormularioLogin from '@/components/organisms/FormularioLogin/formularioLogin'
-import AuthTemplate from '@/components/templates/AuthTemplate/authTemplate'
+import type { Metadata } from 'next'
+import LoginPage from '@/components/pages/LoginPage/loginPage'
 
-export default function LoginPage() {
-  return (
-    <AuthTemplate titulo="Clínica Bem Viver" subtitulo="Entre com seu e-mail e senha">
-      <FormularioLogin />
-    </AuthTemplate>
-  )
+export const metadata: Metadata = {
+  title: 'Login | Clínica Bem Viver',
+  description: 'Acesse o sistema de agendamento e gestão da Clínica Bem Viver.',
+}
+
+export default function Page() {
+  return <LoginPage />
 }

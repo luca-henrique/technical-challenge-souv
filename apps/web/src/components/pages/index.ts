@@ -1,0 +1,6 @@
+export { default as LoginPage } from './LoginPage'
+export { default as RecepcaoPage } from './RecepcaoPage'
+export { default as RelatoriosPage } from './RelatoriosPage'
+export { default as MinhasConsultasPage } from './MinhasConsultasPage'
+export { default as AgendarConsultaPage } from './AgendarConsultaPage'
+export { default as ProfissionalPage } from './ProfissionalPage'

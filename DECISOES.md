@@ -158,6 +158,25 @@ A ordem estabelecida para as 10 funcionalidades é:
 - Testes no Frontend (`apps/web/test/features/feat-06-relatorio-faltas.test.tsx`), simulando a navegação entre páginas de reincidentes.
 - Execução completa do `typecheck` e testes automatizados.
 
+### BFF (Backend for Frontend) & SSR com App Router
+
+1. **BFF Gateway no Next.js (`apps/web/src/app/api/[...path]/route.ts`)**:
+   - Criação de Route Handler no Next.js interceptando todas as chamadas de API (`/api/*`) para abstrair e proteger as rotas internas do backend Express (`API_URL`).
+   - Encaminhamento seguro de métodos HTTP (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`), headers de autenticação (`Authorization: Bearer`), cookies de sessão, filtragem de headers hop-by-hop e injeção de headers de auditoria (`x-bff-agent: nextjs-bff`, `x-forwarded-for`).
+   - Respostas tratadas com streaming do body, preservando `Content-Type`, `Content-Disposition` (geração e download de PDFs) e status codes sem expor portas ou IPs internos da infraestrutura.
+   - Tratamento de falhas de comunicação com retorno de status 502 amigável.
+   - Testes automatizados dedicados em `apps/web/test/bff.test.ts`.
+
+2. **SSR (Server-Side Rendering) & Separação de Camadas (`apps/web/src/components/pages`)**:
+   - As páginas em `src/app/**/page.tsx` tornaram-se **Server Components (SSR)** nativos, responsáveis pelo scaffolding da página no servidor e geração de metadados SEO (`metadata: Metadata` com título e descrição específicos por rota).
+   - A base visual e interativa das páginas foi desacoplada para `src/components/pages/` como Client Components (`'use client'`):
+     - `LoginPage`: autenticação e fluxo de entrada.
+     - `RecepcaoPage`: controle da agenda diária e filtros da recepção.
+     - `RelatoriosPage`: filtros dinâmicos, métricas e relatório de faltas.
+     - `MinhasConsultasPage`: listagem de consultas do paciente e cancelamentos.
+     - `AgendarConsultaPage`: agendamento de novas consultas.
+     - `ProfissionalPage`: visualização da agenda do profissional.
+
 ## Como usei IA
 
 - codificação
@@ -172,6 +191,6 @@ A ordem estabelecida para as 10 funcionalidades é:
 
 ## O que ficou de fora
 
-BFF, SSR, trocar props drilling entre components por context ( talvez um gerenciador de estado ), gerar cache pelos mais buscados, teste unitarios dentro dos components, storybook, design system, padronizar tudo para inglês ( costume, achei estranho tudo em português, mas faz parte do desafio ), melhorias de ui/ux, teste de performance, ci/cd
+trocar props drilling entre components por context ( talvez um gerenciador de estado ), gerar cache pelos mais buscados, teste unitarios dentro dos components, storybook, design system tokens completos, padronizar tudo para inglês ( costume, achei estranho tudo em português, mas faz parte do desafio ), melhorias adicionais de ui/ux, teste de performance, ci/cd
 
 OBS: documentei muita coisa para me ajudar nas implementações e organização, talvez seja até exagero, mas me ajudou a visualizar e entender melhor o projeto e suas regras e necessidades.

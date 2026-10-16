@@ -1,5 +1,11 @@
-import MinhasConsultas from '@/components/organisms/MinhasConsultas/minhasConsultas'
+import type { Metadata } from 'next'
+import MinhasConsultasPage from '@/components/pages/MinhasConsultasPage/minhasConsultasPage'
 
-export default function MinhasConsultasPage() {
-  return <MinhasConsultas />
+export const metadata: Metadata = {
+  title: 'Minhas Consultas | Clínica Bem Viver',
+  description: 'Consulte suas próximas consultas e histórico médico na Clínica Bem Viver.',
+}
+
+export default function Page() {
+  return <MinhasConsultasPage />
 }
