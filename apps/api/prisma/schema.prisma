@@ -34,6 +34,7 @@ model Usuario {
 
   profissional Profissional?
   consultas    Consulta[]
+  listaEspera  ListaEspera[]
 
   @@map("usuarios")
 }
@@ -43,9 +44,10 @@ model Profissional {
   id            String @id
   especialidade String
 
-  usuario   Usuario    @relation(fields: [id], references: [id])
-  consultas Consulta[]
-  folgas    Folga[]
+  usuario     Usuario       @relation(fields: [id], references: [id])
+  consultas   Consulta[]
+  folgas      Folga[]
+  listaEspera ListaEspera[]
 
   @@map("profissionais")
 }
@@ -82,4 +84,24 @@ model Folga {
 
   @@unique([profissionalId, data])
   @@map("folgas")
+}
+
+model ListaEspera {
+  id             String       @id @default(uuid())
+  profissionalId String       @map("profissional_id")
+  pacienteId     String       @map("paciente_id")
+  data           String
+  tipo           TipoConsulta
+  turno          String       @default("qualquer") // manha, tarde, qualquer
+  status         String       @default("aguardando") // aguardando, notificado, atendido, cancelado
+  criadaEm       DateTime     @default(now()) @map("criada_em") @db.Timestamptz(3)
+  notificadoEm   DateTime?    @map("notificado_em") @db.Timestamptz(3)
+
+  profissional Profissional @relation(fields: [profissionalId], references: [id])
+  paciente     Usuario      @relation(fields: [pacienteId], references: [id])
+
+  @@unique([profissionalId, pacienteId, data])
+  @@index([profissionalId, data])
+  @@index([pacienteId])
+  @@map("lista_espera")
 }

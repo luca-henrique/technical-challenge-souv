@@ -6,6 +6,7 @@ import { rotasIntegracoes } from './rotas/integracoes'
 import { rotasPacientes } from './rotas/pacientes'
 import { rotasProfissionais } from './rotas/profissionais'
 import { rotasRelatorios } from './rotas/relatorios'
+import { rotasListaEspera } from './rotas/listaEspera'
 
 export const app = express()
 
@@ -18,6 +19,7 @@ app.use('/profissionais', rotasProfissionais)
 app.use('/consultas', rotasConsultas)
 app.use('/pacientes', rotasPacientes)
 app.use('/relatorios', rotasRelatorios)
+app.use('/lista-espera', rotasListaEspera)
 
 app.use((erro: { status?: number }, _req: Request, res: Response, _next: NextFunction) => {
   if (erro.status === 400) {

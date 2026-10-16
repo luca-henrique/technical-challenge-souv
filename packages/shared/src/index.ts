@@ -72,6 +72,25 @@ export interface RelatorioFaltas {
   }>
 }
 
+export type TurnoListaEspera = 'manha' | 'tarde' | 'qualquer'
+export type StatusListaEspera = 'aguardando' | 'notificado' | 'atendido' | 'cancelado'
+
+export interface ItemListaEspera {
+  id: string
+  profissionalId: string
+  pacienteId: string
+  data: string
+  tipo: TipoConsulta
+  turno: TurnoListaEspera
+  status: StatusListaEspera
+  criadaEm: string
+  notificadoEm?: string | null
+  profissionalNome?: string
+  especialidade?: string
+  pacienteNome?: string
+  pacienteEmail?: string
+}
+
 export const FUSO = 'America/Recife'
 
 export const DURACAO_MINUTOS: Record<TipoConsulta, number> = {

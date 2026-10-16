@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Alert from '@/components/atoms/Alert/alert'
 import LinkButton from '@/components/atoms/LinkButton/linkButton'
 import CartaoConsulta from '@/components/molecules/CartaoConsulta/cartaoConsulta'
+import MinhasInscricoesEspera from '@/components/organisms/MinhasInscricoesEspera/minhasInscricoesEspera'
 import MinhasConsultasSkeleton from '@/components/organisms/MinhasConsultasSkeleton/minhasConsultasSkeleton'
 import { useMinhasConsultas } from '@/hooks/useMinhasConsultas'
 
@@ -53,6 +54,8 @@ export default function MinhasConsultas() {
           ))}
         </ul>
       )}
+
+      <MinhasInscricoesEspera />
     </div>
   )
 }

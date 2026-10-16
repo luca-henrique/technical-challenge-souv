@@ -1,7 +1,7 @@
 import { encerrarSessao, lerSessao } from './sessao'
 
 interface Opcoes {
-  metodo?: 'GET' | 'POST'
+  metodo?: 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT'
   corpo?: unknown
 }
 

@@ -3,6 +3,7 @@ import { DURACAO_MINUTOS, hojeEmRecife } from '@bemviver/shared'
 import { instante, temConflito } from '../agenda'
 import { prisma } from '../prisma'
 import { criarConsultaSchema } from '../schemas/consultaSchema'
+import { notificarProximoListaEspera } from './listaEsperaController'
 
 export async function listarMinhasConsultas(req: Request, res: Response) {
   const consultas = await prisma.consulta.findMany({
@@ -116,7 +117,22 @@ export async function cancelarConsulta(req: Request, res: Response) {
     where: { id: consulta.id },
     data: { status: 'cancelada', canceladaEm: new Date() },
   })
-  res.json(cancelada)
+
+  let proximoEspera = null
+  try {
+    proximoEspera = await notificarProximoListaEspera(
+      consulta.profissionalId,
+      consulta.data,
+      consulta.hora
+    )
+  } catch (e) {
+    console.error('Erro ao notificar lista de espera:', e)
+  }
+
+  res.json({
+    ...cancelada,
+    pacienteNotificadoListaEspera: proximoEspera,
+  })
 }
 
 export async function registrarFaltaConsulta(req: Request, res: Response) {

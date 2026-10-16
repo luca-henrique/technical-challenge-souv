@@ -10,6 +10,7 @@ import Alert from '@/components/atoms/Alert/alert'
 import Button from '@/components/atoms/Button/button'
 import Card from '@/components/atoms/Card/card'
 import Skeleton from '@/components/atoms/Skeleton/skeleton'
+import CardEntrarListaEspera from '@/components/molecules/CardEntrarListaEspera/cardEntrarListaEspera'
 import SeletorData from '@/components/molecules/SeletorData/seletorData'
 import SeletorHorario from '@/components/molecules/SeletorHorario/seletorHorario'
 import SeletorProfissional from '@/components/molecules/SeletorProfissional/seletorProfissional'
@@ -154,13 +155,24 @@ export default function AgendarConsulta({
                   <span className="sr-only">Carregando horários disponíveis...</span>
                 </div>
               ) : (
-                <SeletorHorario
-                  horarios={horarios}
-                  selecionado={formHora}
-                  onSelecionar={(horaEscolhida) => {
-                    setValue('hora', horaEscolhida, { shouldValidate: true })
-                  }}
-                />
+                <>
+                  <SeletorHorario
+                    horarios={horarios}
+                    selecionado={formHora}
+                    onSelecionar={(horaEscolhida) => {
+                      setValue('hora', horaEscolhida, { shouldValidate: true })
+                    }}
+                  />
+                  {horarios.length === 0 && (
+                    <div className="mt-3">
+                      <CardEntrarListaEspera
+                        profissionalId={formProfissionalId}
+                        data={formData}
+                        tipo={formTipo}
+                      />
+                    </div>
+                  )}
+                </>
               )}
               {errors.hora && (
                 <p className="mt-1 text-sm text-red-600">{errors.hora.message}</p>
