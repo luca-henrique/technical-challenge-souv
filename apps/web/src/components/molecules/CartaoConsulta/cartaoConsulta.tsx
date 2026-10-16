@@ -14,10 +14,10 @@ export default function CartaoConsulta({ consulta, onCancelar }: CartaoConsultaP
       <p className="font-medium first-letter:uppercase">
         {formatarData(consulta.data)} às {consulta.hora}
       </p>
-      <p className="text-gray-700">
+      <p className="text-gray-700 dark:text-gray-300">
         {consulta.profissionalNome} ({consulta.especialidade})
       </p>
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-gray-500 dark:text-gray-400">
         {NOME_TIPO[consulta.tipo]}, {NOME_STATUS[consulta.status].toLowerCase()}
       </p>
       {consulta.status === 'agendada' &&
