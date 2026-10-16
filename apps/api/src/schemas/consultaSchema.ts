@@ -9,15 +9,15 @@ import {
 
 export const criarConsultaSchema = z
   .object({
-    profissionalId: z.string().min(1, 'Informe o profissional'),
-    pacienteId: z.string().min(1, 'Informe o paciente'),
+    profissionalId: z.string({ message: 'Informe o profissional' }).min(1, 'Informe o profissional'),
+    pacienteId: z.string({ message: 'Informe o paciente' }).min(1, 'Informe o paciente'),
     data: z
-      .string()
+      .string({ message: 'Informe a data' })
       .min(1, 'Informe a data')
       .refine(dataValida, 'Informe a data no formato AAAA-MM-DD')
       .refine(diaUtil, 'A clínica só atende de segunda a sexta'),
     hora: z
-      .string()
+      .string({ message: 'Informe o horário' })
       .min(1, 'Informe o horário')
       .refine((h) => GRADE.includes(h), 'Escolha um horário da grade de 30 minutos'),
     tipo: z.enum(['primeira', 'retorno'] as const, {
