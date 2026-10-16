@@ -318,10 +318,55 @@ export async function remarcarConsulta(req: Request, res: Response) {
   }
 }
 
+export async function confirmarConsulta(req: Request, res: Response) {
+  const id = String(req.params.id)
+  const consulta = await prisma.consulta.findUnique({
+    where: { id },
+    include: { profissional: { include: { usuario: true } } },
+  })
+
+  if (!consulta) {
+    res.status(404).json({ erro: 'Consulta não encontrada' })
+    return
+  }
+
+  if (consulta.status !== 'agendada') {
+    res.status(409).json({ erro: 'Só é possível confirmar uma consulta agendada' })
+    return
+  }
+
+  if (req.usuario.perfil === 'paciente' && consulta.pacienteId !== req.usuario.id) {
+    res.status(403).json({ erro: 'Você só pode confirmar suas próprias consultas' })
+    return
+  }
+
+  if (consulta.confirmadaEm) {
+    res.json({
+      ...consulta,
+      profissionalNome: consulta.profissional.usuario.nome,
+      especialidade: consulta.profissional.especialidade,
+    })
+    return
+  }
+
+  const atualizada = await prisma.consulta.update({
+    where: { id: consulta.id },
+    data: { confirmadaEm: new Date() },
+    include: { profissional: { include: { usuario: true } } },
+  })
+
+  res.json({
+    ...atualizada,
+    profissionalNome: atualizada.profissional.usuario.nome,
+    especialidade: atualizada.profissional.especialidade,
+  })
+}
+
 export const consultasController = {
   listarMinhas: listarMinhasConsultas,
   criar: criarConsulta,
   cancelar: cancelarConsulta,
   remarcar: remarcarConsulta,
+  confirmar: confirmarConsulta,
   registrarFalta: registrarFaltaConsulta,
 }

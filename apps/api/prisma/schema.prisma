@@ -65,6 +65,7 @@ model Consulta {
   status         StatusConsulta @default(agendada)
   criadaEm       DateTime       @default(now()) @map("criada_em") @db.Timestamptz(3)
   canceladaEm    DateTime?      @map("cancelada_em") @db.Timestamptz(3)
+  confirmadaEm   DateTime?      @map("confirmada_em") @db.Timestamptz(3)
 
   profissional Profissional @relation(fields: [profissionalId], references: [id])
   paciente     Usuario      @relation(fields: [pacienteId], references: [id])

@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { permitir } from '../auth'
 import {
   cancelarConsulta,
+  confirmarConsulta,
   criarConsulta,
   listarMinhasConsultas,
   registrarFaltaConsulta,
@@ -13,6 +14,7 @@ export const rotasConsultas = Router()
 rotasConsultas.get('/minhas', permitir('paciente'), listarMinhasConsultas)
 rotasConsultas.post('/', permitir('paciente', 'recepcao'), criarConsulta)
 rotasConsultas.post('/:id/cancelar', permitir('paciente', 'recepcao'), cancelarConsulta)
+rotasConsultas.post('/:id/confirmar', permitir('paciente', 'recepcao'), confirmarConsulta)
 rotasConsultas.patch('/:id/remarcar', permitir('paciente', 'recepcao'), remarcarConsulta)
 rotasConsultas.post('/:id/remarcar', permitir('paciente', 'recepcao'), remarcarConsulta)
 rotasConsultas.post('/:id/falta', permitir('recepcao'), registrarFaltaConsulta)

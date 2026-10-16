@@ -33,6 +33,7 @@ export interface Consulta {
   status: StatusConsulta
   criadaEm: string
   canceladaEm: string | null
+  confirmadaEm?: string | null
   pacienteNome?: string
   profissionalNome?: string
   especialidade?: string
