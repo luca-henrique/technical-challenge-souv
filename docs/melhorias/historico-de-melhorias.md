@@ -279,6 +279,28 @@ Revisão e implementação completa da [RN05](file:///Users/lucas1/Desktop/proje
   - Backend: [`apps/api/test/rn05-cancelamento-de-consultas.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/rn05-cancelamento-de-consultas.test.ts) (7 testes cobrindo cancelamento por paciente/recepção, bloqueio de cancelamento de terceiros, 404, 409 e liberação imediata do slot).
   - Frontend: [`apps/web/test/rn05-cancelamento-de-consultas.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/rn05-cancelamento-de-consultas.test.tsx) (3 testes cobrindo fluxo com confirmação inline no paciente, tratamento de erro da API e cancelamento na recepção com invalidação).
 
+## 14. Implementação e Revisão da Regra de Negócio RN06 (Perfis de Usuário e Controle de Acesso - RBAC)
+
+Revisão e implementação completa da [RN06](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN06-perfis-e-permissoes-rbac.md):
+
+- **Matriz de Permissões Estrita no Back-end**:
+  - **Autenticação**: Middleware [`autenticar`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/src/auth.ts#L28-L41) rejeitando requisições sem Bearer token ou com JWT expirado/inválido com `401 Unauthorized`.
+  - **Controle de Perfil**: Middleware [`permitir`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/src/auth.ts#L43-L51) rejeitando perfis não autorizados com `403 Forbidden`.
+  - **Prevenção de Injeção de Paciente**: Em [`criarConsulta`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/src/controllers/consultasController.ts#L24-L28), o `pacienteId` é forçado como `req.usuario.id` quando o perfil for `paciente`, impedindo o agendamento em nome de terceiros.
+  - **Privacidade de Agenda Médica**: Em [`GET /profissionais/:id/agenda`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/src/rotas/profissionais.ts#L51-L54), médicos são terminantemente impedidos de visualizar a agenda de colegas (`403 Forbidden`).
+  - **Exclusividade no Bloqueio de Folga**: Endpoint [`POST /profissionais/:id/folgas`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/src/rotas/profissionais.ts#L96-L103) restrito exclusivamente ao perfil `profissional`, validando que `req.usuario.id === profissionalId`.
+  - **Restrição de Lista de Pacientes**: [`GET /pacientes`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/src/rotas/pacientes.ts#L7) restrito à recepção (`403 Forbidden` para pacientes e profissionais).
+- **Proteção Perimetral no Front-end (Next.js Edge Middleware)**:
+  - [`middleware.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/middleware.ts):
+    - Redireciona usuários deslogados tentando acessar `/paciente`, `/recepcao` ou `/profissional` para `/`.
+    - Redireciona usuários logados acessando `/` diretamente para sua respectiva área (`/paciente`, `/recepcao` ou `/profissional`).
+    - Bloqueia acesso direto por URL de pacientes a `/recepcao` ou `/profissional`, redirecionando-os para `/paciente`.
+  - Sessão híbrida e segura gerenciada em [`sessao.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/src/lib/sessao.ts) com cookies `SameSite=Lax` e `localStorage`.
+- **Cobertura de Testes Automatizados**:
+  - Backend: [`apps/api/test/rn06-perfis-e-permissoes-rbac.test.ts`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/api/test/rn06-perfis-e-permissoes-rbac.test.ts) (15 testes cobrindo todas as células da matriz de permissões RBAC para os perfis `paciente`, `recepcao` e `profissional`).
+  - Frontend: [`apps/web/test/rn06-perfis-e-permissoes-rbac.test.tsx`](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/apps/web/test/rn06-perfis-e-permissoes-rbac.test.tsx) (7 testes cobrindo rotas privadas, redirecionamento pós-login, bloqueio de URL cruzada e sessão híbrida).
+
+
 
 
 

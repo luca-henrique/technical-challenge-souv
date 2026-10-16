@@ -93,11 +93,11 @@ rotasProfissionais.get('/:id/horarios', async (req, res) => {
   res.json({ horarios: horariosDisponiveis(marcadas, tipo, data) })
 })
 
-rotasProfissionais.post('/:id/folgas', permitir('profissional', 'recepcao'), async (req, res) => {
+rotasProfissionais.post('/:id/folgas', permitir('profissional'), async (req, res) => {
   const profissionalId = req.params.id
   const data = String(req.body?.data ?? '')
 
-  if (req.usuario.perfil === 'profissional' && req.usuario.id !== profissionalId) {
+  if (req.usuario.id !== profissionalId) {
     res.status(403).json({ erro: 'Você só pode bloquear a sua própria agenda' })
     return
   }
