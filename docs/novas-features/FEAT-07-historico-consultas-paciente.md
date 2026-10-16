@@ -15,28 +15,47 @@ Atualmente, o endpoint `GET /consultas/minhas` filtra exclusivamente `data: { gt
 1. **Abas de Navegação no Painel do Paciente**:
    - Aba **"Próximas consultas"**: Consultas futuras agendadas (`data >= hojeEmRecife()`).
    - Aba **"Histórico"**: Consultas passadas (`data < hojeEmRecife()` ou com status `'realizada'`, `'faltou'`, `'cancelada'`).
-2. **Visualização Detalhada do Registro**:
+2. **Transição Temporal e Cancelamento por Falta de Confirmação (Edge Case)**:
+   - Se o horário de início da consulta já passou (`inicio <= agora`):
+     - Caso o paciente **não tenha confirmado presença** até o horário (`confirmadaEm === null`), a consulta é automaticamente cancelada (`status: 'cancelada'`, com `canceladaEm: agora`).
+     - A consulta deixa imediatamente a aba **"Próximas consultas"** e migra para o **"Histórico"**, mesmo que ocorra no dia de hoje (ex.: consulta hoje às 13:30, mas o horário atual já é 14:00).
+3. **Visualização Detalhada do Registro**:
    - Cada card do histórico exibe: profissional, especialidade, data, horário, tipo (`primeira` ou `retorno`) e o desfecho (`Realizada`, `Faltou`, `Cancelada`).
-3. **Visão pelo Profissional**:
+4. **Visão pelo Profissional**:
    - Ao atender um paciente, o médico pode visualizar seu histórico completo na clínica, melhorando o acompanhamento clínico.
 
 ---
 
 ## 3. Especificação Técnica
 
-### 3.1. Endpoint da API
-- `GET /consultas/minhas?historico=true`:
-  - Se `historico=true`, altera a cláusula do Prisma para:
+### 3.1. Endpoints da API
+
+- `GET /consultas/minhas`:
+  - Executa rotina de cancelamento automático das consultas do paciente com `status = 'agendada'`, `confirmadaEm = null` e `inicio <= agora`.
+  - Se `historico=false` (padrão): filtra consultas futuras estritamente posteriores ao instante atual:
+    ```ts
+    where: {
+      pacienteId: req.usuario.id,
+      inicio: { gt: agora },
+      status: 'agendada',
+    }
+    ```
+  - Se `historico=true`: retorna todas as consultas cujo horário de início já passou ou com status concluído/cancelado:
     ```ts
     where: {
       pacienteId: req.usuario.id,
       OR: [
-        { data: { lt: hojeEmRecife() } },
-        { status: { in: ['realizada', 'faltou', 'cancelada'] } }
-      ]
+        { inicio: { lte: agora } },
+        { status: { in: ['realizada', 'faltou', 'cancelada'] } },
+      ],
     }
     ```
-  - Ordenação decrescente: `orderBy: { inicio: 'desc' }`.
+  - Ordenação: `orderBy: { inicio: historico ? 'desc' : 'asc' }`.
+
+- `GET /pacientes/:id/consultas`:
+  - Executa a mesma rotina de cancelamento de consultas expiradas sem confirmação e retorna todo o histórico ordenado decrescente por `inicio`.
 
 ### 3.2. Front-end
-- Componente de Tabs (`Abas`) no topo da página `/paciente`.
+- Componente de Tabs (`Abas`) no topo da página `/paciente` alternando entre "Próximas consultas" e "Histórico".
+- As consultas expiradas ou canceladas por falta de confirmação aparecem com o badge e status de cancelamento, sem ações de remarcação ou novo cancelamento.
+

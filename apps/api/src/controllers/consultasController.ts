@@ -6,20 +6,40 @@ import { prisma, type Prisma } from '../prisma'
 import { criarConsultaSchema } from '../schemas/consultaSchema'
 import { notificarProximoListaEspera } from './listaEsperaController'
 
+export async function cancelarConsultasExpiradasNaoConfirmadas(pacienteId?: string) {
+  const agora = new Date()
+  await prisma.consulta.updateMany({
+    where: {
+      ...(pacienteId ? { pacienteId } : {}),
+      status: 'agendada',
+      confirmadaEm: null,
+      inicio: { lte: agora },
+    },
+    data: {
+      status: 'cancelada',
+      canceladaEm: agora,
+    },
+  })
+}
+
 export async function listarMinhasConsultas(req: Request, res: Response) {
   const historico = req.query.historico === 'true'
+  const agora = new Date()
+
+  // Cancela automaticamente consultas não confirmadas cujo horário já passou
+  await cancelarConsultasExpiradasNaoConfirmadas(req.usuario.id)
 
   const whereClause: Prisma.ConsultaWhereInput = historico
     ? {
         pacienteId: req.usuario.id,
         OR: [
-          { data: { lt: hojeEmRecife() } },
+          { inicio: { lte: agora } },
           { status: { in: ['realizada', 'faltou', 'cancelada'] } },
         ],
       }
     : {
         pacienteId: req.usuario.id,
-        data: { gte: hojeEmRecife() },
+        inicio: { gt: agora },
         status: 'agendada',
       }
 

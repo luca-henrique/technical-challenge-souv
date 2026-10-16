@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { permitir } from '../auth'
+import { cancelarConsultasExpiradasNaoConfirmadas } from '../controllers/consultasController'
 import { prisma } from '../prisma'
 
 export const rotasPacientes = Router()
@@ -15,6 +16,7 @@ rotasPacientes.get('/', permitir('recepcao'), async (_req, res) => {
 
 rotasPacientes.get('/:id/consultas', permitir('recepcao', 'profissional'), async (req, res) => {
   const pacienteId = String(req.params.id)
+  await cancelarConsultasExpiradasNaoConfirmadas(pacienteId)
   const consultas = await prisma.consulta.findMany({
     where: { pacienteId },
     include: { profissional: { include: { usuario: { select: { nome: true } } } } },
