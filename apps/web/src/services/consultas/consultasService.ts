@@ -2,8 +2,9 @@ import type { Consulta } from '@bemviver/shared'
 import { api } from '@/lib/api'
 import type { CriarConsultaParams } from './types'
 
-export async function listarMinhasConsultas(): Promise<Consulta[]> {
-  return api<Consulta[]>('/consultas/minhas')
+export async function listarMinhasConsultas(historico = false): Promise<Consulta[]> {
+  const caminho = historico ? '/consultas/minhas?historico=true' : '/consultas/minhas'
+  return api<Consulta[]>(caminho)
 }
 
 export async function agendarConsulta(dados: CriarConsultaParams): Promise<Consulta> {

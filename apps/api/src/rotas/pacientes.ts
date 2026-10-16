@@ -12,3 +12,20 @@ rotasPacientes.get('/', permitir('recepcao'), async (_req, res) => {
   })
   res.json(pacientes)
 })
+
+rotasPacientes.get('/:id/consultas', permitir('recepcao', 'profissional'), async (req, res) => {
+  const pacienteId = String(req.params.id)
+  const consultas = await prisma.consulta.findMany({
+    where: { pacienteId },
+    include: { profissional: { include: { usuario: { select: { nome: true } } } } },
+    orderBy: { inicio: 'desc' },
+  })
+
+  res.json(
+    consultas.map(({ profissional, ...consulta }) => ({
+      ...consulta,
+      profissionalNome: profissional.usuario.nome,
+      especialidade: profissional.especialidade,
+    })),
+  )
+})

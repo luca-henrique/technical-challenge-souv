@@ -2,15 +2,31 @@ import type { Request, Response } from 'express'
 import { z } from 'zod'
 import { cabeNoExpediente, diaUtil, DURACAO_MINUTOS, hojeEmRecife } from '@bemviver/shared'
 import { instante, temConflito } from '../agenda'
-import { prisma } from '../prisma'
+import { prisma, type Prisma } from '../prisma'
 import { criarConsultaSchema } from '../schemas/consultaSchema'
 import { notificarProximoListaEspera } from './listaEsperaController'
 
 export async function listarMinhasConsultas(req: Request, res: Response) {
+  const historico = req.query.historico === 'true'
+
+  const whereClause: Prisma.ConsultaWhereInput = historico
+    ? {
+        pacienteId: req.usuario.id,
+        OR: [
+          { data: { lt: hojeEmRecife() } },
+          { status: { in: ['realizada', 'faltou', 'cancelada'] } },
+        ],
+      }
+    : {
+        pacienteId: req.usuario.id,
+        data: { gte: hojeEmRecife() },
+        status: 'agendada',
+      }
+
   const consultas = await prisma.consulta.findMany({
-    where: { pacienteId: req.usuario.id, data: { gte: hojeEmRecife() } },
+    where: whereClause,
     include: { profissional: { include: { usuario: { select: { nome: true } } } } },
-    orderBy: { inicio: 'asc' },
+    orderBy: { inicio: historico ? 'desc' : 'asc' },
   })
 
   res.json(
