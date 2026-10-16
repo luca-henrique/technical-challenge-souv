@@ -7,6 +7,7 @@ import Alert from '@/components/atoms/Alert/alert'
 import Button from '@/components/atoms/Button/button'
 import Heading from '@/components/atoms/Heading/heading'
 import LinkButton from '@/components/atoms/LinkButton/linkButton'
+import Spinner from '@/components/atoms/Spinner/spinner'
 import Text from '@/components/atoms/Text/text'
 import BotaoExportarPdf from '@/components/molecules/BotaoExportarPdf/botaoExportarPdf'
 import SeletorData from '@/components/molecules/SeletorData/seletorData'
@@ -124,7 +125,10 @@ export default function RelatoriosPage() {
         {erro && <Alert>{erro}</Alert>}
 
         {carregando && (
-          <p className="text-sm text-gray-500 dark:text-gray-400">Carregando relatório...</p>
+          <div className="flex items-center justify-center gap-2 py-6 text-sm text-gray-500 dark:text-gray-400">
+            <Spinner tamanho="md" aria-label="Carregando relatório..." />
+            <span>Carregando relatório...</span>
+          </div>
         )}
 
         {relatorio && (
