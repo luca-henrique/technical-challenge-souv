@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express'
-import type { TipoConsulta } from '@bemviver/shared'
+import { dataValida, ehTipoConsulta, type TipoConsulta } from '../../../agenda'
 import { PrismaProfissionaisRepository } from '../repositories/profissionais.repository'
 import { BloquearFolgaUseCase } from '../usecases/bloquearFolga.usecase'
 import { BloquearPeriodoFolgaUseCase } from '../usecases/bloquearPeriodoFolga.usecase'
@@ -8,11 +8,8 @@ import { ListarHorariosDisponiveisUseCase } from '../usecases/listarHorariosDisp
 import { ListarProfissionaisUseCase } from '../usecases/listarProfissionais.usecase'
 import { ObterAgendaProfissionalUseCase } from '../usecases/obterAgendaProfissional.usecase'
 import {
-  agendaQuerySchema,
   bloquearFolgaSchema,
   bloquearPeriodoSchema,
-  filtroProfissionaisSchema,
-  horariosQuerySchema,
 } from '../validations/profissionais.validation'
 
 export class ProfissionaisController {
@@ -38,13 +35,15 @@ export class ProfissionaisController {
   }
 
   listarProfissionais = async (req: Request, res: Response): Promise<void> => {
-    const validacao = filtroProfissionaisSchema.safeParse(req.query)
-    if (!validacao.success) {
-      res.status(400).json({ erro: validacao.error.issues[0]?.message ?? 'Parâmetros inválidos' })
+    const data = req.query.data ? String(req.query.data) : undefined
+    const profissionalId = req.query.profissionalId ? String(req.query.profissionalId) : undefined
+    const especialidade = req.query.especialidade ? String(req.query.especialidade) : undefined
+
+    if (data && !dataValida(data)) {
+      res.status(400).json({ erro: 'Informe a data no formato AAAA-MM-DD' })
       return
     }
 
-    const { data, profissionalId, especialidade } = validacao.data
     const profissionais = await this.listarProfissionaisUseCase.executar({
       data,
       profissionalId,
@@ -55,16 +54,22 @@ export class ProfissionaisController {
 
   obterAgenda = async (req: Request, res: Response): Promise<void> => {
     const profissionalId = req.params.id
-    const validacao = agendaQuerySchema.safeParse(req.query)
-    if (!validacao.success) {
-      res.status(400).json({ erro: validacao.error.issues[0]?.message ?? 'Informe a data no formato AAAA-MM-DD' })
+    const data = String(req.query.data ?? '')
+
+    if (req.usuario.perfil === 'profissional' && req.usuario.id !== profissionalId) {
+      res.status(403).json({ erro: 'Você só pode ver a sua própria agenda' })
+      return
+    }
+
+    if (!dataValida(data)) {
+      res.status(400).json({ erro: 'Informe a data no formato AAAA-MM-DD' })
       return
     }
 
     try {
       const agenda = await this.obterAgendaProfissionalUseCase.executar({
         profissionalId,
-        data: validacao.data.data,
+        data,
         usuarioPerfil: req.usuario.perfil,
         usuarioId: req.usuario.id,
       })
@@ -80,22 +85,35 @@ export class ProfissionaisController {
 
   listarHorarios = async (req: Request, res: Response): Promise<void> => {
     const profissionalId = req.params.id
-    const validacao = horariosQuerySchema.safeParse(req.query)
-    if (!validacao.success) {
+    const data = String(req.query.data ?? '')
+    const tipo = req.query.tipo
+
+    if (!dataValida(data) || !ehTipoConsulta(tipo)) {
       res.status(400).json({ erro: 'Informe a data (AAAA-MM-DD) e o tipo da consulta' })
       return
     }
 
     const horarios = await this.listarHorariosDisponiveisUseCase.executar({
       profissionalId,
-      data: validacao.data.data,
-      tipo: validacao.data.tipo as TipoConsulta,
+      data,
+      tipo: tipo as TipoConsulta,
     })
     res.json({ horarios })
   }
 
   bloquearFolga = async (req: Request, res: Response): Promise<void> => {
     const profissionalId = req.params.id
+    const data = String(req.body?.data ?? '')
+
+    if (req.usuario.id !== profissionalId) {
+      res.status(403).json({ erro: 'Você só pode bloquear a sua própria agenda' })
+      return
+    }
+    if (!dataValida(data)) {
+      res.status(400).json({ erro: 'Informe a data no formato AAAA-MM-DD' })
+      return
+    }
+
     const validacao = bloquearFolgaSchema.safeParse(req.body)
     if (!validacao.success) {
       res.status(400).json({ erro: validacao.error.issues[0]?.message ?? 'Informe a data no formato AAAA-MM-DD' })
@@ -137,6 +155,18 @@ export class ProfissionaisController {
 
   bloquearPeriodo = async (req: Request, res: Response): Promise<void> => {
     const profissionalId = req.params.id
+    const dataInicio = String(req.body?.dataInicio ?? '')
+    const dataFim = String(req.body?.dataFim ?? '')
+
+    if (req.usuario.perfil === 'profissional' && req.usuario.id !== profissionalId) {
+      res.status(403).json({ erro: 'Você só pode bloquear a sua própria agenda' })
+      return
+    }
+    if (!dataValida(dataInicio) || !dataFim || !dataValida(dataFim)) {
+      res.status(400).json({ erro: 'Informe as datas de início e fim no formato AAAA-MM-DD' })
+      return
+    }
+
     const validacao = bloquearPeriodoSchema.safeParse(req.body)
     if (!validacao.success) {
       res.status(400).json({
