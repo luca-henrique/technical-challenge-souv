@@ -67,7 +67,7 @@ export default function CartaoConsulta({ consulta, onCancelar }: CartaoConsultaP
                 onClick={() => setConfirmando(true)}
                 className="flex-1 text-red-600 hover:text-red-700"
               >
-                Cancelar
+                Cancelar consulta
               </Button>
             </div>
           ))}

@@ -37,6 +37,7 @@ rotasIntegracoes.get('/lembretes', async (req, res) => {
 
   res.json(
     consultas.map((consulta) => ({
+      id: consulta.id,
       consultaId: consulta.id,
       data: consulta.data,
       hora: consulta.hora,

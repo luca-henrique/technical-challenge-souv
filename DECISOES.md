@@ -24,9 +24,27 @@ Use uma seção para cada problema investigado ou decisão tomada, copiando o bl
 
 **Como montei o fluxo**
 
+- Exportado no arquivo `n8n/lembrete.json` e executado no container oficial do n8n (`n8nio/n8n:2.40.3`) via `docker compose --profile n8n up -d` (`npm run n8n`).
+- **Nó Schedule Trigger**: Configurado para disparar diariamente às 08:00 (fuso `America/Recife`), com antecedência de 24 horas para as consultas agendadas do dia seguinte.
+- **Nó HTTP Request**: Realiza requisição `GET http://host.docker.internal:3333/integracoes/lembretes` autenticado pelo cabeçalho `x-chave-integracao` com a chave do ambiente (`CHAVE_INTEGRACAO`), obtendo a lista de consultas ativas (`status = 'agendada'`).
+- **Nó Code (JavaScript)**: Itera pelas consultas e formata a data para o padrão nacional (`DD/MM/AAAA`), o assunto (`Lembrete: Sua consulta na Clínica Bem Viver amanhã às HH:mm`) e gera um template HTML responsivo e com a identidade visual da clínica, informando paciente, médico, especialidade, tipo de consulta e orientações para comparecimento com 15 minutos de antecedência.
+- **Nó Send Email (SMTP)**: Conecta-se diretamente ao container do Mailpit (`host: mailpit`, porta `1025`) para despachar os e-mails para `atendimento@clinicabemviver.com.br` -> `pacienteEmail` sem necessidade de SSL/TLS local.
+
 **Como testei**
 
+- **Testes automatizados na API**:
+  - `apps/api/test/features/feat-01-lembrete-n8n.test.ts`: 5 testes cobrindo autenticação por `x-chave-integracao` (401 para chave ausente ou inválida), cálculo padrão do dia seguinte (`D+1`), formatação e integridade dos nós e conexões do arquivo exportado `n8n/lembrete.json`.
+  - `apps/api/test/integracoes.test.ts`: 3 testes cobrindo filtros de data e exclusão de consultas canceladas.
+- **Testes de integração com Mailpit**:
+  - Validação via API HTTP do Mailpit (`curl http://localhost:8025/api/v1/messages`) para certificar que o servidor SMTP emula com perfeição o recebimento dos e-mails disparados pelo workflow n8n.
+
 **O que mudaria para usar em produção**
+
+- **Idempotência**: Criação de campo `lembreteEnviadoEm DateTime?` na tabela `consultas` e gravação de timestamp após cada disparo bem-sucedido, garantindo que reexecuções manuais ou retries do n8n não dupliquem e-mails aos pacientes.
+- **Canais adicionais (Omnichannel)**: Integração com WhatsApp Business API (Evolution API, Twilio ou Z-API) e SMS para pacientes que não acessam e-mail com frequência.
+- **Ações diretas (Magic Links)**: Inclusão de links com tokens JWT de uso único no corpo do e-mail ("Confirmar presença com 1 clique" e "Remarcar consulta"), permitindo ao paciente atualizar o status sem login manual prévio.
+- **Observabilidade**: Adição de nó *Error Trigger* no n8n reportando falhas de conexão ou erros de entrega SMTP para canal de alerta (Slack/Discord/Sentry).
+- **Provedor SMTP Transacional**: Substituição do Mailpit local por serviço em nuvem de alta entregabilidade (AWS SES, Resend ou SendGrid) com DKIM, SPF e DMARC devidamente configurados.
 
 ## Ordem das funcionalidades, com justificativa
 

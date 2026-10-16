@@ -16,11 +16,15 @@ export default function SeletorEspecialidade({
     <Field label={label} erro={erro} className={className}>
       <Select value={valor} onChange={(e) => onChange(e.target.value)}>
         {permitirVazio && <option value="">{textoVazio}</option>}
-        {especialidades.map((esp) => (
-          <option key={esp} value={esp}>
-            {esp}
-          </option>
-        ))}
+        {especialidades.map((esp) => {
+          const nome = typeof esp === 'string' ? esp : ((esp as unknown as { especialidade?: string })?.especialidade ?? '')
+          if (!nome) return null
+          return (
+            <option key={nome} value={nome}>
+              {nome}
+            </option>
+          )
+        })}
       </Select>
     </Field>
   )

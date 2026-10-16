@@ -10,7 +10,9 @@ export default function MinhasInscricoesEspera() {
   const { data: inscricoes = [], isLoading } = useMinhasEspera()
   const { mutate: cancelar, isPending: cancelando } = useCancelarEspera()
 
-  const ativas = inscricoes.filter((i) => i.status === 'aguardando' || i.status === 'notificado')
+  const ativas = Array.isArray(inscricoes)
+    ? inscricoes.filter((i) => i && (i.status === 'aguardando' || i.status === 'notificado'))
+    : []
 
   if (isLoading) {
     return (

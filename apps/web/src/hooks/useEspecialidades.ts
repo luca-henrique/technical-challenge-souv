@@ -6,6 +6,14 @@ import { listarEspecialidades } from '@/services/profissionais/profissionaisServ
 export function useEspecialidades() {
   return useQuery<string[], Error>({
     queryKey: ['especialidades'],
-    queryFn: () => listarEspecialidades(),
+    queryFn: async () => {
+      const res = await listarEspecialidades()
+      if (Array.isArray(res)) {
+        return res
+          .map((item) => (typeof item === 'string' ? item : (item as unknown as { especialidade?: string })?.especialidade ?? ''))
+          .filter(Boolean)
+      }
+      return []
+    },
   })
 }

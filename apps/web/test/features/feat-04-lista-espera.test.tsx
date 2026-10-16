@@ -62,7 +62,7 @@ describe('FEAT-04: Lista de espera para horários que forem liberados (Front-end
     await screen.findByRole('option', { name: /dr\. roberto/i })
 
     // Seleciona profissional
-    const selectProfissional = screen.getByRole('combobox')
+    const selectProfissional = screen.getByLabelText('Profissional')
     fireEvent.change(selectProfissional, { target: { value: 'prof-roberto' } })
 
     // Seleciona data (uma terça-feira futura)
