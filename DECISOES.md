@@ -191,6 +191,14 @@ A ordem estabelecida para as 10 funcionalidades é:
 
 ## O que ficou de fora
 
-trocar props drilling entre components por context ( talvez um gerenciador de estado ), gerar cache pelos mais buscados, teste unitarios dentro dos components, storybook, design system tokens completos, padronizar tudo para inglês ( costume, achei estranho tudo em português, mas faz parte do desafio ), melhorias adicionais de ui/ux, teste de performance, ci/cd
+- [ ] **Gerenciamento de Estado**: Substituir *prop drilling* entre componentes por Context API ou biblioteca de estado (ex: Zustand).
+- [ ] **Estratégia de Cache**: Implementar cache para os dados e consultas mais buscados (ex: React Query / SWR / Redis).
+- [ ] **Testes de Componentes**: Adicionar testes unitários e de integração nos componentes de UI (ex: React Testing Library / Vitest / Jest).
+- [ ] **Storybook**: Documentação visual e desenvolvimento isolado de componentes.
+- [ ] **Design System Tokens**: Definição completa e padronizada de tokens de design (espaçamentos, tipografia, paletas).
+- [ ] **Internacionalização / Código em Inglês**: Padronizar código, entidades e documentação técnica em inglês.
+- [ ] **Melhorias de UI/UX**: Polimento fino de microinterações, estados de loading/empty states e acessibilidade.
+- [ ] **Testes de Performance**: Testes de carga e estresse na API e otimização de bundle/LCP no frontend.
+- [ ] **Pipeline de CI/CD**: Automação de lint, build, testes e deploy contínuo (GitHub Actions).
 
 OBS: documentei muita coisa para me ajudar nas implementações e organização, talvez seja até exagero, mas me ajudou a visualizar e entender melhor o projeto e suas regras e necessidades.
