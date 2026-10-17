@@ -32,7 +32,15 @@ export class ProfissionaisController {
   }
 
   listarEspecialidades = async (_req: Request, res: Response): Promise<void> => {
+    const chaveCache = 'cache:profissionais:especialidades'
+    const cacheado = await cacheService.obter<string[]>(chaveCache)
+    if (cacheado) {
+      res.json(cacheado)
+      return
+    }
+
     const especialidades = await this.listarEspecialidadesUseCase.executar()
+    await cacheService.salvar(chaveCache, especialidades, 300)
     res.json(especialidades)
   }
 
