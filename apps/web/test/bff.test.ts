@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { GET, POST, DELETE } from '../src/app/api/[...path]/route'
+import { GET, POST } from '../src/app/api/[...path]/route'
 
 describe('BFF (Backend for Frontend) Gateway', () => {
   const fetchOriginal = globalThis.fetch

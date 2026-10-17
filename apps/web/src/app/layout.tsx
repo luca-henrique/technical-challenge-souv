@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import './globals.css'
 import { ProvedorQuery } from '@/providers/provedorQuery'
+import { ProvedorSessao } from '@/providers/provedorSessao'
 
 export const metadata: Metadata = {
   title: 'Clínica Bem Viver',
@@ -37,7 +38,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         >
           Pular para o conteúdo principal
         </a>
-        <ProvedorQuery>{children}</ProvedorQuery>
+        <ProvedorQuery>
+          <ProvedorSessao>{children}</ProvedorSessao>
+        </ProvedorQuery>
       </body>
     </html>
   )

@@ -12,12 +12,30 @@ import Field from '@/components/molecules/Field/field'
 import { useAgenda } from '@/hooks/useAgenda'
 import { usePacientes } from '@/hooks/usePacientes'
 import { NOME_TIPO_COM_DURACAO } from '@/lib/formato'
+import { useAgendaContext } from '@/providers/provedorAgenda'
 import { agendarConsultaSchema, type DadosAgendarConsulta } from './schema'
 import type { MarcarConsultaProps } from './types'
 
-export default function MarcarConsulta({ profissionalId, data, onMarcada }: MarcarConsultaProps) {
+export default function MarcarConsulta({
+  profissionalId: propProfissionalId,
+  data: propData,
+  onMarcada,
+}: MarcarConsultaProps) {
+  const context = useAgendaContext()
+  const profissionalId = propProfissionalId ?? context?.profissionalId ?? ''
+  const data = propData ?? context?.data ?? ''
+
   const { data: pacientes = [], isLoading: carregandoPacientes, error: erroPacientes } = usePacientes()
-  const { agendarConsulta, agendando } = useAgenda(profissionalId, data)
+
+  // Se já estiver dentro de um AgendaContext, reutiliza a mutation do context evitando re-execuções.
+  const fallbackAgenda = useAgenda(
+    context ? '' : profissionalId,
+    context ? '' : data,
+  )
+
+  const agendarConsulta = context?.agendarConsulta ?? fallbackAgenda.agendarConsulta
+  const agendando = context?.agendando ?? fallbackAgenda.agendando
+
   const [mensagemSucesso, setMensagemSucesso] = useState('')
   const [erroMutacao, setErroMutacao] = useState('')
 
