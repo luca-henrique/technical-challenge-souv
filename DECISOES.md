@@ -194,7 +194,7 @@ A ordem estabelecida para as 10 funcionalidades é:
 - [x] **Gerenciamento de Estado**: Substituir *prop drilling* entre componentes por Context API ou biblioteca de estado (ex: Zustand).
 - [x] **Estratégia de Cache**: Implementar cache para os dados e consultas mais buscados (ex: React Query / SWR / Redis).
 - [x] **Testes de Componentes**: Adicionar testes unitários e de integração nos componentes de UI (ex: React Testing Library / Vitest / Jest).
-- [ ] **Storybook**: Documentação visual e desenvolvimento isolado de componentes.
+- [x] **Storybook**: Documentação visual e desenvolvimento isolado de componentes.
 - [x] **Design System Tokens**: Definição completa e padronizada de tokens de design (espaçamentos, tipografia, paletas).
 - [ ] **Internacionalização / Código em Inglês**: Padronizar código, entidades e documentação técnica em inglês.
 - [ ] **Melhorias de UI/UX**: Polimento fino de microinterações, estados de loading/empty states e acessibilidade.
