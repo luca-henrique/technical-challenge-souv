@@ -1,10 +1,14 @@
 import type { ReactNode } from 'react'
-import AreaTemplate from '@/components/templates/AreaTemplate/areaTemplate'
+import { AppShell } from '@/widgets/layout/app-shell/app-shell'
 
-export default function Layout({ children }: { children: ReactNode }) {
+export default function ProfessionalLayout({ children }: { children: ReactNode }) {
   return (
-    <AreaTemplate perfil="profissional" titulo="Minha agenda">
+    <AppShell
+      requiredRole="profissional"
+      title="Minha Agenda"
+      subtitle="Gerenciamento de consultas e escala de atendimentos"
+    >
       {children}
-    </AreaTemplate>
+    </AppShell>
   )
 }

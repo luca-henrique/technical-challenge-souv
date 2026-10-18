@@ -268,6 +268,25 @@ A ordem estabelecida para as 10 funcionalidades é:
 5. **Cobertura de Testes Automatizados**:
    - Nova suite de testes unitários em `apps/web/test/patient-features.test.tsx` cobrindo validações de schema, seletores, cards de consulta e modais acessíveis.
 
+### Refatoração da Área do Profissional (pattern-front.md & FSD Estrito)
+
+1. **Separação Rígida de Responsabilidades**:
+   - **Schema Zod** (`block-schedule.schema.ts`): validação de bloqueio de dia individual e intervalo de férias/recesso com regra de `startDate <= endDate`.
+   - **Custom Hook** (`use-doctor-schedule.ts`): queries de agenda com chave unificada (`queryKeys.professionals.agenda`), mutações de folga individual e em período, navegação de datas (anterior/hoje/próximo) e feedback por toast.
+   - **Componentes Puros de UI**:
+     - Moléculas: `ScheduleDateNav`, `BlockDayAction`, `BlockPeriodModal` (com acessibilidade WCAG total) e `ScheduleAppointmentsTable`.
+     - Organismo: `DoctorScheduleBoard` integrando navegação, exportação de PDF, alertas de folga e tabela de consultas.
+     - View: `DoctorScheduleView` desacoplada do roteador Next.js.
+2. **Teto Estrito de 120 Linhas por Arquivo**:
+   - Todos os novos arquivos mantidos estritamente abaixo do limite de 120 linhas.
+3. **Resiliência e Acessibilidade**:
+   - `useToast` com fallback gracioso para execuções isoladas de testes.
+   - `AgendaProfissional` atuando como adapter compatível mantendo compatibilidade com testes legados (`rn07` e `feat-05`).
+4. **Stories do Storybook**:
+   - Criação de stories para `schedule-date-nav` e `schedule-appointments-table`.
+5. **Cobertura de Testes Automatizados**:
+   - Suite dedicada em `apps/web/test/doctor-features.test.tsx` (7 novos testes unitários).
+
 ## Como usei IA
 
 - codificação

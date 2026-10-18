@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import ProfissionalPage from '@/components/pages/ProfissionalPage/profissionalPage'
+import { DoctorScheduleView } from '@/views/doctor/ui/doctor-schedule-view'
 
 export const metadata: Metadata = {
   title: 'Minha Agenda | Clínica Bem Viver',
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-  return <ProfissionalPage />
+  return <DoctorScheduleView />
 }
