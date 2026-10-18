@@ -5,12 +5,16 @@ import {
   Badge,
   Button,
   Card,
+  EmptyState,
   FormField,
   Input,
   Modal,
   Select,
   Skeleton,
+  ToastCard,
+  ToastProvider,
   Typography,
+  useToast,
 } from '../src/shared/ui'
 
 describe('Shared UI Design System Components (FSD)', () => {
@@ -156,6 +160,102 @@ describe('Shared UI Design System Components (FSD)', () => {
         </Modal>,
       )
       expect(screen.queryByRole('dialog')).toBeNull()
+    })
+  })
+
+  describe('EmptyState', () => {
+    it('renders with status role, accessible label, title and action', () => {
+      const onAction = vi.fn()
+      render(
+        <EmptyState
+          title="Nenhuma consulta"
+          description="Você ainda não possui agendamentos cadastrados."
+          variant="dashed"
+          action={<Button onClick={onAction}>Novo Agendamento</Button>}
+        />,
+      )
+
+      const status = screen.getByRole('status')
+      expect(status.getAttribute('aria-label')).toBe('Nenhuma consulta')
+      expect(screen.getByText('Nenhuma consulta')).toBeDefined()
+      expect(screen.getByText('Você ainda não possui agendamentos cadastrados.')).toBeDefined()
+
+      const button = screen.getByRole('button', { name: 'Novo Agendamento' })
+      fireEvent.click(button)
+      expect(onAction).toHaveBeenCalledTimes(1)
+    })
+
+    it('renders inline variant correctly', () => {
+      render(
+        <EmptyState
+          title="Histórico limpo"
+          variant="inline"
+        />,
+      )
+      expect(screen.getByText('Histórico limpo')).toBeDefined()
+    })
+  })
+
+  describe('Toast', () => {
+    it('renders ToastCard with correct accessible alert/status role and dismiss button', () => {
+      const onDismiss = vi.fn()
+      render(
+        <ToastCard
+          toast={{
+            id: 't-1',
+            type: 'success',
+            title: 'Operação realizada com sucesso',
+            description: 'Seus dados foram salvos.',
+          }}
+          onDismiss={onDismiss}
+        />,
+      )
+
+      const status = screen.getByRole('status')
+      expect(status.textContent).toContain('Operação realizada com sucesso')
+      expect(status.textContent).toContain('Seus dados foram salvos.')
+
+      const closeButton = screen.getByRole('button', { name: 'Fechar notificação' })
+      fireEvent.click(closeButton)
+      expect(onDismiss).toHaveBeenCalledTimes(1)
+    })
+
+    it('renders error toast with alert role', () => {
+      render(
+        <ToastCard
+          toast={{
+            id: 't-2',
+            type: 'error',
+            title: 'Falha no agendamento',
+          }}
+          onDismiss={() => {}}
+        />,
+      )
+
+      const alert = screen.getByRole('alert')
+      expect(alert.textContent).toContain('Falha no agendamento')
+    })
+
+    it('allows triggering toasts via useToast within ToastProvider', () => {
+      function TestToastConsumer() {
+        const { success } = useToast()
+        return (
+          <button type="button" onClick={() => success('Sucesso disparado!')}>
+            Disparar
+          </button>
+        )
+      }
+
+      render(
+        <ToastProvider>
+          <TestToastConsumer />
+        </ToastProvider>,
+      )
+
+      const triggerBtn = screen.getByRole('button', { name: 'Disparar' })
+      fireEvent.click(triggerBtn)
+
+      expect(screen.getByText('Sucesso disparado!')).toBeDefined()
     })
   })
 })
