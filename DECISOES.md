@@ -177,6 +177,81 @@ A ordem estabelecida para as 10 funcionalidades é:
      - `AgendarConsultaPage`: agendamento de novas consultas.
      - `ProfissionalPage`: visualização da agenda do profissional.
 
+### Gerenciamento de Estado & Eliminação de Prop Drilling
+
+1. **Contexto de Sessão (`apps/web/src/providers/provedorSessao.tsx`)**:
+   - Centralização do estado de autenticação e perfil do usuário logado via `ProvedorSessao` e hook `useSessaoContext()`.
+   - Remoção de repasse manual de dados de usuário entre `AppShell`, cabeçalhos e páginas filhas.
+2. **Contexto de Agenda (`apps/web/src/providers/provedorAgenda.tsx`)**:
+   - Criação do `ProvedorAgenda` e hook `useAgendaContext()` encapsulando profissional selecionado, data ativa, listagem de consultas, carregamento e a mutation `agendarConsulta`.
+   - Componentes profundos como `CardAgendaDia` e `MarcarConsulta` agora consomem diretamente o contexto ou mantêm fallback gracioso se usados isoladamente, eliminando múltiplos níveis de passagem de callbacks e identificadores.
+   - Testes dedicados em `apps/web/test/gerenciamento-estado-context.test.tsx`.
+
+### Estratégia de Cache Unificada com React Query e Redis
+
+1. **Frontend TanStack Query (`apps/web/src/lib/`)**:
+   - Centralização de Query Keys em `queryKeys.ts` para padronização e invalidação granular (`especialidades`, `profissionais`, `consultas`, `relatorioFaltas`).
+   - Configuração de cache com `staleTime: 5 * 60 * 1000` (5 minutos) e `gcTime: 30 * 60 * 1000` (30 minutos) em `queryClient.ts`.
+   - Utilitário `prefetch.ts` para pré-carregamento de dados críticos na navegação.
+2. **Cache de Especialidades no Redis na API (`apps/api`)**:
+   - Cache com TTL de 300 segundos da listagem de especialidades mais buscadas com cabeçalho `X-Cache: HIT / MISS`.
+   - Testes automatizados em `apps/web/test/cache-strategy.test.ts`.
+
+### Design System Tokens, FSD & Atomic Design no Storybook
+
+1. **Estrutura Feature-Sliced Design (FSD)**:
+   - Organização das camadas em `shared/ui`, `entities`, `features`, `widgets` e `views`.
+   - Componentes em `shared/ui`: `Typography`, `Button`, `Input`, `Select`, `Badge`, `Card`, `Skeleton`, `Modal`, `FormField`.
+2. **Acessibilidade e Tokens de Design**:
+   - Touch targets mínimos de 44px (`min-h-11`) para botões e campos de entrada.
+   - Foco visível com anéis destacados (`focus-visible:ring-2 focus-visible:ring-teal-500`).
+   - Acessibilidade semântica com `role="alert"`, `role="status"` e `aria-live`.
+3. **Documentação Visual com Storybook**:
+   - Instalação e configuração do Storybook 10 em Next.js (`.storybook/main.ts` e `preview.ts`).
+   - Stories isoladas para todos os átomos e moléculas do Design System.
+4. **Testes Unitários de Componentes**:
+   - Suite completa com React Testing Library e Vitest em `apps/web/test/shared-ui-components.test.tsx` (17 testes cobrindo todas as variantes visuais, acessibilidade e interatividade).
+
+### Padronização e Internacionalização do Domínio em Inglês
+
+1. **Contratos Canônicos em `@bemviver/shared`**:
+   - Disponibilização de aliases e tipos de domínio em inglês (`User`, `Professional`, `Appointment`, `AbsenceReport`, `TIMEZONE`, etc.) mantendo retrocompatibilidade total com a base existente.
+2. **Glossário de Domínio Técnico**:
+   - Criação de `docs/domain-glossary-en.md` mapeando todos os termos de negócio (perfis, tipos de consulta, status, entidades) entre Português e Inglês.
+
+### Melhorias de UI/UX, Feedback Visual e Microinterações
+
+1. **Componente de Estado Vazio (`EmptyState`)**:
+   - Componente polido em `apps/web/src/shared/ui/empty-state/` com suporte a variantes (`dashed`, `card`, `inline`), ilustrações SVG e slots de ação, com acessibilidade `role="status"`.
+2. **Sistema de Notificações Toast (`ToastProvider` e `useToast()`)**:
+   - Contexto de feedback visual dinâmico com animação, suporte a tipos (`success`, `error`, `warning`, `info`), auto-dismiss e acessibilidade.
+3. **Acessibilidade e Microinterações**:
+   - Adicionada resposta tátil com escala suave em cliques (`active:scale-[0.98]`).
+   - Inclusão de skip link acessível no `AppShell` (`#conteudo-principal`) para usuários de leitores de tela e navegação por teclado.
+
+### Testes de Carga, Performance e Otimizações de Produção
+
+1. **Suite de Performance da API (`apps/api/test/performance.test.ts`)**:
+   - Testes automatizados com 30 requisições simultâneas para validar vazão, comportamento do pool de conexões e tempo de resposta sob concorrência.
+2. **Script de Benchmark de Carga (`apps/api/scripts/benchmark-load.ts`)**:
+   - Script executável via `npm run test:performance -w @bemviver/api` medindo percentis p50 (1.94ms), p95 (2.73ms), p99 (3.52ms) e vazão estimada (~486 req/s).
+3. **Otimizações no Frontend Next.js**:
+   - Habilitação de compressão gzip/brotli (`compress: true`) e desativação do cabeçalho `poweredByHeader` para reduzir payload e melhorar LCP.
+4. **Correção de Truncate no Banco**:
+   - Adicionado `CASCADE` ao `TRUNCATE` no `prisma/seed.ts` para suportar chaves estrangeiras da tabela `lista_espera`.
+
+### Pipeline de CI/CD com GitHub Actions
+
+1. **Workflow Automatizado (`.github/workflows/ci.yml`)**:
+   - Pipeline completa disparada em `push` e `pull_request` na branch `main`.
+   - Jobs isolados:
+     - **Lint & Typecheck**: ESLint e TypeScript em todos os workspaces.
+     - **Backend API & Performance**: Sobe containers de PostgreSQL 17, Redis 7 e Mailpit com healthcheck, aplica migrações e seed, roda suite de testes da API e benchmark de carga.
+     - **Frontend Tests & Build**: Executa testes unitários (Vitest), compilação do Next.js em modo produção e build do Storybook.
+     - **Continuous Deployment**: Job de entrega contínua após aprovação de todos os testes.
+2. **Compatibilização FSD com Next.js App Router**:
+   - Resolução de conflito entre App Router e o legacy Pages Router do Next.js: camada de páginas do FSD desacoplada em `apps/web/src/views/`, garantindo build de produção com 0 erros.
+
 ## Como usei IA
 
 - codificação
