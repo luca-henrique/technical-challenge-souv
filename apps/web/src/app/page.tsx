@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import LoginPage from '@/components/pages/LoginPage/loginPage'
+import { LoginPage } from '@/pages/login/ui/login-page'
 
 export const metadata: Metadata = {
   title: 'Login | Clínica Bem Viver',
