@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import RelatoriosPageView from '@/components/pages/RelatoriosPage/relatoriosPage'
+import { AbsenceReportView } from '@/views/reception/ui/absence-report-view'
 
 export const metadata: Metadata = {
   title: 'Relatório de Absenteísmo | Clínica Bem Viver',
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 }
 
 export default function RelatoriosPage() {
-  return <RelatoriosPageView />
+  return <AbsenceReportView />
 }

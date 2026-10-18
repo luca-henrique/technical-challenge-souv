@@ -287,6 +287,29 @@ A ordem estabelecida para as 10 funcionalidades é:
 5. **Cobertura de Testes Automatizados**:
    - Suite dedicada em `apps/web/test/doctor-features.test.tsx` (7 novos testes unitários).
 
+### Refatoração da Área da Recepção e Relatórios (pattern-front.md & FSD Estrito)
+
+1. **Separação Rígida de Responsabilidades**:
+   - **Slice `reception-agenda`**:
+     - Schema Zod (`reception-agenda.schema.ts`): validação de filtros de profissional e data no formato `AAAA-MM-DD`.
+     - Custom Hook (`use-reception-agenda.ts`): queries de profissionais com base na data para disponibilidade e auto-seleção inicial.
+     - Molécula `ReceptionFilterBar` com touch targets $\ge 44px$ (`min-h-11`).
+     - Organismo `ReceptionAgendaBoard` coordenando skeleton com acessibilidade, empty state e agenda do dia.
+     - View `ReceptionDashboardView` desacoplada da rota Next.js.
+   - **Slice `absence-report`**:
+     - Schema Zod (`absence-report.schema.ts`): validação de filtros de intervalo de datas e profissional médico.
+     - Custom Hook (`use-absence-report.ts`): gerencia paginação com TanStack Query, filtros ativos e reset.
+     - Moléculas: `ReportFilterBar`, `ReportMetricsGrid` (com badge de taxa de absenteísmo) e `RepeatOffendersTable` (com paginação e empty state acessíveis).
+     - Organismo `AbsenceReportBoard` e View `AbsenceReportView`.
+2. **Teto Estrito de 120 Linhas por Arquivo**:
+   - 100% dos novos arquivos `.tsx` e `.ts` mantidos estritamente abaixo de 120 linhas.
+   - Eliminação da violação do arquivo legado `RelatoriosPage` (que possuía 160 linhas), delegando-o para `AbsenceReportView`.
+3. **Stories do Storybook**:
+   - Stories adicionadas para `reception-filter-bar` e `report-metrics-grid`.
+4. **Cobertura de Testes Automatizados**:
+   - Suite completa em `apps/web/test/reception-features.test.tsx` (6 testes unitários).
+   - Manutenção de 100% de compatibilidade regressiva nos testes de recepção e relatórios (`recepcao.test.tsx` e `feat-06-relatorio-faltas.test.tsx`).
+
 ## Como usei IA
 
 - codificação

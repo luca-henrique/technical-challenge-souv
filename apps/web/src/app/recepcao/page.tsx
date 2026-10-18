@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { ReceptionPage } from '@/views/reception/ui/reception-page'
+import { ReceptionDashboardView } from '@/views/reception/ui/reception-dashboard-view'
 
 export const metadata: Metadata = {
   title: 'Agenda da Recepção | Clínica Bem Viver',
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-  return <ReceptionPage />
+  return <ReceptionDashboardView />
 }
