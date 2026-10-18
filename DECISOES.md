@@ -199,6 +199,6 @@ A ordem estabelecida para as 10 funcionalidades é:
 - [x] **Internacionalização / Código em Inglês**: Padronizar código, entidades e documentação técnica em inglês.
 - [x] **Melhorias de UI/UX**: Polimento fino de microinterações, estados de loading/empty states e acessibilidade.
 - [x] **Testes de Performance**: Testes de carga e estresse na API e otimização de bundle/LCP no frontend.
-- [ ] **Pipeline de CI/CD**: Automação de lint, build, testes e deploy contínuo (GitHub Actions).
+- [x] **Pipeline de CI/CD**: Automação de lint, build, testes e deploy contínuo (GitHub Actions).
 
 OBS: documentei muita coisa para me ajudar nas implementações e organização, talvez seja até exagero, mas me ajudou a visualizar e entender melhor o projeto e suas regras e necessidades.

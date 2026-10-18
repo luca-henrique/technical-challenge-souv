@@ -3,6 +3,7 @@ import {
   diaUtil,
   DURACAO_MINUTOS,
   hojeEmRecife,
+  type TipoConsulta,
 } from '@bemviver/shared'
 import { instante, temConflito } from '../../../agenda'
 import { prisma } from '../../../infra/database'
@@ -123,7 +124,7 @@ export class RemarcarConsultaUseCase {
         pacienteId: atualizada.pacienteId,
         data: atualizada.data,
         hora: atualizada.hora,
-        tipo: atualizada.tipo as any,
+        tipo: atualizada.tipo as TipoConsulta,
         status: atualizada.status,
         inicio: atualizada.inicio,
         fim: atualizada.fim,

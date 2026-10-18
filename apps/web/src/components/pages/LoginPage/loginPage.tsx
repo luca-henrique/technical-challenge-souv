@@ -1,3 +1,3 @@
 'use client'
 
-export { LoginPage as default } from '@/pages/login/ui/login-page'
+export { LoginPage as default } from '@/views/login/ui/login-page'

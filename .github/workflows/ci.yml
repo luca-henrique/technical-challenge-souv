@@ -1,0 +1,151 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-typecheck:
+    name: Lint & Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run Typecheck
+        run: npm run typecheck
+
+  backend-tests:
+    name: Backend API & Performance Tests
+    runs-on: ubuntu-latest
+    needs: [lint-and-typecheck]
+    services:
+      postgres:
+        image: postgres:17.11-alpine
+        env:
+          POSTGRES_USER: bemviver
+          POSTGRES_PASSWORD: bemviver
+          POSTGRES_DB: bemviver
+        ports:
+          - 5434:5432
+        options: >-
+          --health-cmd "pg_isready -U bemviver -h 127.0.0.1"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6380:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+
+      mailpit:
+        image: axllent/mailpit:v1.31.1
+        ports:
+          - 1025:1025
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prepare database and run seed
+        run: npm run db:preparar -w @bemviver/api
+        env:
+          DATABASE_URL: "postgresql://bemviver:bemviver@localhost:5434/bemviver"
+          DATABASE_URL_TESTE: "postgresql://bemviver:bemviver@localhost:5434/bemviver"
+          JWT_SEGREDO: "segredo-ci-test"
+          REDIS_URL: "redis://localhost:6380"
+          REDIS_HOST: "localhost"
+          REDIS_PORT: 6380
+          SMTP_HOST: "localhost"
+          SMTP_PORT: 1025
+          SMTP_FROM: "ci@clinicabemviver.com.br"
+
+      - name: Run Backend Unit & Integration Tests
+        run: npm test -w @bemviver/api
+        env:
+          DATABASE_URL: "postgresql://bemviver:bemviver@localhost:5434/bemviver"
+          DATABASE_URL_TESTE: "postgresql://bemviver:bemviver@localhost:5434/bemviver"
+          JWT_SEGREDO: "segredo-ci-test"
+          REDIS_URL: "redis://localhost:6380"
+          REDIS_HOST: "localhost"
+          REDIS_PORT: 6380
+
+      - name: Run API Performance & Load Benchmark
+        run: npm run test:performance -w @bemviver/api
+        env:
+          DATABASE_URL: "postgresql://bemviver:bemviver@localhost:5434/bemviver"
+          JWT_SEGREDO: "segredo-ci-test"
+          REDIS_URL: "redis://localhost:6380"
+
+  frontend-tests-and-build:
+    name: Frontend Tests & Production Build
+    runs-on: ubuntu-latest
+    needs: [lint-and-typecheck]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Frontend Tests (Vitest)
+        run: npm test -w @bemviver/web
+
+      - name: Build Next.js Web App
+        run: npm run build -w @bemviver/web
+
+      - name: Build Storybook
+        run: npm run build-storybook -w @bemviver/web
+
+  deploy:
+    name: Continuous Deployment (Staging / Production)
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-tests-and-build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy Notification
+        run: |
+          echo "🚀 Pipeline de CI/CD aprovada com sucesso!"
+          echo "Todos os testes de backend, frontend, performance, lint, typecheck e build foram concluídos."

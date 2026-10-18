@@ -10,7 +10,6 @@ import type { IProfissionaisRepository } from '../repositories/profissionais.rep
 import { BloquearFolgaUseCase } from './bloquearFolga.usecase'
 import { BloquearPeriodoFolgaUseCase } from './bloquearPeriodoFolga.usecase'
 import { ListarEspecialidadesUseCase } from './listarEspecialidades.usecase'
-import { ListarHorariosDisponiveisUseCase } from './listarHorariosDisponiveis.usecase'
 import { ListarProfissionaisUseCase } from './listarProfissionais.usecase'
 import { ObterAgendaProfissionalUseCase } from './obterAgendaProfissional.usecase'
 

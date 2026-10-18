@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { ReceptionPage } from '@/pages/reception/ui/reception-page'
+import { ReceptionPage } from '@/views/reception/ui/reception-page'
 
 export const metadata: Metadata = {
   title: 'Agenda da Recepção | Clínica Bem Viver',
