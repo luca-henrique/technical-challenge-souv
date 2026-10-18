@@ -252,6 +252,22 @@ A ordem estabelecida para as 10 funcionalidades é:
 2. **Compatibilização FSD com Next.js App Router**:
    - Resolução de conflito entre App Router e o legacy Pages Router do Next.js: camada de páginas do FSD desacoplada em `apps/web/src/views/`, garantindo build de produção com 0 erros.
 
+### Refatoração da Área do Paciente (pattern-front.md & FSD Estrito)
+
+1. **Separação Rígida de Responsabilidades**:
+   - **Schema Zod** (`schedule-appointment.schema.ts`): validação declarativa de tipos, formato ISO 8601 com fuso horário e regras de negócio de agendamento.
+   - **Custom Hooks** (`use-patient-schedule.ts`, `use-patient-appointments.ts`): isolamento total de queries React Query, mutações e estados de formulário, sem acoplamento com JSX.
+   - **Componentes Puros de UI**: divisão atômica em moléculas (`SpecialtySelector`, `DoctorSelector`, `AppointmentDatePicker`, `ConsultationTypeSelector`, `TimeSlotGrid`, `AppointmentCard`, `CancelAppointmentModal`) e organismos (`PatientScheduleForm`, `PatientAppointmentsList`).
+2. **Teto Estrito de 120 Linhas por Arquivo**:
+   - Todos os arquivos `.tsx` e `.ts` mantidos estritamente abaixo de 120 linhas, garantindo alta coesão e facilidade de manutenção.
+3. **Acessibilidade e Usabilidade (WCAG)**:
+   - Touch targets mínimos de 44px (`min-h-11`) em todos os seletores e botões.
+   - Modais com foco retido (focus-trap), fechamento com tecla `Escape`, clique no backdrop e bloqueio de rolagem do body.
+4. **Stories do Storybook**:
+   - Criação de stories isoladas para as moléculas da área do paciente (`specialty-selector`, `doctor-selector`, `appointment-card`).
+5. **Cobertura de Testes Automatizados**:
+   - Nova suite de testes unitários em `apps/web/test/patient-features.test.tsx` cobrindo validações de schema, seletores, cards de consulta e modais acessíveis.
+
 ## Como usei IA
 
 - codificação

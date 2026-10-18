@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import MinhasConsultasPage from '@/components/pages/MinhasConsultasPage/minhasConsultasPage'
+import { PatientDashboardView } from '@/views/patient/ui/patient-dashboard-view'
 
 export const metadata: Metadata = {
   title: 'Minhas Consultas | Clínica Bem Viver',
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-  return <MinhasConsultasPage />
+  return <PatientDashboardView />
 }

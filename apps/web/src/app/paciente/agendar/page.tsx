@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import AgendarConsultaPage from '@/components/pages/AgendarConsultaPage/agendarConsultaPage'
+import { ScheduleAppointmentView } from '@/views/patient/ui/schedule-appointment-view'
 
 export const metadata: Metadata = {
   title: 'Agendar Consulta | Clínica Bem Viver',
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-  return <AgendarConsultaPage />
+  return <ScheduleAppointmentView />
 }
