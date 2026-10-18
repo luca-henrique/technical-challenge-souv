@@ -196,7 +196,7 @@ A ordem estabelecida para as 10 funcionalidades é:
 - [x] **Testes de Componentes**: Adicionar testes unitários e de integração nos componentes de UI (ex: React Testing Library / Vitest / Jest).
 - [x] **Storybook**: Documentação visual e desenvolvimento isolado de componentes.
 - [x] **Design System Tokens**: Definição completa e padronizada de tokens de design (espaçamentos, tipografia, paletas).
-- [ ] **Internacionalização / Código em Inglês**: Padronizar código, entidades e documentação técnica em inglês.
+- [x] **Internacionalização / Código em Inglês**: Padronizar código, entidades e documentação técnica em inglês.
 - [ ] **Melhorias de UI/UX**: Polimento fino de microinterações, estados de loading/empty states e acessibilidade.
 - [ ] **Testes de Performance**: Testes de carga e estresse na API e otimização de bundle/LCP no frontend.
 - [ ] **Pipeline de CI/CD**: Automação de lint, build, testes e deploy contínuo (GitHub Actions).

@@ -176,3 +176,32 @@ export function validarHorario(data: string, hora: string, tipo: TipoConsulta, a
   return null
 }
 
+// ==========================================
+// Canonical English Domain Mappings & Aliases
+// ==========================================
+export type UserRole = Perfil
+export type AppointmentType = TipoConsulta
+export type AppointmentStatus = StatusConsulta
+export type User = Usuario
+export type Professional = Profissional
+export type Patient = Paciente
+export type Appointment = Consulta
+export type DailySchedule = Agenda
+export type Pagination = Paginacao
+export type AbsenceReport = RelatorioFaltas
+export type WaitingListShift = TurnoListaEspera
+export type WaitingListStatus = StatusListaEspera
+export type WaitingListEntry = ItemListaEspera
+
+export const TIMEZONE = FUSO
+export const APPOINTMENT_DURATION = DURACAO_MINUTOS
+export const CLINIC_HOURS = EXPEDIENTE
+export const TIME_SLOTS = GRADE
+
+export const isBusinessDay = diaUtil
+export const isValidDate = dataValida
+export const getTodayInClinicTimezone = hojeEmRecife
+export const isAppointmentType = ehTipoConsulta
+export const validateAppointmentSlot = validarHorario
+
+
