@@ -18,6 +18,16 @@ Documentação técnica aprofundada de cada regra de negócio do sistema, com ma
 - **[RN06: Perfis de Acesso e Permissões RBAC](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN06-perfis-e-permissoes-rbac.md)**
 - **[RN07: Bloqueio de Folgas do Profissional](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN07-bloqueio-de-folgas.md)**
 - **[RN08: Registro de Faltas e Restrições Operacionais](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN08-registro-de-faltas-e-restricoes.md)**
+- **[RN09: Confirmação de Presença pelo Paciente](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN09-confirmacao-presenca-paciente.md)**
+- **[RN10: Remarcação de Consultas](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN10-remarcacao-de-consultas.md)**
+- **[RN11: Lista de Espera para Vagas Liberadas](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN11-lista-de-espera-vagas-liberadas.md)**
+- **[RN12: Bloqueio de Agenda por Período](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN12-bloqueio-agenda-por-periodo.md)**
+- **[RN13: Relatório de Faltas e Métricas de Absenteísmo](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN13-relatorio-faltas-e-absenteismo.md)**
+- **[RN14: Lembrete Automático de Consultas 24 Horas Antes](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN14-lembrete-automatico-consultas.md)**
+- **[RN15: Histórico de Consultas e Linha do Tempo](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN15-historico-consultas-paciente.md)**
+- **[RN16: Busca e Filtragem por Especialidade](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN16-busca-profissionais-por-especialidade.md)**
+- **[RN17: Exportação de Relatórios e Contingência em PDF](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN17-exportacao-agenda-pdf.md)**
+- **[RN18: Concorrência Atômica e Prevenção de Race Conditions](file:///Users/lucas1/Desktop/projects/technical-challenge-souv/docs/regras-de-negocio/RN18-concorrencia-atomica-agendamentos.md)**
 
 ---
 
