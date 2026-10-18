@@ -26,13 +26,7 @@ export default function MarcarConsulta({
   const data = propData ?? context?.data ?? ''
 
   const { data: pacientes = [], isLoading: carregandoPacientes, error: erroPacientes } = usePacientes()
-
-  // Se já estiver dentro de um AgendaContext, reutiliza a mutation do context evitando re-execuções.
-  const fallbackAgenda = useAgenda(
-    context ? '' : profissionalId,
-    context ? '' : data,
-  )
-
+  const fallbackAgenda = useAgenda(context ? '' : profissionalId, context ? '' : data)
   const agendarConsulta = context?.agendarConsulta ?? fallbackAgenda.agendarConsulta
   const agendando = context?.agendando ?? fallbackAgenda.agendando
 
@@ -47,11 +41,7 @@ export default function MarcarConsulta({
     formState: { errors },
   } = useForm<DadosAgendarConsulta>({
     resolver: zodResolver(agendarConsultaSchema),
-    defaultValues: {
-      pacienteId: '',
-      tipo: 'primeira',
-      hora: GRADE[0],
-    },
+    defaultValues: { pacienteId: '', tipo: 'primeira', hora: GRADE[0] },
   })
 
   const formTipo = useWatch({ control, name: 'tipo' })
@@ -61,19 +51,9 @@ export default function MarcarConsulta({
     setMensagemSucesso('')
     setErroMutacao('')
     try {
-      await agendarConsulta({
-        profissionalId,
-        data,
-        pacienteId: valores.pacienteId,
-        tipo: valores.tipo,
-        hora: valores.hora,
-      })
+      await agendarConsulta({ profissionalId, data, pacienteId: valores.pacienteId, tipo: valores.tipo, hora: valores.hora })
       setMensagemSucesso('Consulta marcada com sucesso.')
-      reset({
-        pacienteId: '',
-        tipo: 'primeira',
-        hora: GRADE[0],
-      })
+      reset({ pacienteId: '', tipo: 'primeira', hora: GRADE[0] })
       onMarcada?.()
     } catch (e) {
       setErroMutacao((e as Error).message)
@@ -85,18 +65,10 @@ export default function MarcarConsulta({
       <form onSubmit={onSubmit} noValidate className="space-y-3">
         <h2 className="text-lg font-semibold">Marcar consulta</h2>
         <Field label="Paciente" erro={errors.pacienteId?.message}>
-          <Select
-            {...register('pacienteId')}
-            aria-invalid={Boolean(errors.pacienteId)}
-            disabled={carregandoPacientes}
-          >
-            <option value="">
-              {carregandoPacientes ? 'Carregando pacientes...' : 'Selecione'}
-            </option>
+          <Select {...register('pacienteId')} aria-invalid={Boolean(errors.pacienteId)} disabled={carregandoPacientes}>
+            <option value="">{carregandoPacientes ? 'Carregando pacientes...' : 'Selecione'}</option>
             {pacientes.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.nome}
-              </option>
+              <option key={p.id} value={p.id}>{p.nome}</option>
             ))}
           </Select>
         </Field>
@@ -109,20 +81,14 @@ export default function MarcarConsulta({
         <Field label="Horário" erro={errors.hora?.message}>
           <Select {...register('hora')} aria-invalid={Boolean(errors.hora)}>
             {gradeDisponivel.map((h) => (
-              <option key={h} value={h}>
-                {h}
-              </option>
+              <option key={h} value={h}>{h}</option>
             ))}
           </Select>
         </Field>
         <Button type="submit" disabled={agendando} className="w-full">
           {agendando ? 'Marcando...' : 'Marcar'}
         </Button>
-        {mensagemSucesso && (
-          <p role="status" className="text-sm text-teal-700">
-            {mensagemSucesso}
-          </p>
-        )}
+        {mensagemSucesso && <p role="status" className="text-sm text-teal-700">{mensagemSucesso}</p>}
         {erroMutacao && <Alert>{erroMutacao}</Alert>}
         {erroPacientes && <Alert>{erroPacientes.message}</Alert>}
       </form>

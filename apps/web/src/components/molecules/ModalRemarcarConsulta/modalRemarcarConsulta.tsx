@@ -23,28 +23,19 @@ export default function ModalRemarcarConsulta({
 }: ModalRemarcarConsultaProps) {
   const [erroMutacao, setErroMutacao] = useState('')
 
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<DadosRemarcarConsultaForm>({
+  const { control, handleSubmit, setValue, formState: { errors } } = useForm<DadosRemarcarConsultaForm>({
     resolver: zodResolver(remarcarConsultaSchema),
-    defaultValues: {
-      novaData: '',
-      novaHora: '',
-    },
+    defaultValues: { novaData: '', novaHora: '' },
   })
 
   const formNovaData = useWatch({ control, name: 'novaData' })
   const formNovaHora = useWatch({ control, name: 'novaHora' })
 
-  const {
-    data: horarios = [],
-    isLoading: carregandoHorarios,
-    error: erroHorarios,
-  } = useHorarios(consulta.profissionalId, formNovaData, consulta.tipo)
-
+  const { data: horarios = [], isLoading: carregandoHorarios, error: erroHorarios } = useHorarios(
+    consulta.profissionalId,
+    formNovaData,
+    consulta.tipo,
+  )
   const { mutateAsync: remarcar, isPending: remarcando } = useRemarcarConsulta()
 
   if (!aberto) return null
@@ -52,11 +43,7 @@ export default function ModalRemarcarConsulta({
   const onSubmit = handleSubmit(async (valores) => {
     setErroMutacao('')
     try {
-      await remarcar({
-        id: consulta.id,
-        novaData: valores.novaData,
-        novaHora: valores.novaHora,
-      })
+      await remarcar({ id: consulta.id, novaData: valores.novaData, novaHora: valores.novaHora })
       if (onSucesso) onSucesso()
       onFechar()
     } catch (e) {
@@ -74,10 +61,8 @@ export default function ModalRemarcarConsulta({
       />
       <Modal.Body>
         <p className="text-xs text-gray-600 dark:text-gray-300">
-          Horário atual: <strong>{formatarData(consulta.data)} às {consulta.hora}</strong>.
-          Selecione a nova data e o horário desejado:
+          Horário atual: <strong>{formatarData(consulta.data)} às {consulta.hora}</strong>. Selecione a nova data e horário:
         </p>
-
         <form onSubmit={onSubmit} className="space-y-4">
           <Controller
             name="novaData"
@@ -107,9 +92,7 @@ export default function ModalRemarcarConsulta({
             />
           )}
 
-          {(erroMutacao || erroHorarios?.message) && (
-            <Alert>{erroMutacao || erroHorarios?.message}</Alert>
-          )}
+          {(erroMutacao || erroHorarios?.message) && <Alert>{erroMutacao || erroHorarios?.message}</Alert>}
 
           <Modal.Footer>
             <Button type="button" variante="secundario" onClick={onFechar} disabled={remarcando}>

@@ -1,26 +1,13 @@
 'use client'
 
-import PageHeader from '@/components/molecules/PageHeader/pageHeader'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-import { Controller, useForm, useWatch } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { diaUtil, hojeEmRecife } from '@bemviver/shared'
+import { diaUtil } from '@bemviver/shared'
 import Alert from '@/components/atoms/Alert/alert'
 import Button from '@/components/atoms/Button/button'
 import Card from '@/components/atoms/Card/card'
-import CardEntrarListaEspera from '@/components/molecules/CardEntrarListaEspera/cardEntrarListaEspera'
-import SecaoHorario from '@/components/molecules/SecaoHorario/secaoHorario'
-import SeletorData from '@/components/molecules/SeletorData/seletorData'
-import SeletorEspecialidade from '@/components/molecules/SeletorEspecialidade/seletorEspecialidade'
-import SeletorProfissional from '@/components/molecules/SeletorProfissional/seletorProfissional'
-import SeletorTipoConsulta from '@/components/molecules/SeletorTipoConsulta/seletorTipoConsulta'
-import { useAgendarConsulta } from '@/hooks/useAgendarConsulta'
-import { useEspecialidades } from '@/hooks/useEspecialidades'
-import { useHorarios } from '@/hooks/useHorarios'
-import { useProfissionais } from '@/hooks/useProfissionais'
-import { agendarConsultaPacienteSchema, type DadosAgendarConsultaPaciente } from './schema'
+import PageHeader from '@/components/molecules/PageHeader/pageHeader'
+import { AgendarConsultaFields } from './agendar-consulta-fields'
+import { useAgendarConsultaForm } from './use-agendar-consulta-form'
 import type { AgendarConsultaProps } from './types'
 
 export default function AgendarConsulta({
@@ -28,71 +15,7 @@ export default function AgendarConsulta({
   onSucesso,
   opcoesTipoConsulta,
 }: AgendarConsultaProps) {
-  const router = useRouter()
-  const [erroMutacao, setErroMutacao] = useState('')
-
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<DadosAgendarConsultaPaciente>({
-    resolver: zodResolver(agendarConsultaPacienteSchema),
-    mode: 'onChange',
-    defaultValues: {
-      profissionalId: '',
-      data: '',
-      tipo: 'primeira',
-      hora: '',
-    },
-  })
-
-  const [especialidadeFiltro, setEspecialidadeFiltro] = useState('')
-  const { data: especialidades = [] } = useEspecialidades()
-
-  const formProfissionalId = useWatch({ control, name: 'profissionalId' })
-  const formData = useWatch({ control, name: 'data' })
-  const formTipo = useWatch({ control, name: 'tipo' })
-  const formHora = useWatch({ control, name: 'hora' })
-
-  const {
-    data: profissionais = [],
-    isLoading: carregandoProfissionais,
-    error: erroProfissionais,
-  } = useProfissionais({
-    ...(formData ? { data: formData } : {}),
-    ...(especialidadeFiltro ? { especialidade: especialidadeFiltro } : {}),
-  })
-
-  const {
-    data: horarios = [],
-    isLoading: carregandoHorarios,
-    error: erroHorarios,
-  } = useHorarios(formProfissionalId, formData, formTipo)
-
-  const { mutateAsync: agendar, isPending: enviando } = useAgendarConsulta()
-
-  const onSubmit = handleSubmit(async (valores) => {
-    setErroMutacao('')
-    try {
-      await agendar({
-        profissionalId: valores.profissionalId,
-        data: valores.data,
-        hora: valores.hora,
-        tipo: valores.tipo,
-      })
-      if (onSucesso) {
-        onSucesso()
-      } else {
-        router.push('/paciente')
-      }
-    } catch (e) {
-      setErroMutacao((e as Error).message)
-      setValue('hora', '', { shouldValidate: true })
-    }
-  })
-
-  const erroGeral = erroMutacao || erroProfissionais?.message || erroHorarios?.message
+  const form = useAgendarConsultaForm(onSucesso)
 
   return (
     <div className={`mx-auto max-w-md space-y-4 ${className}`}>
@@ -104,97 +27,33 @@ export default function AgendarConsulta({
           </Link>
         }
       />
-
       <Card className="space-y-4">
-        <form onSubmit={onSubmit} noValidate className="space-y-4">
-          {especialidades.length > 0 && (
-            <SeletorEspecialidade
-              especialidades={especialidades}
-              valor={especialidadeFiltro}
-              onChange={(novaEsp) => {
-                setEspecialidadeFiltro(novaEsp)
-                setValue('profissionalId', '', { shouldValidate: true })
-                setValue('hora', '', { shouldValidate: true })
-              }}
-            />
-          )}
-
-          <Controller
-            name="profissionalId"
-            control={control}
-            render={({ field }) => (
-              <SeletorProfissional
-                profissionais={profissionais}
-                valor={field.value}
-                permitirVazio
-                onChange={(id) => {
-                  field.onChange(id)
-                  setValue('hora', '', { shouldValidate: true })
-                }}
-                erro={errors.profissionalId?.message}
-              />
-            )}
+        <form onSubmit={form.onSubmit} noValidate className="space-y-4">
+          <AgendarConsultaFields
+            control={form.control}
+            setValue={form.setValue}
+            errors={form.errors}
+            especialidades={form.especialidades}
+            especialidadeFiltro={form.especialidadeFiltro}
+            setEspecialidadeFiltro={form.setEspecialidadeFiltro}
+            profissionais={form.profissionais}
+            opcoesTipoConsulta={opcoesTipoConsulta}
+            formProfissionalId={form.formProfissionalId}
+            formData={form.formData}
+            formTipo={form.formTipo}
+            formHora={form.formHora}
+            horarios={form.horarios}
+            carregandoHorarios={form.carregandoHorarios}
           />
 
-          <Controller
-            name="data"
-            control={control}
-            render={({ field }) => (
-              <SeletorData
-                min={hojeEmRecife()}
-                valor={field.value}
-                onChange={(novaData) => {
-                  field.onChange(novaData)
-                  setValue('hora', '', { shouldValidate: true })
-                }}
-                erro={errors.data?.message}
-              />
-            )}
-          />
-
-          <Controller
-            name="tipo"
-            control={control}
-            render={({ field }) => (
-              <SeletorTipoConsulta
-                opcoes={opcoesTipoConsulta}
-                valor={field.value}
-                onChange={(novoTipo) => {
-                  field.onChange(novoTipo)
-                  setValue('hora', '', { shouldValidate: true })
-                }}
-                erro={errors.tipo?.message}
-              />
-            )}
-          />
-
-          {formProfissionalId && formData && diaUtil(formData) && (
-            <SecaoHorario
-              horarios={horarios}
-              selecionado={formHora}
-              carregando={carregandoHorarios}
-              erro={errors.hora?.message}
-              onSelecionar={(horaEscolhida) => {
-                setValue('hora', horaEscolhida, { shouldValidate: true })
-              }}
-              slotVazio={
-                <CardEntrarListaEspera
-                  profissionalId={formProfissionalId}
-                  data={formData}
-                  tipo={formTipo}
-                />
-              }
-            />
-          )}
-
-          {erroGeral && <Alert>{erroGeral}</Alert>}
+          {form.erroGeral && <Alert>{form.erroGeral}</Alert>}
 
           <Button
             type="submit"
-            disabled={!formHora || enviando || carregandoProfissionais || (Boolean(formData) && !diaUtil(formData))}
+            disabled={!form.formHora || form.enviando || form.carregandoProfissionais || (Boolean(form.formData) && !diaUtil(form.formData))}
             className="w-full"
           >
-            {enviando ? 'Marcando...' : 'Confirmar consulta'}
+            {form.enviando ? 'Marcando...' : 'Confirmar consulta'}
           </Button>
         </form>
       </Card>
