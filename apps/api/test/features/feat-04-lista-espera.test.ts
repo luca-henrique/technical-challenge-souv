@@ -2,7 +2,7 @@ import request from 'supertest'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { app } from '../../src/app'
 import { prisma } from '../../src/prisma'
-import { criarUsuario, proximaSegunda } from '../ajuda'
+import { criarUsuario, proximaSegunda, somarDias } from '../ajuda'
 
 describe('FEAT-04: Lista de espera para horários que forem liberados (API)', () => {
   let profissional: Awaited<ReturnType<typeof criarUsuario>>
@@ -90,7 +90,7 @@ describe('FEAT-04: Lista de espera para horários que forem liberados (API)', ()
       .set('Authorization', paciente.auth)
       .send({
         profissionalId: profissional.id,
-        data: '2026-10-17', // Sábado
+        data: somarDias(proximaSegunda(), 5), // Sábado futuro
         tipo: 'primeira',
       })
 

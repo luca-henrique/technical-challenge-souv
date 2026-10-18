@@ -9,6 +9,7 @@
     "db:preparar": "prisma migrate deploy && tsx --env-file=.env prisma/seed.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:performance": "tsx --env-file=.env scripts/benchmark-load.ts",
     "studio": "prisma studio --port 5555"
   },
   "dependencies": {

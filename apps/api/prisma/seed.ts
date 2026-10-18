@@ -76,7 +76,7 @@ const PACIENTES = [
 ]
 
 async function main() {
-  await prisma.$executeRaw`TRUNCATE consultas, folgas, profissionais, usuarios`
+  await prisma.$executeRaw`TRUNCATE lista_espera, consultas, folgas, profissionais, usuarios CASCADE`
 
   const usuarios: Prisma.UsuarioCreateManyInput[] = [
     { nome: 'Fernanda Souza', email: 'recepcao@bemviver.com.br', senhaHash: gerarHashSenha(SENHA), perfil: 'recepcao' },
